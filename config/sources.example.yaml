@@ -1,0 +1,21 @@
+version: 1
+raw_root_env: CHICAGO_RAW_DIR
+
+sources:
+  food_inspections:
+    file: food_inspections.csv
+    format: csv
+    columns_file: food_columns.json
+  business_licenses:
+    file: business_licenses.csv
+    format: csv
+    columns_file: license_columns.json
+  community_areas:
+    file: community_areas.geojson
+    format: geojson
+    columns_file: area_columns.json
+
+integrity:
+  root: metadata/source_catalog/verification
+  manifest_file: download_manifest.csv
+  checksum_suffix: '.sha256'

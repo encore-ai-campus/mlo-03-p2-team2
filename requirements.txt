@@ -1,0 +1,2 @@
+# Planning scaffold. Pin approved dependencies during implementation.
+# See docs/00_project_plan.md for the proposed stack.
