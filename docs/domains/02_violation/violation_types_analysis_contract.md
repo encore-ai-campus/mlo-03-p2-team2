@@ -13,4 +13,4 @@
 
 ## 실행 결과와 변경 기록
 
-[최신 원천 재실행 결과](02_violation_types.md)와 단계별 변경 기록은 `docs/domains/02_violation/`에 둡니다.
+[최신 원천 재실행 결과](violation_types_analysis_results.md)와 단계별 변경 기록은 `docs/domains/02_violation/`에 둡니다.
