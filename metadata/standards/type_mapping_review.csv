@@ -1,0 +1,66 @@
+﻿source_dataset,source_column,source_declared_or_shape,bronze_type,current_silver_recommendation,team_silver_type,comparison,required_validation
+food_inspections,Inspection ID,number,string,string (키),string,개념 일치,원문·NULL 처리 확인
+food_inspections,DBA Name,text,string,string (검토 필요),string,개념 일치,원문·NULL 처리 확인
+food_inspections,AKA Name,text,string,string (검토 필요),string,개념 일치,원문·NULL 처리 확인
+food_inspections,License #,number,string,string (키),string,개념 일치,원문·NULL 처리 확인
+food_inspections,Facility Type,text,string,string (검토 필요),string,개념 일치,원문·NULL 처리 확인
+food_inspections,Risk,text,string,string (검토 필요),string,개념 일치,원문·NULL 처리 확인
+food_inspections,Address,text,string,string (검토 필요),string,개념 일치,원문·NULL 처리 확인
+food_inspections,City,text,string,string (검토 필요),string,개념 일치,원문·NULL 처리 확인
+food_inspections,State,text,string,string (검토 필요),string,개념 일치,원문·NULL 처리 확인
+food_inspections,Zip,number,string,string,string,개념 일치,원문·NULL 처리 확인
+food_inspections,Inspection Date,calendar_date,string,date (예외 검증 후),date32,"방향 일치, 저장형 미확정",특이 연도와 Pandas 호환성 확인
+food_inspections,Inspection Type,text,string,string (검토 필요),string,개념 일치,원문·NULL 처리 확인
+food_inspections,Results,text,string,string (검토 필요),string,개념 일치,원문·NULL 처리 확인
+food_inspections,Violations,text,string,string (검토 필요),string,개념 일치,원문·NULL 처리 확인
+food_inspections,Latitude,number,string,decimal (원본값 병행 보존),float64,정밀도 선택 차이,float64 오차와 원본값 병행 보존 확인
+food_inspections,Longitude,number,string,decimal (원본값 병행 보존),float64,정밀도 선택 차이,float64 오차와 원본값 병행 보존 확인
+food_inspections,Location,point,string,string (검토 필요),string,개념 일치,원문·NULL 처리 확인
+business_licenses,ID,text,string,string (키),string,개념 일치,원문·NULL 처리 확인
+business_licenses,LICENSE ID,number,string,string (키),string,개념 일치,원문·NULL 처리 확인
+business_licenses,ACCOUNT NUMBER,number,string,string (키),string,개념 일치,원문·NULL 처리 확인
+business_licenses,SITE NUMBER,number,string,string (키),string,개념 일치,원문·NULL 처리 확인
+business_licenses,LEGAL NAME,text,string,string (검토 필요),string,개념 일치,원문·NULL 처리 확인
+business_licenses,DOING BUSINESS AS NAME,text,string,string (검토 필요),string,개념 일치,원문·NULL 처리 확인
+business_licenses,ADDRESS,text,string,string (검토 필요),string,개념 일치,원문·NULL 처리 확인
+business_licenses,CITY,text,string,string (검토 필요),string,개념 일치,원문·NULL 처리 확인
+business_licenses,STATE,text,string,string (검토 필요),string,개념 일치,원문·NULL 처리 확인
+business_licenses,ZIP CODE,text,string,string,string,개념 일치,원문·NULL 처리 확인
+business_licenses,WARD,number,string,string (검토 필요),int64,문자열 권장안과 차이,숫자 변환 실패·범위·코드 의미 확인
+business_licenses,PRECINCT,number,string,string (검토 필요),int64,문자열 권장안과 차이,숫자 변환 실패·범위·코드 의미 확인
+business_licenses,WARD PRECINCT,text,string,string (검토 필요),string,개념 일치,원문·NULL 처리 확인
+business_licenses,POLICE DISTRICT,number,string,string (검토 필요),int64,문자열 권장안과 차이,숫자 변환 실패·범위·코드 의미 확인
+business_licenses,COMMUNITY AREA,number,string,string (검토 필요),int64,문자열 권장안과 차이,숫자 변환 실패·범위·코드 의미 확인
+business_licenses,COMMUNITY AREA NAME,text,string,string (검토 필요),string,개념 일치,원문·NULL 처리 확인
+business_licenses,NEIGHBORHOOD,text,string,string (검토 필요),string,개념 일치,원문·NULL 처리 확인
+business_licenses,LICENSE CODE,number,string,string (검토 필요),string,개념 일치,원문·NULL 처리 확인
+business_licenses,LICENSE DESCRIPTION,text,string,string (검토 필요),string,개념 일치,원문·NULL 처리 확인
+business_licenses,BUSINESS ACTIVITY ID,text,string,string (검토 필요),string,개념 일치,원문·NULL 처리 확인
+business_licenses,BUSINESS ACTIVITY,text,string,string (검토 필요),string,개념 일치,원문·NULL 처리 확인
+business_licenses,LICENSE NUMBER,number,string,string (키),string,개념 일치,원문·NULL 처리 확인
+business_licenses,APPLICATION TYPE,text,string,string (검토 필요),string,개념 일치,원문·NULL 처리 확인
+business_licenses,APPLICATION CREATED DATE,calendar_date,string,date (예외 검증 후),date32,"방향 일치, 저장형 미확정",특이 연도와 Pandas 호환성 확인
+business_licenses,APPLICATION REQUIREMENTS COMPLETE,calendar_date,string,string (검토 필요),date32,별도 설계 필요,의미·저장형 합의
+business_licenses,PAYMENT DATE,calendar_date,string,date (예외 검증 후),date32,"방향 일치, 저장형 미확정",특이 연도와 Pandas 호환성 확인
+business_licenses,CONDITIONAL APPROVAL,text,string,string (검토 필요),string,개념 일치,원문·NULL 처리 확인
+business_licenses,LICENSE TERM START DATE,calendar_date,string,date (예외 검증 후),date32,"방향 일치, 저장형 미확정",특이 연도와 Pandas 호환성 확인
+business_licenses,LICENSE TERM EXPIRATION DATE,calendar_date,string,date (예외 검증 후),date32,"방향 일치, 저장형 미확정",특이 연도와 Pandas 호환성 확인
+business_licenses,LICENSE APPROVED FOR ISSUANCE,calendar_date,string,string (검토 필요),date32,별도 설계 필요,의미·저장형 합의
+business_licenses,DATE ISSUED,calendar_date,string,date (예외 검증 후),date32,"방향 일치, 저장형 미확정",특이 연도와 Pandas 호환성 확인
+business_licenses,LICENSE STATUS,text,string,string (검토 필요),string,개념 일치,원문·NULL 처리 확인
+business_licenses,LICENSE STATUS CHANGE DATE,calendar_date,string,date (예외 검증 후),date32,"방향 일치, 저장형 미확정",특이 연도와 Pandas 호환성 확인
+business_licenses,SSA,text,string,string (검토 필요),string,개념 일치,원문·NULL 처리 확인
+business_licenses,LATITUDE,number,string,decimal (원본값 병행 보존),float64,정밀도 선택 차이,float64 오차와 원본값 병행 보존 확인
+business_licenses,LONGITUDE,number,string,decimal (원본값 병행 보존),float64,정밀도 선택 차이,float64 오차와 원본값 병행 보존 확인
+business_licenses,LOCATION,point,string,string (검토 필요),string,개념 일치,원문·NULL 처리 확인
+community_areas,type,GeoJSON string,string,string (검토 필요),string,개념 일치,원문·NULL 처리 확인
+community_areas,geometry,multipolygon,string,geometry/GeoJSON (검토 필요),GeoJSON object,별도 설계 필요,의미·저장형 합의
+community_areas,:id,—,string,string (검토 필요),string,개념 일치,원문·NULL 처리 확인
+community_areas,:version,—,string,string (검토 필요),string,개념 일치,원문·NULL 처리 확인
+community_areas,:created_at,—,string,string (검토 필요),"timestamp[ms, UTC]",시간대 변환 검토,UTC 밀리초 보존 확인
+community_areas,:updated_at,—,string,date (예외 검증 후),"timestamp[ms, UTC]",시간대 변환 검토,UTC 밀리초 보존 확인
+community_areas,area_numbe,`number`,string,string (키),int64,문자열 권장안과 차이,숫자 변환 실패·범위·코드 의미 확인
+community_areas,community,`text`,string,string (검토 필요),string,개념 일치,원문·NULL 처리 확인
+community_areas,area_num_1,`text`,string,string (키),string,개념 일치,원문·NULL 처리 확인
+community_areas,shape_area,`number`,string,decimal (원본값 병행 보존),float64,정밀도 선택 차이,float64 오차와 원본값 병행 보존 확인
+community_areas,shape_len,`number`,string,decimal (원본값 병행 보존),float64,정밀도 선택 차이,float64 오차와 원본값 병행 보존 확인
