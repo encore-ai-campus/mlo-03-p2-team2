@@ -1,3 +1,3 @@
 source_file,source_column,target_file,transformation,affected_rows,status
-data/01_bronze/food_inspections/food_inspections.parquet,Violations,data/02_silver/food_inspections/violations/inspection_violations_accepted.parquet,Split fragments; accept complete PARSED records,1029015,APPLIED
-data/01_bronze/food_inspections/food_inspections.parquet,Violations,data/quarantine/food_inspections/violations/inspection_violations_quarantine.parquet,Preserve incomplete or invalid fragments with reason,1791,APPLIED
+data/01_bronze/food_inspections/food_inspections.parquet,Violations,data/02_silver/food_inspections/violations/inspection_violations_accepted.parquet,Split fragments; accept complete PARSED records,1029281,APPLIED
+data/01_bronze/food_inspections/food_inspections.parquet,Violations,data/quarantine/food_inspections/violations/inspection_violations_quarantine.parquet,Preserve incomplete or invalid fragments with reason,1792,APPLIED

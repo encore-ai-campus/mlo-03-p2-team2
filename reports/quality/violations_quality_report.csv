@@ -1,27 +1,27 @@
 ﻿quality_rule,target_column,checked_rows,issue_rows,status,note
-bronze_silver_record_reconciliation,Violations,1030806,0,PASS,Bronze candidates=1030806; Silver rows=1030806; missing=0; extra=0.
-blank_source_cells_excluded,Violations,90000,0,PASS,NULL=0; empty=90000; whitespace-only=0; blank cells must create no Silver row.
-unexpected_parsing_status,parsing_status,1030806,0,PASS,"{""MISSING_COMMENTS_MARKER"": 1791, ""PARSED"": 1029015}"
-violation_code_extraction,violation_code,1030806,0,PASS,Bronze code header failures=0; Silver NULL code=0.
-description_extraction,violation_description,1030806,0,PASS,Description NULL is expected only for MISSING_COMMENTS_MARKER; intended count=1791.
-comments_extraction,violation_comments,1030806,0,PASS,Comments NULL is expected only for MISSING_COMMENTS_MARKER; intended count=1791.
-parsing_status_matches_source,parsing_status,1030806,0,PASS,"Expected status counts={'MISSING_COMMENTS_MARKER': 1791, 'PARSED': 1029015}; fields were independently re-parsed from the Bronze fragment."
-missing_comments_marker_status,parsing_status,1791,0,PASS,Comments boundary is not inferred when its marker is absent.
-violation_code_nonnull,violation_code,1030806,0,PASS,Distinct Silver codes=65.
-violation_code_format,violation_code,1030806,0,PASS,Accepted format: digits with optional uppercase suffix; code remains a string.
+bronze_silver_record_reconciliation,Violations,1031073,0,PASS,Bronze candidates=1031073; Silver rows=1031073; missing=0; extra=0.
+blank_source_cells_excluded,Violations,90022,0,PASS,NULL=0; empty=90022; whitespace-only=0; blank cells must create no Silver row.
+unexpected_parsing_status,parsing_status,1031073,0,PASS,"{""MISSING_COMMENTS_MARKER"": 1792, ""PARSED"": 1029281}"
+violation_code_extraction,violation_code,1031073,0,PASS,Bronze code header failures=0; Silver NULL code=0.
+description_extraction,violation_description,1031073,0,PASS,Description NULL is expected only for MISSING_COMMENTS_MARKER; intended count=1792.
+comments_extraction,violation_comments,1031073,0,PASS,Comments NULL is expected only for MISSING_COMMENTS_MARKER; intended count=1792.
+parsing_status_matches_source,parsing_status,1031073,0,PASS,"Expected status counts={'MISSING_COMMENTS_MARKER': 1792, 'PARSED': 1029281}; fields were independently re-parsed from the Bronze fragment."
+missing_comments_marker_status,parsing_status,1792,0,PASS,Comments boundary is not inferred when its marker is absent.
+violation_code_nonnull,violation_code,1031073,0,PASS,Distinct Silver codes=65.
+violation_code_format,violation_code,1031073,0,PASS,Accepted format: digits with optional uppercase suffix; code remains a string.
 bronze_silver_code_set_match,violation_code,65,0,PASS,Bronze distinct=65; Silver distinct=65; symmetric difference=[].
-bronze_lineage_and_fragment_match,bronze_row_number/item_sequence_num/inspection_id/source_violations_fragment,1030806,0,PASS,"Compared every Silver record in order with its Bronze row, source ID, lineage columns, and raw fragment."
-silver_grain_key_unique,bronze_row_number + item_sequence_num,1030806,0,PASS,Grain key identifies one violation fragment within its Bronze inspection row; repeated codes are allowed.
-column_null_count,inspection_id,1030806,0,PASS,Observed NULL=0; expected NULL=0.
-column_null_count,bronze_row_number,1030806,0,PASS,Observed NULL=0; expected NULL=0.
-column_null_count,item_sequence_num,1030806,0,PASS,Observed NULL=0; expected NULL=0.
-column_null_count,_SRC_FILE,1030806,0,PASS,Observed NULL=0; expected NULL=0.
-column_null_count,_LOAD_DTM,1030806,0,PASS,Observed NULL=0; expected NULL=0.
-column_null_count,source_violations_fragment,1030806,0,PASS,Observed NULL=0; expected NULL=0.
-column_null_count,violation_code,1030806,0,PASS,Observed NULL=0; expected NULL=0.
-column_null_count,violation_description,1030806,0,PASS,Observed NULL=1791; expected NULL=1791. NULL is intentional only for MISSING_COMMENTS_MARKER records.
-column_null_count,violation_comments,1030806,0,PASS,Observed NULL=1791; expected NULL=1791. NULL is intentional only for MISSING_COMMENTS_MARKER records.
-column_null_count,parsing_status,1030806,0,PASS,Observed NULL=0; expected NULL=0.
+bronze_lineage_and_fragment_match,bronze_row_number/item_sequence_num/inspection_id/source_violations_fragment,1031073,0,PASS,"Compared every Silver record in order with its Bronze row, source ID, lineage columns, and raw fragment."
+silver_grain_key_unique,bronze_row_number + item_sequence_num,1031073,0,PASS,Grain key identifies one violation fragment within its Bronze inspection row; repeated codes are allowed.
+column_null_count,inspection_id,1031073,0,PASS,Observed NULL=0; expected NULL=0.
+column_null_count,bronze_row_number,1031073,0,PASS,Observed NULL=0; expected NULL=0.
+column_null_count,item_sequence_num,1031073,0,PASS,Observed NULL=0; expected NULL=0.
+column_null_count,_SRC_FILE,1031073,0,PASS,Observed NULL=0; expected NULL=0.
+column_null_count,_LOAD_DTM,1031073,0,PASS,Observed NULL=0; expected NULL=0.
+column_null_count,source_violations_fragment,1031073,0,PASS,Observed NULL=0; expected NULL=0.
+column_null_count,violation_code,1031073,0,PASS,Observed NULL=0; expected NULL=0.
+column_null_count,violation_description,1031073,0,PASS,Observed NULL=1792; expected NULL=1792. NULL is intentional only for MISSING_COMMENTS_MARKER records.
+column_null_count,violation_comments,1031073,0,PASS,Observed NULL=1792; expected NULL=1792. NULL is intentional only for MISSING_COMMENTS_MARKER records.
+column_null_count,parsing_status,1031073,0,PASS,Observed NULL=0; expected NULL=0.
 mapping_affected_counts,metadata/standards/violations_mapping.csv,8,0,PASS,Mapping rows=8; mismatches=[]; missing targets=[]; duplicate targets=0.
 profiling_count_reconciliation,Bronze / Violations,8,0,PASS,Profiling differences={}.
-origin_bronze_silver_readonly_hashes,Origin/Bronze/Silver,3,0,PASS,Origin before/after=c97464b9aa02801c7e7bedca876d0d6fff482fb56366ad35befe5c68897e4fe7/c97464b9aa02801c7e7bedca876d0d6fff482fb56366ad35befe5c68897e4fe7; Bronze before/after=cbc2b9eb8d5feb883d93619d250193ec6d9d59e572ba4f4e9f0b26a9c40c79c5/cbc2b9eb8d5feb883d93619d250193ec6d9d59e572ba4f4e9f0b26a9c40c79c5; Silver before/after=22e2d374d3aaacd351771e01f8f45f87550515b9a7d2e3899e88fad7f08296c4/22e2d374d3aaacd351771e01f8f45f87550515b9a7d2e3899e88fad7f08296c4.
+origin_bronze_silver_readonly_hashes,Origin/Bronze/Silver,3,0,PASS,Origin before/after=b43beb7fae834a8698ca162004caf2929cb2eca7ff75c27b4db6bf07aa103c98/b43beb7fae834a8698ca162004caf2929cb2eca7ff75c27b4db6bf07aa103c98; Bronze before/after=8bce236e42751111b74742fbe55081ee0d800e1da48fe7c12b8d3604c8f6d682/8bce236e42751111b74742fbe55081ee0d800e1da48fe7c12b8d3604c8f6d682; Silver before/after=9e0a49c3f465043e810d007bee72a62386c7e25bd9a1d12229970ec2beebea6d/9e0a49c3f465043e810d007bee72a62386c7e25bd9a1d12229970ec2beebea6d.
