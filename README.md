@@ -12,10 +12,10 @@
 | `02_violation` | 위반 유형 |
 | `03_repeat_inspection` | 반복 위반·후속 검사 |
 | `04_license` | 사업체 인허가 이력 |
-| `05_geospatial` | 지역별 점검 패턴 |
+| [`05_geospatial`](docs/domains/05_geospatial.md) | 지역별 불합격률과 위반 기록 |
 
 관점별 코드와 테스트는 각각 `src/domains/<폴더명>/`과 `tests/domains/<폴더명>/`에 둡니다. 파일명은 영문 `snake_case`를 사용합니다. 04번의 예시는 `match_license_periods.sql`과 `test_match_license_periods.py`입니다.
 
 ## 로컬 설정
 
-팀이 공유한 원천 데이터와 컬럼 JSON을 `origin/`에 두고, `.env.example`을 `.env`로 복사합니다. 원천과 공유용 압축본은 Git에서 제외됩니다. [원천 설정 예시](config/sources.example.yaml) · [공용 작업 규칙](AGENTS.md)
+팀이 공유한 원천 데이터와 컬럼 JSON은 `data/00_origin/`에 둡니다. 공용 단계 경로는 `data/01_bronze/`, `data/02_silver/`, `data/03_gold/`입니다. 원천과 공유용 압축본은 Git에서 제외됩니다. [원천 설정 예시](config/sources.example.yaml) · [공용 작업 규칙](AGENTS.md) · [05 실행 가이드](docs/domains/05_geospatial/runbook.md)
