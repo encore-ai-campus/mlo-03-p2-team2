@@ -19,3 +19,8 @@
 ## 로컬 설정
 
 팀이 공유한 원천 데이터와 컬럼 JSON을 `origin/`에 두고, `.env.example`을 `.env`로 복사합니다. 원천과 공유용 압축본은 Git에서 제외됩니다. [원천 설정 예시](config/sources.example.yaml) · [공용 작업 규칙](AGENTS.md)
+
+원천 파일의 데이터셋별 배치, Bronze 적재·검증·재실행 방법은 [Bronze 작업 안내](docs/bronze.md)에 기록했습니다.
+Bronze 출력은 `data/bronze/<데이터셋>/<데이터셋>.parquet`에 저장합니다.
+
+Silver 설계 전 원천 구조와 품질을 확인하려면 [원천 프로파일](metadata/source_profiles.md), [컬럼 데이터 사전](metadata/data_dictionary.md), [변환 규칙 초안](metadata/transformation_rules.md), [결정 로그](docs/decision_log.md)를 참조합니다. 재실행 명령은 `python -m src.profiling.profile_sources`이며, 이후 `python -m src.profiling.render_dictionary`와 `python -m src.profiling.render_profiles`로 문서를 갱신합니다.
