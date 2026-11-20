@@ -2,7 +2,7 @@
   "version": "1.2-geographic-team-draft",
   "mapping_version": "team-integration-draft-20261120",
   "basis": [
-    "docs/domains/05_geospatial/model.md",
+    "docs/domains/05_geospatial/02_silver/README.md",
     "metadata/data_dictionary/05_geospatial/column_mapping.csv"
   ],
   "datasets": {
