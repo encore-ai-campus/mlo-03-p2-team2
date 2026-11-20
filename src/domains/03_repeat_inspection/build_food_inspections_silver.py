@@ -14,8 +14,8 @@ import pyarrow.parquet as pq
 
 PROJECT = Path(__file__).resolve().parents[3]
 DOMAIN = "03_repeat_inspection"
-BRONZE_DIR = PROJECT / "data" / "bronze" / DOMAIN
-SILVER_DIR = PROJECT / "data" / "silver" / DOMAIN
+BRONZE_DIR = PROJECT / "data" / "01_bronze" / DOMAIN
+SILVER_DIR = PROJECT / "data" / "02_silver" / DOMAIN
 SNAPSHOT_MANIFEST = PROJECT / "metadata" / "lineage" / DOMAIN / "bronze_manifest.json"
 DATASET = "food_inspections"
 BATCH_SIZE = 10_000
@@ -228,7 +228,7 @@ def main():
     parser = ArgumentParser(description="Build a typed Food Inspections Silver Parquet from Bronze.")
     parser.add_argument("--bronze-dir", type=Path)
     parser.add_argument("--manifest", type=Path, help="Bronze snapshot manifest")
-    parser.add_argument("--output", type=Path, default=SILVER_DIR / f"{DATASET}.parquet")
+    parser.add_argument("--output", type=Path, default=SILVER_DIR / f"03_{DATASET}.parquet")
     parser.add_argument("--code-map", type=Path, help="CSV with dataset, source_column, source_value, standard_code")
     args = parser.parse_args()
     manifest_path = args.manifest

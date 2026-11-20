@@ -84,15 +84,17 @@
 
 ## 7. 로컬 실행
 
-저장소 루트에서 실행합니다. 로컬 스냅샷 `Food_Inspections_20261119.csv`를 `origin/03_repeat_inspection/`에 두고, 같은 파일을 바이트 그대로 `data/bronze/03_repeat_inspection/`에 복사한 뒤 Silver를 빌드합니다.
+저장소 루트에서 실행합니다. 팀 공용 원천을 `data/00_origin/`에서 복원하고, 점검 CSV를 Bronze에 바이트 그대로 복사한 뒤 Silver를 빌드합니다. [팀 공용 원천 복원 방법](../project_setup_and_sharing.md#팀-공용-원천)
 
 ```powershell
 python -m pip install -r src/domains/03_repeat_inspection/requirements.txt
+python src/ingestion/restore_origin.py --restore
+Copy-Item -LiteralPath data/00_origin/food_inspections.csv -Destination data/01_bronze/03_repeat_inspection/03_food_inspections.csv
 python src/domains/03_repeat_inspection/build_food_inspections_silver.py
 python src/domains/03_repeat_inspection/build_inspection_marts.py
 ```
 
-Silver와 Gold Parquet은 각각 `data/silver/03_repeat_inspection/`과 `data/gold/marts/03_repeat_inspection/`에 생성됩니다. 로컬 방식의 새 HTML은 `reports/runs/03_repeat_inspection/`에서 열 수 있습니다. [데이터 프로파일](../../reports/03_repeat_inspection/data_profile.html)
+Silver는 `data/02_silver/03_repeat_inspection/`에 `03_food_inspections.parquet`과 `03_inspection_history.parquet`을 생성합니다. 두 Gold 마트는 `data/03_gold/03_repeat_inspection/`에 `03_` 접두사로 저장합니다. 로컬 방식의 새 HTML은 `reports/runs/03_repeat_inspection/`에서 열 수 있습니다. [데이터 프로파일](../../reports/03_repeat_inspection/data_profile.html)
 
 Windows 터미널에서 품질 조사 스크립트의 문자 인코딩 오류를 피하려면 `python -X utf8 src/domains/03_repeat_inspection/quality_datasets.py community_areas`처럼 실행합니다. 스크립트에 지정된 CSV를 `origin/03_repeat_inspection/`에서 읽습니다.
 
@@ -108,7 +110,7 @@ python src/domains/03_repeat_inspection/build_inspection_marts.py --fact $inspec
 
 01번 매니페스트로 점검 Silver 파일의 SHA-256과 행 수를 검증합니다. 매니페스트에 기록된 원천 `source_sha256`을 02번 품질 대사 보고서의 원천 해시와 비교하고, 02번의 점검 ID와 Bronze 행 순번을 Silver와 대조합니다. 02번의 정상 조각에서 점검별 고유 문자열 코드를 만들고, 격리 조각이 섞인 점검은 부분 파싱으로 표시합니다. 격리 조각만 있으면 파싱 실패, 원문이 비어 있으면 공란으로 구분합니다. 두 점검 모두 파싱 완료인 경우에만 재관측률을 계산합니다.
 
-통합 모드의 결과는 `data/02_silver/03_repeat_inspection/`과 `data/03_gold/marts/03_repeat_inspection/`에 생성됩니다. HTML은 `reports/runs/03_repeat_inspection/team/inspection_analysis.html`에 생성되며, 같은 점검 Silver를 기준으로 기존 03번 파서와 02번 산출물 적용 결과를 비교합니다.
+통합 모드도 `data/02_silver/03_repeat_inspection/`과 `data/03_gold/03_repeat_inspection/`에 `03_` 접두사로 저장합니다. 로컬 모드와 통합 모드의 Parquet을 함께 보관하려면 `--silver-dir`과 `--gold-dir`로 별도 출력 경로를 지정합니다. HTML은 `reports/runs/03_repeat_inspection/team/inspection_analysis.html`에 생성되며, 같은 점검 Silver를 기준으로 기존 03번 파서와 02번 산출물 적용 결과를 비교합니다.
 
 ### 통합 규칙 적용 검증
 

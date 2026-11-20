@@ -1,9 +1,9 @@
 {
   "dataset": "food_inspections",
-  "source_file": "origin/03_repeat_inspection/Food_Inspections_20261119.csv",
+  "source_file": "data/00_origin/food_inspections.csv",
   "snapshot_date": "2026-11-19",
   "ingested_at_utc": "2026-11-20T01:08:26+00:00",
-  "bronze_file": "data/bronze/03_repeat_inspection/Food_Inspections_20261119.csv",
+  "bronze_file": "data/01_bronze/03_repeat_inspection/03_food_inspections.csv",
   "byte_size": 356934166,
   "sha256": "b43beb7fae834a8698ca162004caf2929cb2eca7ff75c27b4db6bf07aa103c98",
   "logical_row_count": 318627,

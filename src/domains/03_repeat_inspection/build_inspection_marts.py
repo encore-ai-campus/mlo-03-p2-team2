@@ -18,10 +18,8 @@ from violation_inputs import load_domain02_violations
 
 PROJECT = Path(__file__).resolve().parents[3]
 DOMAIN = "03_repeat_inspection"
-SILVER_DIR = PROJECT / "data" / "silver" / DOMAIN
-GOLD_DIR = PROJECT / "data" / "gold" / "marts" / DOMAIN
-TEAM_SILVER_DIR = PROJECT / "data" / "02_silver" / DOMAIN
-TEAM_GOLD_DIR = PROJECT / "data" / "03_gold" / "marts" / DOMAIN
+SILVER_DIR = PROJECT / "data" / "02_silver" / DOMAIN
+GOLD_DIR = PROJECT / "data" / "03_gold" / DOMAIN
 REPORT_DIR = PROJECT / "reports" / "runs" / DOMAIN
 VIOLATION_START = date(2018, 7, 1)
 REINSPECTION_MAX_DAYS = 30
@@ -294,9 +292,9 @@ def build(fact_path, silver_dir, gold_dir, report_dir=None, *, domain02_root=Non
         tempfile.TemporaryDirectory(dir=gold_dir) as staged_gold,
         tempfile.TemporaryDirectory(dir=report_dir) as staged_report,
     ):
-        history = Path(staged_silver) / "inspection_history.parquet"
-        repeat = Path(staged_gold) / "repeat_violation_mart.parquet"
-        reinspection = Path(staged_gold) / "inspection_reinspection_mart.parquet"
+        history = Path(staged_silver) / "03_inspection_history.parquet"
+        repeat = Path(staged_gold) / "03_repeat_violation_mart.parquet"
+        reinspection = Path(staged_gold) / "03_inspection_reinspection_mart.parquet"
         report = Path(staged_report) / "inspection_analysis.html"
         write_parquet(history, HISTORY_SCHEMA, metadata, history_rows(rows, histories))
         repeat_metadata = {
@@ -323,16 +321,13 @@ def main():
     team_mode = args.domain02_root is not None
     if team_mode and args.fact is None:
         parser.error("--domain02-root requires --fact with the inspection Silver path")
-    silver_dir = args.silver_dir or (TEAM_SILVER_DIR if team_mode else SILVER_DIR)
-    gold_dir = args.gold_dir or (TEAM_GOLD_DIR if team_mode else GOLD_DIR)
+    silver_dir = args.silver_dir or SILVER_DIR
+    gold_dir = args.gold_dir or GOLD_DIR
     report_dir = args.report_dir
-    if report_dir is None:
-        if team_mode and gold_dir == TEAM_GOLD_DIR:
-            report_dir = REPORT_DIR / "team"
-        elif gold_dir == GOLD_DIR:
-            report_dir = REPORT_DIR
+    if report_dir is None and gold_dir == GOLD_DIR:
+        report_dir = REPORT_DIR / "team" if team_mode else REPORT_DIR
     build(
-        args.fact or SILVER_DIR / "food_inspections.parquet", silver_dir, gold_dir,
+        args.fact or SILVER_DIR / "03_food_inspections.parquet", silver_dir, gold_dir,
         report_dir, domain02_root=args.domain02_root, inspection_manifest=args.inspection_manifest,
     )
 
