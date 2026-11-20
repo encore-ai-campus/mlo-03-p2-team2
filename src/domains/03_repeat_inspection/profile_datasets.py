@@ -103,8 +103,9 @@ def profile_dataset(name: str, filename: str) -> None:
     print(sample.to_string(max_colwidth=32))
 
 
-def select_dataset(parser: ArgumentParser) -> Namespace:
-    parser.add_argument("dataset", nargs="?", choices=DATASETS, help="조회할 데이터셋")
+def select_dataset(parser: ArgumentParser, *, allow_all: bool = False) -> Namespace:
+    choices = (*DATASETS, "all") if allow_all else tuple(DATASETS)
+    parser.add_argument("dataset", nargs="?", choices=choices, help="조회할 데이터셋")
     args = parser.parse_args()
 
     if args.dataset is None:

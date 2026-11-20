@@ -1,10 +1,59 @@
 from argparse import ArgumentParser
 from dataclasses import dataclass
+from html import escape
 from pathlib import Path
 
 import pandas as pd
 
 from profile_datasets import DATA_DIR, DATASETS, DATE_COLUMNS, THOUSANDS_COLUMNS, select_dataset
+
+
+HTML_HEAD = """<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>시카고 원본 데이터 품질 검사</title>
+<style>
+  body { max-width: 75rem; margin: 2rem auto; padding: 0 1rem; font: 1rem/1.5 system-ui, sans-serif; }
+  nav ul { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; padding-left: 1.25rem; }
+  section { margin: 2rem 0 3rem; }
+  h2 { border-bottom: 1px solid #d9dee5; padding-bottom: .4rem; }
+  h3 { margin-top: 1.8rem; }
+  .table-container { overflow-x: auto; }
+  table { border-collapse: collapse; text-align: left; }
+  th, td { padding: .4rem .65rem; border-bottom: 1px solid #d9dee5; }
+  th { background: #eef2f6; }
+  tbody tr:nth-child(even) { background: #f8fafc; }
+</style>
+<main>
+<h1>시카고 원본 데이터 품질 검사</h1>
+"""
+
+
+class QualityOutput:
+    def __init__(self, html: bool):
+        self.parts: list[str] | None = [] if html else None
+
+    def text(self, value: str) -> None:
+        if self.parts is None:
+            print(value)
+        else:
+            self.parts.append(f"<p>{escape(value)}</p>")
+
+    def heading(self, title: str, detail: str = "") -> None:
+        if self.parts is None:
+            print(f"\n[{title}]{' ' + detail if detail else ''}")
+        else:
+            self.parts.append(f"<h3>{escape(title)}</h3>")
+            if detail:
+                self.text(detail)
+
+    def table(self, frame: pd.DataFrame, *, max_colwidth: int | None = None) -> None:
+        if self.parts is None:
+            print(frame.to_string(index=False, max_colwidth=max_colwidth))
+        else:
+            table = frame.to_html(index=False, border=0, justify="left", escape=True)
+            self.parts.append(f'<div class="table-container">{table}</div>')
 
 
 @dataclass(frozen=True)
@@ -59,8 +108,8 @@ def examples(values: pd.Series) -> str:
     return ", ".join(repr(value[:60]) for value in values.drop_duplicates().head(3)) or "–"
 
 
-def report_missing(df: pd.DataFrame) -> None:
-    print("\n[결측값] NULL 표기와 빈 문자열·공백을 별도로 집계")
+def report_missing(df: pd.DataFrame, output: QualityOutput) -> None:
+    output.heading("결측값", "NULL 표기와 빈 문자열·공백을 별도로 집계")
     rows = []
     for column, raw in df.items():
         values = raw.str.strip()
@@ -74,40 +123,41 @@ def report_missing(df: pd.DataFrame) -> None:
             "blank_count": blank_count,
             "blank_pct": round(100 * blank_count / total, 2) if total else 0,
         })
-    print(pd.DataFrame(rows).to_string(index=False))
+    output.table(pd.DataFrame(rows))
 
 
-def report_duplicates(df: pd.DataFrame, identifiers: tuple[str, ...]) -> None:
-    print("\n[중복값] 첫 행을 제외한 초과 중복 건수")
-    print(f"전체 행 중복: {df.duplicated().sum():,}건")
+def report_duplicates(df: pd.DataFrame, identifiers: tuple[str, ...], output: QualityOutput) -> None:
+    output.heading("중복값", "첫 행을 제외한 초과 중복 건수")
+    output.text(f"전체 행 중복: {df.duplicated().sum():,}건")
     for column in identifiers:
         ids = present_values(df[column])
         repeated = ids[ids.duplicated()]
-        print(f"{column}: 초과 {len(repeated):,}건, 중복 ID {repeated.nunique():,}개, 예시 {examples(repeated)}")
+        output.text(f"{column}: 초과 {len(repeated):,}건, 중복 ID {repeated.nunique():,}개, 예시 {examples(repeated)}")
 
 
-def report_categories(df: pd.DataFrame, columns: tuple[str, ...], top: int) -> None:
-    print("\n[범주형 고유값과 빈도] 비율은 결측·빈값을 제외한 건수 기준")
+def report_categories(df: pd.DataFrame, columns: tuple[str, ...], top: int, output: QualityOutput) -> None:
+    output.heading("범주형 고유값과 빈도", "비율은 결측·빈값을 제외한 건수 기준")
     for column in columns:
         values = present_values(df[column])
         counts = values.value_counts()
         shown = counts.head(top) if top else counts
         table = shown.rename_axis("value").reset_index(name="count")
         table["pct"] = (100 * table["count"] / len(values)).round(2)
-        print(f"\n{column}: {len(counts):,}종, 유효 값 {len(values):,}건")
+        output.text(f"\n{column}: {len(counts):,}종, 유효 값 {len(values):,}건")
         if not table.empty:
-            print(table.to_string(index=False, max_colwidth=64))
+            output.table(table, max_colwidth=64)
         if len(shown) < len(counts):
-            print(f"나머지 {len(counts) - len(shown):,}종, {len(values) - shown.sum():,}건")
+            output.text(f"나머지 {len(counts) - len(shown):,}종, {len(values) - shown.sum():,}건")
 
 
 def report_dates(
-    df: pd.DataFrame, snapshot_date: pd.Timestamp | None, term: tuple[str, str] | None
+    df: pd.DataFrame, snapshot_date: pd.Timestamp | None, term: tuple[str, str] | None,
+    output: QualityOutput,
 ) -> None:
-    print("\n[날짜 범위와 변환 유효성] MM/DD/YYYY 기준")
+    output.heading("날짜 범위와 변환 유효성", "MM/DD/YYYY 기준")
     date_columns = [column for column in df if column.upper() in DATE_COLUMNS]
     if not date_columns:
-        print("점검 대상 날짜 컬럼 없음")
+        output.text("점검 대상 날짜 컬럼 없음")
         return
 
     rows = []
@@ -129,18 +179,18 @@ def report_dates(
             "after_snapshot": future,
             "invalid_examples": examples(values[invalid]),
         })
-    print(pd.DataFrame(rows).to_string(index=False))
+    output.table(pd.DataFrame(rows))
     if snapshot_date is not None:
-        print(f"기준일: {snapshot_date.date()} (원본 파일명 날짜)")
+        output.text(f"기준일: {snapshot_date.date()} (원본 파일명 날짜)")
     if term:
         period = pd.DataFrame(term_dates).dropna()
         start, end = term
         reversed_terms = period[start].gt(period[end]).sum()
-        print(f"시작일이 만료일보다 늦음: {reversed_terms:,}건 (두 날짜가 유효한 {len(period):,}건 중)")
+        output.text(f"시작일이 만료일보다 늦음: {reversed_terms:,}건 (두 날짜가 유효한 {len(period):,}건 중)")
 
 
-def report_numbers(df: pd.DataFrame, rules: QualityRules) -> None:
-    print("\n[숫자 변환 유효성 및 이상값]")
+def report_numbers(df: pd.DataFrame, rules: QualityRules, output: QualityOutput) -> None:
+    output.heading("숫자 변환 유효성 및 이상값")
     labels = {column: "정수" for column in rules.nonnegative_integers}
     labels.update({column: "숫자" for column in rules.nonnegative_numbers})
     coordinate_bounds = dict(zip(rules.coordinates or (), (90, 180)))
@@ -168,21 +218,19 @@ def report_numbers(df: pd.DataFrame, rules: QualityRules) -> None:
             "outside_range": int(usable.abs().gt(bound).sum()) if bound is not None else "–",
             "invalid_examples": examples(values[~valid]),
         })
-    print(pd.DataFrame(rows).to_string(index=False))
+    output.table(pd.DataFrame(rows))
     if coordinate_bounds:
-        print("허용 범위: 위도 -90~90, 경도 -180~180")
+        output.text("허용 범위: 위도 -90~90, 경도 -180~180")
 
 
-def main() -> None:
-    parser = ArgumentParser(description="시카고 CSV 데이터셋 품질 조사")
-    parser.add_argument("--top", type=int, default=15, help="범주형 빈도 표시 개수 (0은 전체)")
-    args = select_dataset(parser)
-    if args.top < 0:
-        parser.error("--top은 0 이상이어야 합니다.")
-
-    name, filename = DATASETS[args.dataset]
-    rules = RULES[args.dataset]
-    print(f"\n데이터셋: {name} ({filename})", flush=True)
+def report_dataset(dataset: str, top: int, output: QualityOutput) -> None:
+    name, filename = DATASETS[dataset]
+    rules = RULES[dataset]
+    if output.parts is None:
+        print(f"\n데이터셋: {name} ({filename})", flush=True)
+    else:
+        output.parts.append(f'<section id="{escape(dataset)}"><h2>{escape(name)}</h2>')
+        output.text(filename)
     # CSV의 빈 필드와 NULL 문자를 읽을 때 구분할 수 있도록 유지
     df = pd.read_csv(
         DATA_DIR / filename,
@@ -191,16 +239,45 @@ def main() -> None:
         low_memory=False,
         encoding="utf-8-sig",
     )
-    print(f"행 수: {len(df):,} / 열 수: {len(df.columns)}")
+    output.text(f"행 수: {len(df):,} / 열 수: {len(df.columns)}")
 
     file_date = Path(filename).stem.rsplit("_", 1)[-1]
     snapshot_date = pd.to_datetime(file_date, format="%Y%m%d") if file_date.isdigit() else None
-    report_missing(df)
-    report_duplicates(df, rules.identifiers)
-    report_categories(df, rules.categories, args.top)
-    report_dates(df, snapshot_date, rules.term)
-    report_numbers(df, rules)
-    print("\n[다음 단계] 허가번호와 지역 코드의 데이터셋 간 매칭")
+    report_missing(df, output)
+    report_duplicates(df, rules.identifiers, output)
+    report_categories(df, rules.categories, top, output)
+    report_dates(df, snapshot_date, rules.term, output)
+    report_numbers(df, rules, output)
+    if output.parts is None:
+        output.heading("다음 단계", "허가번호와 지역 코드의 데이터셋 간 매칭")
+    else:
+        output.parts.append("</section>")
+
+
+def main() -> None:
+    parser = ArgumentParser(description="시카고 CSV 데이터셋 품질 조사")
+    parser.add_argument("--top", type=int, default=15, help="범주형 빈도 표시 개수 (0은 전체)")
+    parser.add_argument("--html", type=Path, help="품질 검사 결과를 저장할 HTML 파일 경로")
+    args = select_dataset(parser, allow_all=True)
+    if args.top < 0:
+        parser.error("--top은 0 이상이어야 합니다.")
+
+    datasets = tuple(DATASETS) if args.dataset == "all" else (args.dataset,)
+    output = QualityOutput(html=args.html is not None)
+    for dataset in datasets:
+        report_dataset(dataset, args.top, output)
+
+    if output.parts is not None:
+        navigation = "".join(
+            f'<li><a href="#{escape(dataset)}">{escape(DATASETS[dataset][0])}</a></li>'
+            for dataset in datasets
+        )
+        content = [HTML_HEAD, f'<nav aria-label="데이터셋"><ul>{navigation}</ul></nav>']
+        content.extend(output.parts)
+        content.append("</main>\n</html>\n")
+        args.html.parent.mkdir(parents=True, exist_ok=True)
+        args.html.write_text("\n".join(content), encoding="utf-8", newline="\n")
+        print(args.html)
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 import re
 import tempfile
 from argparse import ArgumentParser
-from collections import Counter, defaultdict
+from collections import defaultdict
 from dataclasses import dataclass
 from datetime import date
 from itertools import islice
@@ -264,8 +264,7 @@ def build(fact_path, silver_dir, gold_dir, report_dir=None):
         write_parquet(history, HISTORY_SCHEMA, metadata, history_rows(rows, histories))
         write_parquet(repeat, REPEAT_SCHEMA, metadata, repeat_rows(histories, violations))
         write_parquet(reinspection, REINSPECTION_SCHEMA, metadata, reinspection_rows(rows, histories, observation_end))
-        parse_counts = Counter(status for _, status in violations.values())
-        report.write_text(build_report(repeat, reinspection, parse_counts, observation_end), encoding="utf-8")
+        report.write_text(build_report(repeat, reinspection, observation_end), encoding="utf-8")
         history.replace(silver_dir / history.name)
         for path in (repeat, reinspection):
             path.replace(gold_dir / path.name)
