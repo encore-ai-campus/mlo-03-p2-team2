@@ -68,7 +68,8 @@ Thumbs.db
 !/data/00_origin/food_columns.json
 !/data/00_origin/license_columns.json
 
-# Published Domain 03 Silver and Gold snapshot.
+# Published Domain 03 Bronze, Silver and Gold snapshot.
+!/data/01_bronze/03_repeat_inspection/03_food_inspections.parquet
 !/data/02_silver/03_repeat_inspection/03_inspection_history.parquet
 !/data/03_gold/03_repeat_inspection/03_inspection_reinspection_mart.parquet
 !/data/03_gold/03_repeat_inspection/03_repeat_violation_mart.parquet

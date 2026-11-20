@@ -19,7 +19,7 @@
 | 공용 점검 Silver 설계안 | 위생점검 한 건 | `inspection_key`, `license_number_key`, `inspection_dtm`, `inspection_type`, `result_cd`, `violations_text`, `source_row_num` | 점검 이력 정렬과 파생 결과의 참조 기준 |
 
 - **원천 스냅샷 확인 방법** 팀 인벤토리의 원천은 318,552행 × 17열, 로컬 원천은 318,627행 × 17열입니다. 팀 공용 매니페스트의 SHA-256을 확인해 사용할 파일을 확정합니다. 이 문서의 관측 수치는 로컬 원천 기준입니다.
-- **원천 행 추적** Bronze에서 원본 CSV의 바이트, 헤더, 논리 레코드 순서를 보존합니다. `source_row_num`은 헤더와 완전히 빈 레코드를 제외한 **1부터 시작하는 논리 레코드 순번**입니다. 인용부호 안의 줄바꿈은 같은 레코드에 속합니다. [Bronze 매니페스트](../../metadata/lineage/03_repeat_inspection/bronze_manifest.json)에 헤더, 논리 행 수, SHA-256과 순번 계산 기준을 기록합니다. 로컬 Silver는 `source_row_num`을 `int64`로 저장해 원천 행과 변환 예외를 추적합니다.
+- **원천 행 추적** Bronze Parquet은 CSV의 모든 원본 컬럼을 문자열로 저장하고 논리 레코드 순서를 보존합니다. `source_row_num`은 헤더와 완전히 빈 레코드를 제외한 **1부터 시작하는 논리 레코드 순번**입니다. 인용부호 안의 줄바꿈은 같은 레코드에 속합니다. Silver도 이 순번을 `int64`로 저장해 원천 행과 변환 예외를 추적합니다. [Bronze 매니페스트](../../metadata/lineage/03_repeat_inspection/bronze_manifest.json)
 - **공용으로 재사용할 테이블과 기준** 점검 Silver는 `inspection_key`(`string`) 기준으로 점검 한 건을 유지합니다. ②에서 `inspection_key`와 위반 코드를 제공하는 공용 위반 상세가 합의되면 그 파싱 결과를 재사용합니다. 초기 분석은 Food Inspections만 사용합니다.
 
 ## 3. 컬럼명·타입·변경 규칙
@@ -65,7 +65,7 @@
 | --- | --- | --- |
 | 로컬 원천 규모와 식별자 | 논리 레코드, 헤더, `Inspection ID` 공란·중복 | 318,627행 × 17열. 점검 ID 공란 0건, 초과 중복 0건 |
 | 팀 스냅샷 일치 여부 | 팀 매니페스트 SHA-256과 로컬 원천 SHA-256 | 행 수와 해시가 다름. 팀 공유 원천으로 다시 검증할 예정 |
-| 원천 → Bronze → Silver 행 보존 | 논리 레코드 수, 헤더, SHA-256, `source_row_num` | 로컬 원본과 Bronze 해시 일치. Silver 318,627행의 원천 순번·점검 ID·위반 원문 대조 완료 |
+| 원천 → Bronze → Silver 행 보존 | 논리 레코드 수, 헤더, 원천 SHA-256, `source_row_num` | 원본 해시를 매니페스트와 대조. Bronze 318,627행의 원본 값과 순서 일치. Silver에서 원천 순번·점검 ID·위반 원문 추적 가능 |
 | 점검일 변환 | 공란, 파싱 실패, 최소·최대 | 로컬 원천 공란 및 파싱 실패 0건. 2010-01-04~2026-11-18 |
 | 면허번호 예외 | 공란, `0`, `9999999` | 로컬 공란 19건, `0` 840건, `9999999` 1건 |
 | 로컬 코드표 적용 범위 | `Results`·`Risk`의 양끝 공백을 제거한 비결측 값 | 내장 매핑의 미등록 비결측 값 0건. `Risk` 공란 88건 |
@@ -84,17 +84,17 @@
 
 ## 7. 로컬 실행
 
-저장소 루트에서 실행합니다. 팀 공용 원천을 `data/00_origin/`에서 복원하고, 점검 CSV를 Bronze에 바이트 그대로 복사한 뒤 Silver를 빌드합니다. [팀 공용 원천 복원 방법](../project_setup_and_sharing.md#팀-공용-원천)
+저장소 루트에서 실행합니다. 팀 공용 점검 CSV를 `data/00_origin/`에서 복원한 뒤 Bronze Parquet으로 적재합니다. 적재 후 원본 CSV와 Parquet의 값과 순서를 행별로 대조합니다. [팀 공용 원천 복원 방법](../project_setup_and_sharing.md#팀-공용-원천)
 
 ```powershell
 python -m pip install -r src/domains/03_repeat_inspection/requirements.txt
 python src/ingestion/restore_origin.py --restore
-Copy-Item -LiteralPath data/00_origin/food_inspections.csv -Destination data/01_bronze/03_repeat_inspection/03_food_inspections.csv
+python src/domains/03_repeat_inspection/build_food_inspections_bronze.py
 python src/domains/03_repeat_inspection/build_food_inspections_silver.py
 python src/domains/03_repeat_inspection/build_inspection_marts.py
 ```
 
-Silver는 `data/02_silver/03_repeat_inspection/`에 `03_food_inspections.parquet`과 `03_inspection_history.parquet`을 생성합니다. 두 Gold 마트는 `data/03_gold/03_repeat_inspection/`에 `03_` 접두사로 저장합니다. 로컬 방식의 새 HTML은 `reports/runs/03_repeat_inspection/`에서 열 수 있습니다. [데이터 프로파일](../../reports/03_repeat_inspection/data_profile.html)
+Bronze는 `data/01_bronze/03_repeat_inspection/03_food_inspections.parquet`에 생성됩니다. Silver는 `data/02_silver/03_repeat_inspection/`에 `03_food_inspections.parquet`과 `03_inspection_history.parquet`을 생성합니다. 두 Gold 마트는 `data/03_gold/03_repeat_inspection/`에 `03_` 접두사로 저장합니다. 로컬 방식의 새 HTML은 `reports/runs/03_repeat_inspection/`에서 열 수 있습니다. [데이터 프로파일](../../reports/03_repeat_inspection/data_profile.html) · [공유 Parquet 체크섬](../../reports/03_repeat_inspection/parquet_sha256sums.txt)
 
 Windows 터미널에서 품질 조사 스크립트의 문자 인코딩 오류를 피하려면 `python -X utf8 src/domains/03_repeat_inspection/quality_datasets.py community_areas`처럼 실행합니다. 스크립트에 지정된 CSV를 `origin/03_repeat_inspection/`에서 읽습니다.
 

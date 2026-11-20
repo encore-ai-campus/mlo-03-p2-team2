@@ -1,5 +1,4 @@
 import csv
-import hashlib
 import json
 import math
 import tempfile
@@ -11,12 +10,11 @@ from pathlib import Path
 import pyarrow as pa
 import pyarrow.parquet as pq
 
+from build_food_inspections_bronze import (
+    BRONZE_DIR, DOMAIN, PROJECT, SNAPSHOT_MANIFEST, bronze_schema, csv_records, parquet_records, sha256,
+)
 
-PROJECT = Path(__file__).resolve().parents[3]
-DOMAIN = "03_repeat_inspection"
-BRONZE_DIR = PROJECT / "data" / "01_bronze" / DOMAIN
 SILVER_DIR = PROJECT / "data" / "02_silver" / DOMAIN
-SNAPSHOT_MANIFEST = PROJECT / "metadata" / "lineage" / DOMAIN / "bronze_manifest.json"
 DATASET = "food_inspections"
 BATCH_SIZE = 10_000
 TEXT_COLUMNS = {
@@ -154,11 +152,8 @@ def standardize(raw, source_row_num, codes):
     }
 
 
-def write_snapshot(source, writer, manifest, schema, codes):
-    reader = csv.reader(source, strict=True)
-    header = next(reader)
-    if header != manifest["header"] or len(header) != len(set(header)):
-        raise ValueError("Bronze CSV header differs from the manifest or has duplicate columns")
+def write_snapshot(records, writer, manifest, schema, codes):
+    header = manifest["header"]
     if missing := REQUIRED_COLUMNS.difference(header):
         raise ValueError(f"Missing Bronze columns {sorted(missing)}")
 
@@ -166,13 +161,10 @@ def write_snapshot(source, writer, manifest, schema, codes):
     seen_keys = {}
     batch = []
     issue_counts = Counter()
-    for values in reader:
-        if not any(values):
-            continue
-        row_count += 1
-        if len(values) != len(header):
-            raise ValueError(f"Wrong number of fields at source_row_num={row_count}")
-        row = standardize(dict(zip(header, values)), row_count, codes)
+    for row_count, raw in enumerate(records, 1):
+        if raw.pop("source_row_num") != row_count or any(value is None for value in raw.values()):
+            raise ValueError(f"Invalid Bronze record at source_row_num={row_count}")
+        row = standardize(raw, row_count, codes)
         key = row["inspection_key"]
         if key is None:
             raise ValueError(f"Missing inspection_key at source_row_num={row_count}")
@@ -193,30 +185,38 @@ def write_snapshot(source, writer, manifest, schema, codes):
     return row_count, issue_counts
 
 
+def read_bronze(path, manifest):
+    source_hash = manifest["sha256"]
+    if path.suffix.lower() == ".csv":
+        if sha256(path) != source_hash:
+            raise ValueError(f"Bronze SHA-256 does not match the manifest for {path}")
+        yield from csv_records(path, manifest["header"])
+        return
+    with pq.ParquetFile(path) as parquet:
+        schema = parquet.schema_arrow
+        if not schema.equals(bronze_schema(manifest["header"])):
+            raise ValueError("Bronze Parquet schema differs from the manifest")
+        if (schema.metadata or {}).get(b"source_sha256") != source_hash.encode("ascii"):
+            raise ValueError("Bronze Parquet source SHA-256 differs from the manifest")
+        yield from parquet_records(parquet)
+
+
 def build_silver(bronze_dir, output, code_map, manifest_path=None):
     if manifest_path is None:
         manifest_path = bronze_dir / "metadata.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     source_path = bronze_dir / Path(manifest["bronze_file"]).name
     codes = load_codes(code_map)
-    with source_path.open("rb") as source_bytes:
-        source_hash = hashlib.file_digest(source_bytes, "sha256").hexdigest()
-    if source_hash != manifest["sha256"]:
-        raise ValueError(f"Bronze SHA-256 does not match the manifest for {source_path}")
-
     schema = SCHEMA.with_metadata({
-        "source_sha256": source_hash,
+        "source_sha256": manifest["sha256"],
         "snapshot_date": manifest["snapshot_date"],
         "code_map": "local" if code_map is None else code_map.name,
     })
     output.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(dir=output.parent) as staging_dir:
         staged_output = Path(staging_dir) / output.name
-        with (
-            source_path.open(encoding="utf-8-sig", newline="") as source,
-            pq.ParquetWriter(staged_output, schema, compression="zstd") as writer,
-        ):
-            row_count, issues = write_snapshot(source, writer, manifest, schema, codes)
+        with pq.ParquetWriter(staged_output, schema, compression="zstd") as writer:
+            row_count, issues = write_snapshot(read_bronze(source_path, manifest), writer, manifest, schema, codes)
         staged_output.replace(output)
 
     print(f"{output} ({row_count:,} rows)")
