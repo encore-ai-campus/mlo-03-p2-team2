@@ -37,7 +37,7 @@ Bronze 한 행은 검사 한 건이고, Silver 한 행은 검사에서 분리한
 
 기존 `metadata/standards/violations_mapping.csv`는 이전 전체 Silver의 1,030,806건 처리 기록이므로 변경하지 않았다. 새 분기 결과는 `metadata/standards/violations_reconciliation_mapping.csv`에 Bronze `Violations` → 정상 Silver 1,029,015건, Bronze `Violations` → 격리 1,791건으로 별도 기록했다.
 
-실행 명령: `python -m src.silver.violations_reconciliation`. 최종 코드로 같은 Bronze를 **연속 두 번 실제 실행**했고 두 실행 모두 PASS였다. 각 실행에서 Bronze 318,552, 빈 셀 90,000, 후보 1,030,806, 정상 1,029,015, 격리 1,791건이었다. 정상·격리의 스키마와 내용 SHA-256이 각각 두 실행에서 동일했다.
+실행 명령: `python -m src.domains.02_violation.reconciliation`. 최종 코드로 같은 Bronze를 **연속 두 번 실제 실행**했고 두 실행 모두 PASS였다. 각 실행에서 Bronze 318,552, 빈 셀 90,000, 후보 1,030,806, 정상 1,029,015, 격리 1,791건이었다. 정상·격리의 스키마와 내용 SHA-256이 각각 두 실행에서 동일했다.
 
 - 정상 내용 SHA-256: `2a0c9cbbf0acba55594f777cfd239ed7b851b479370ce67c0777a9ecbca8ba52`
 - 격리 내용 SHA-256: `5a418be6a48509a42cd7140fdbdcefa5f1fa973a6c9424d06edfba4c94182e71`

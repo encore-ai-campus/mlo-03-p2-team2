@@ -7,7 +7,7 @@
 - 브랜치: feature/violations-quality
 - 기준 커밋: 810caa048a5d5c0d58a5f48656a5e85a0c878953
 - 검사 범위: Food Inspections의 Violations Silver 결과만
-- 실행 명령: python -m src.quality.violations_quality
+- 실행 명령: python -m src.domains.02_violation.quality
 
 Silver 표준화나 다른 데이터셋 품질관리는 수행하지 않았다. Origin, Bronze, Silver, Mapping은 읽기만 했다.
 

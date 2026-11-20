@@ -7,10 +7,10 @@ import pytest
 
 
 analysis = importlib.import_module("src.domains.02_violation.build_analysis_mart")
-gold = importlib.import_module("src.gold.violations")
-silver = importlib.import_module("src.silver.violations_reconciliation")
-profile = importlib.import_module("src.profiling.profile_violations")
-silver_base = importlib.import_module("src.silver.violations")
+gold = importlib.import_module("src.domains.02_violation.gold")
+silver = importlib.import_module("src.domains.02_violation.reconciliation")
+profile = importlib.import_module("src.domains.02_violation.profiling")
+silver_base = importlib.import_module("src.domains.02_violation.silver")
 
 
 def _write_fixture(tmp_path):
@@ -38,16 +38,16 @@ def _write_fixture(tmp_path):
     ]
     pq.write_table(pa.Table.from_pylist(bronze, schema=bronze_schema), paths["bronze"])
     accepted = [
-        {"inspection_id": "i1", "bronze_row_number": 1, "item_sequence_num": 1,
-         "_SRC_FILE": "x", "_LOAD_DTM": "t", "source_violations_fragment": "r1",
+        {"inspection_id": "i1", "source_row_num": 1, "item_sequence_num": 1,
+         "source_violations_fragment": "r1",
          "violation_code": "1", "violation_description": "A", "violation_comments": "c1", "parsing_status": "PARSED"},
-        {"inspection_id": "i2", "bronze_row_number": 2, "item_sequence_num": 1,
-         "_SRC_FILE": "x", "_LOAD_DTM": "t", "source_violations_fragment": "r2",
+        {"inspection_id": "i2", "source_row_num": 2, "item_sequence_num": 1,
+         "source_violations_fragment": "r2",
          "violation_code": "1", "violation_description": "B", "violation_comments": "c2", "parsing_status": "PARSED"},
     ]
     pq.write_table(pa.Table.from_pylist(accepted, schema=silver_base.SILVER_SCHEMA), paths["accepted"])
     pq.write_table(pa.Table.from_pylist(accepted, schema=silver_base.SILVER_SCHEMA), paths["silver"])
-    quarantine = [{**accepted[0], "bronze_row_number": 3, "violation_description": None,
+    quarantine = [{**accepted[0], "source_row_num": 3, "violation_description": None,
                    "violation_comments": None, "parsing_status": "MISSING_COMMENTS_MARKER",
                    "rejection_reason": "MISSING_COMMENTS_MARKER"}]
     pq.write_table(pa.Table.from_pylist(quarantine, schema=silver.QUARANTINE_SCHEMA), paths["quarantine"])
@@ -60,10 +60,10 @@ def _write_fixture(tmp_path):
     ]
     pq.write_table(pa.Table.from_pylist(dim, schema=gold.DIM_SCHEMA), paths["dimension"])
     facts = [
-        {"bronze_row_number": 1, "item_sequence_num": 1, "inspection_id": "i1", "violation_key": 1,
-         "violation_comments": "c1", "source_violations_fragment": "r1", "_SRC_FILE": "x", "_LOAD_DTM": "t"},
-        {"bronze_row_number": 2, "item_sequence_num": 1, "inspection_id": "i2", "violation_key": 2,
-         "violation_comments": "c2", "source_violations_fragment": "r2", "_SRC_FILE": "x", "_LOAD_DTM": "t"},
+        {"source_row_num": 1, "item_sequence_num": 1, "inspection_id": "i1", "violation_key": 1,
+         "violation_comments": "c1", "source_violations_fragment": "r1"},
+        {"source_row_num": 2, "item_sequence_num": 1, "inspection_id": "i2", "violation_key": 2,
+         "violation_comments": "c2", "source_violations_fragment": "r2"},
     ]
     pq.write_table(pa.Table.from_pylist(facts, schema=gold.FACT_SCHEMA), paths["fact"])
     return root, paths
@@ -94,11 +94,11 @@ def test_new_rows_are_calculated_without_production_counts(tmp_path):
     bronze.append({"Inspection ID": "i3", "Facility Type": "Bakery", "Results": "Fail"})
     pq.write_table(pa.Table.from_pylist(bronze, schema=pq.read_schema(paths["bronze"])), paths["bronze"])
     accepted = pq.read_table(paths["accepted"]).to_pylist()
-    accepted.append({**accepted[0], "inspection_id": "i3", "bronze_row_number": 4, "violation_comments": "c3"})
+    accepted.append({**accepted[0], "inspection_id": "i3", "source_row_num": 4, "violation_comments": "c3"})
     pq.write_table(pa.Table.from_pylist(accepted, schema=silver_base.SILVER_SCHEMA), paths["accepted"])
     pq.write_table(pa.Table.from_pylist(accepted, schema=silver_base.SILVER_SCHEMA), paths["silver"])
     facts = pq.read_table(paths["fact"]).to_pylist()
-    facts.append({**facts[0], "inspection_id": "i3", "bronze_row_number": 4, "violation_comments": "c3"})
+    facts.append({**facts[0], "inspection_id": "i3", "source_row_num": 4, "violation_comments": "c3"})
     pq.write_table(pa.Table.from_pylist(facts, schema=gold.FACT_SCHEMA), paths["fact"])
     report = json.loads(paths["report"].read_text(encoding="utf-8"))
     report["counts"] = {"candidate_fragments": 4, "accepted": 3, "quarantined": 1}

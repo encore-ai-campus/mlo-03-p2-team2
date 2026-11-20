@@ -2,19 +2,23 @@
 
 import csv
 import json
+from importlib import import_module
 from pathlib import Path
 
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from src.profiling.profile_violations import profile_violations
-from src.quality.violations_quality import REPORT_RELATIVE, run as run_quality
-from src.silver.violations import SILVER_RELATIVE, SILVER_SCHEMA, run as run_silver
+profiling = import_module("src.domains.02_violation.profiling")
+profile_violations = profiling.profile_violations
+quality = import_module("src.domains.02_violation.quality")
+silver = import_module("src.domains.02_violation.silver")
+REPORT_RELATIVE, run_quality = quality.REPORT_RELATIVE, quality.run
+SILVER_RELATIVE, SILVER_SCHEMA, run_silver = silver.SILVER_RELATIVE, silver.SILVER_SCHEMA, silver.run
 
 
 def _prepared_root(root: Path) -> Path:
-    bronze = root / "data/01_bronze/food_inspections/food_inspections.parquet"
-    origin = root / "data/00_origin/food_inspections/food_inspections.csv"
+    bronze = root / profiling.BRONZE_RELATIVE
+    origin = root / profiling.ORIGIN_RELATIVE
     bronze.parent.mkdir(parents=True)
     origin.parent.mkdir(parents=True)
     origin.write_bytes(b"quality fixture origin")
@@ -22,25 +26,22 @@ def _prepared_root(root: Path) -> Path:
         {
             "Inspection ID": "0001",
             "Violations": "16. SURFACES CLEAN - Comments: CLEAN | 38. PESTS ABSENT - Comments: SEAL",
-            "_SRC_FILE": "fixture.csv",
-            "_LOAD_DTM": "2026-11-20T00:00:00Z",
+            "source_row_num": 1,
         },
         {
             "Inspection ID": "0002",
             "Violations": "1. PERSON IN CHARGE PRESENT",
-            "_SRC_FILE": "fixture.csv",
-            "_LOAD_DTM": "2026-11-20T00:00:00Z",
+            "source_row_num": 2,
         },
         {
             "Inspection ID": "0003",
             "Violations": "",
-            "_SRC_FILE": "fixture.csv",
-            "_LOAD_DTM": "2026-11-20T00:00:00Z",
+            "source_row_num": 3,
         },
     ]
     pq.write_table(pa.Table.from_pylist(rows), bronze)
     profile = profile_violations(root, batch_size=2)
-    profile_path = root / "reports/profiling/violations_profile.json"
+    profile_path = root / "reports/runs/02_violation/violations_profile.json"
     profile_path.parent.mkdir(parents=True)
     profile_path.write_text(json.dumps(profile), encoding="utf-8")
     run_silver(root)
@@ -72,8 +73,8 @@ def test_quality_passes_for_reconciled_silver_and_expected_nulls(tmp_path: Path)
     assert result["silver_null_counts"]["violation_comments"] == 1
     assert rules["column_null_count:violation_description"]["status"] == "PASS"
     assert rules["column_null_count:violation_description"]["issue_rows"] == 0
-    assert rules["bronze_lineage_and_fragment_match:bronze_row_number/item_sequence_num/inspection_id/source_violations_fragment"]["status"] == "PASS"
-    assert (tmp_path / "logs/violations_quality_runs.jsonl").is_file()
+    assert rules["bronze_lineage_and_fragment_match:source_row_num/item_sequence_num/inspection_id/source_violations_fragment"]["status"] == "PASS"
+    assert (tmp_path / "logs/02_violation/violations_quality_runs.jsonl").is_file()
     assert (tmp_path / REPORT_RELATIVE).is_file()
     assert len(_report_rows(tmp_path)) >= len(SILVER_SCHEMA)
 
@@ -90,5 +91,5 @@ def test_quality_fails_on_wrong_grain_key_and_raw_fragment(tmp_path: Path):
 
     assert result["status"] == "FAIL"
     assert result["duplicate_grain_keys"] == 1
-    assert rules["silver_grain_key_unique:bronze_row_number + item_sequence_num"]["status"] == "FAIL"
-    assert rules["bronze_lineage_and_fragment_match:bronze_row_number/item_sequence_num/inspection_id/source_violations_fragment"]["status"] == "FAIL"
+    assert rules["silver_grain_key_unique:source_row_num + item_sequence_num"]["status"] == "FAIL"
+    assert rules["bronze_lineage_and_fragment_match:source_row_num/item_sequence_num/inspection_id/source_violations_fragment"]["status"] == "FAIL"

@@ -18,17 +18,17 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from src.bronze.paths import PROJECT_ROOT
-from src.gold.violations import DIM_RELATIVE, FACT_RELATIVE, rows
-from src.profiling.profile_violations import BRONZE_RELATIVE, ORIGIN_RELATIVE, sha256
-from src.silver.violations import SILVER_RELATIVE
-from src.silver.violations_reconciliation import ACCEPTED_RELATIVE, QUARANTINE_RELATIVE, REPORT_RELATIVE
+from .gold import DIM_RELATIVE, FACT_RELATIVE, rows
+from .profiling import BRONZE_RELATIVE, origin_snapshot, sha256
+from .silver import SILVER_RELATIVE
+from .reconciliation import ACCEPTED_RELATIVE, QUARANTINE_RELATIVE, REPORT_RELATIVE
 
 
-MART_RELATIVE = Path("data/03_gold/marts/violations_analysis_mart.parquet")
-HTML_RELATIVE = Path("reports/violations_analysis.html")
-LOG_RELATIVE = Path("logs/violations_analysis_runs.jsonl")
+MART_RELATIVE = Path("data/03_gold/02_violation/02_violations_analysis_mart.parquet")
+HTML_RELATIVE = Path("reports/02_violation/violations_analysis.html")
+LOG_RELATIVE = Path("logs/02_violation/violations_analysis_runs.jsonl")
 MART_SCHEMA = pa.schema([
-    pa.field("bronze_row_number", pa.int64(), nullable=False),
+    pa.field("source_row_num", pa.int64(), nullable=False),
     pa.field("item_sequence_num", pa.int32(), nullable=False),
     pa.field("inspection_id", pa.string(), nullable=False),
     pa.field("facility_type", pa.string(), nullable=False),
@@ -40,7 +40,7 @@ MART_SCHEMA = pa.schema([
 ])
 BRONZE_COLUMNS = ["Inspection ID", "Facility Type", "Results"]
 FACT_COLUMNS = [
-    "bronze_row_number", "item_sequence_num", "inspection_id", "violation_key", "violation_comments"
+    "source_row_num", "item_sequence_num", "inspection_id", "violation_key", "violation_comments"
 ]
 FAIL_VALUE = "Fail"
 TOP_N = 15
@@ -119,8 +119,9 @@ h1,h2{{color:#16324f}} .cards{{display:flex;gap:16px;flex-wrap:wrap}} .card{{pad
 def build(root: Path = PROJECT_ROOT, output_root: Path | None = None) -> dict:
     root = Path(root)
     output_root = Path(output_root) if output_root is not None else root
+    origin_before = origin_snapshot(root)
     paths = {
-        "origin": root / ORIGIN_RELATIVE, "bronze": root / BRONZE_RELATIVE,
+        "bronze": root / BRONZE_RELATIVE,
         "silver": root / SILVER_RELATIVE, "accepted": root / ACCEPTED_RELATIVE,
         "quarantine": root / QUARANTINE_RELATIVE, "reconciliation": root / REPORT_RELATIVE,
         "dimension": root / DIM_RELATIVE, "fact": root / FACT_RELATIVE,
@@ -185,7 +186,7 @@ def build(root: Path = PROJECT_ROOT, output_root: Path | None = None) -> dict:
             for batch in pq.ParquetFile(paths["fact"]).iter_batches(columns=FACT_COLUMNS, batch_size=CHUNK):
                 output = []
                 for fact in batch.to_pylist():
-                    fact_grain = fact["bronze_row_number"], fact["item_sequence_num"]
+                    fact_grain = fact["source_row_num"], fact["item_sequence_num"]
                     if fact_grain in grain:
                         raise ValueError(f"Duplicate Fact grain: {fact_grain}")
                     grain.add(fact_grain)
@@ -198,7 +199,7 @@ def build(root: Path = PROJECT_ROOT, output_root: Path | None = None) -> dict:
                     facility, result = attributes
                     code, description = pair
                     mart_row = {
-                        "bronze_row_number": fact["bronze_row_number"],
+                        "source_row_num": fact["source_row_num"],
                         "item_sequence_num": fact["item_sequence_num"],
                         "inspection_id": fact["inspection_id"], "facility_type": facility,
                         "inspection_result": result, "violation_key": fact["violation_key"],
@@ -230,6 +231,10 @@ def build(root: Path = PROJECT_ROOT, output_root: Path | None = None) -> dict:
         for name, digest in protected.items():
             if sha256(paths[name]) != digest:
                 raise ValueError(f"Protected input changed: {paths[name]}")
+        origin_after = origin_snapshot(root)
+        if (origin_after["source_sha256"] != origin_before["source_sha256"]
+                or origin_after["guard_sha256"] != origin_before["guard_sha256"]):
+            raise ValueError("Protected Origin inputs changed during analysis")
         for temp, final in ((mart_temp, mart_path), (html_temp, html_path)):
             if final.exists() and sha256(temp) != sha256(final):
                 raise FileExistsError(f"Existing analysis output differs: {final}")
@@ -248,6 +253,9 @@ def build(root: Path = PROJECT_ROOT, output_root: Path | None = None) -> dict:
             "orphan_dimension": orphan_dimension, "unexpected_row_change": mart_count - fact_count,
             "duplicate_grain": 0, "mart_content_sha256": _content_hash(mart_path),
             "mart_sha256": sha256(mart_path), "html_sha256": sha256(html_path),
+            "origin_sha256": origin_before["source_sha256"],
+            "origin_guard_sha256": origin_before["guard_sha256"],
+            "origin_storage_files": origin_before["storage_files"],
             "protected_sha256": protected,
             "top_code": list(summary["top_codes"][0]),
             "top_type": [*summary["top_types"][0][0], summary["top_types"][0][1]],

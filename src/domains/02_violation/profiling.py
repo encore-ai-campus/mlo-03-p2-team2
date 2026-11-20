@@ -1,12 +1,13 @@
 """Profile the raw Food Inspections Violations text in the Bronze Parquet.
 
-Run from the repository root with: python -m src.profiling.profile_violations
+Run from the repository root with: python -m src.domains.02_violation.profiling
 The script is read-only for Origin and Bronze and writes one JSON report.
 """
 
 from __future__ import annotations
 
 from collections import Counter
+import csv
 from datetime import datetime, timezone
 import hashlib
 import json
@@ -18,10 +19,18 @@ import pyarrow.parquet as pq
 from src.bronze.paths import PROJECT_ROOT
 
 
-BRONZE_RELATIVE = Path("data/01_bronze/food_inspections/food_inspections.parquet")
-ORIGIN_RELATIVE = Path("data/00_origin/food_inspections/food_inspections.csv")
-OUTPUT_RELATIVE = Path("reports/profiling/violations_profile.json")
+BRONZE_RELATIVE = Path("data/01_bronze/02_violation/02_food_inspections.parquet")
+ORIGIN_RELATIVE = Path("data/00_origin/food_inspections.csv")
+LEGACY_ORIGIN_RELATIVE = Path("data/00_origin/food_inspections/food_inspections.csv")
+ORIGIN_CHECKSUMS_RELATIVE = Path("data/00_origin/SHA256SUMS")
+SOURCE_CATALOG_RELATIVE = Path("metadata/source_catalog/verification/download_manifest.csv")
+ORIGIN_PARTS = (
+    "food_inspections.csv.gz.part-001",
+    "food_inspections.csv.gz.part-002",
+)
+OUTPUT_RELATIVE = Path("reports/runs/02_violation/violations_profile.json")
 FIELD_NAME = "Violations"
+SOURCE_ROW_COLUMN = "source_row_num"
 FRAGMENT_SEPARATOR = re.compile(r"\s+\|\s+")
 CODE_HEADER = re.compile(r"^(?P<code>\d+[A-Z]?)\.\s+(?P<body>.+)$")
 COMMENTS_MARKER = re.compile(r"\s+-\s+Comments:|\s+Comments:")
@@ -40,6 +49,62 @@ def sha256(path: Path) -> str:
         for block in iter(lambda: stream.read(8 * 1024 * 1024), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def origin_snapshot(root: Path = PROJECT_ROOT) -> dict:
+    """Return the source identity and a read-only guard for either Origin layout."""
+    root = Path(root)
+    checksums_path = root / ORIGIN_CHECKSUMS_RELATIVE
+    if not checksums_path.is_file():
+        for relative in (LEGACY_ORIGIN_RELATIVE, ORIGIN_RELATIVE):
+            path = root / relative
+            if path.is_file():
+                digest = sha256(path)
+                return {
+                    "source_file": relative.as_posix(),
+                    "source_sha256": digest,
+                    "source_file_bytes": path.stat().st_size,
+                    "storage_files": [relative.as_posix()],
+                    "guard_sha256": digest,
+                    "catalog_verified": False,
+                }
+        raise FileNotFoundError(checksums_path)
+
+    catalog_path = root / SOURCE_CATALOG_RELATIVE
+    source_name = ORIGIN_RELATIVE.name
+    with catalog_path.open(encoding="utf-8-sig", newline="") as stream:
+        catalog_rows = [row for row in csv.DictReader(stream) if row.get("File") == source_name]
+    if len(catalog_rows) != 1:
+        raise ValueError("Source catalog must contain one Food Inspections entry")
+    source_sha = catalog_rows[0]["SHA256"].lower()
+    source_bytes = int(catalog_rows[0]["Bytes"])
+
+    expected = {}
+    for line in checksums_path.read_text(encoding="ascii").splitlines():
+        digest, name = line.split("  ", 1)
+        expected[name] = digest.lower()
+    storage_paths = [root / "data" / "00_origin" / name for name in ORIGIN_PARTS]
+    part_hashes = []
+    for name, path in zip(ORIGIN_PARTS, storage_paths):
+        if not path.is_file():
+            raise FileNotFoundError(path)
+        actual = sha256(path)
+        if expected.get(name) != actual:
+            raise ValueError(f"Origin part SHA-256 differs: {name}")
+
+        part_hashes.append(actual)
+
+    guard = hashlib.sha256()
+    for digest in (sha256(catalog_path), sha256(checksums_path), *part_hashes):
+        guard.update(bytes.fromhex(digest))
+    return {
+        "source_file": (Path("data/00_origin") / source_name).as_posix(),
+        "source_sha256": source_sha,
+        "source_file_bytes": source_bytes,
+        "storage_files": [path.relative_to(root).as_posix() for path in storage_paths],
+        "guard_sha256": guard.hexdigest(),
+        "catalog_verified": True,
+    }
 
 
 def shortened(value: str) -> str:
@@ -75,15 +140,17 @@ def profile_violations(root: Path = PROJECT_ROOT, batch_size: int = 10_000) -> d
     """Stream Bronze and return row, separator, code and text-pattern metrics."""
     root = Path(root)
     bronze_path = root / BRONZE_RELATIVE
-    origin_path = root / ORIGIN_RELATIVE
+    origin = origin_snapshot(root)
     if not bronze_path.is_file():
         raise FileNotFoundError(bronze_path)
-    if not origin_path.is_file():
-        raise FileNotFoundError(origin_path)
-
+    bronze_sha = sha256(bronze_path)
     parquet = pq.ParquetFile(bronze_path)
-    if FIELD_NAME not in parquet.schema_arrow.names:
-        raise ValueError(f"{bronze_path} has no {FIELD_NAME!r} column")
+    metadata = parquet.schema_arrow.metadata or {}
+    if origin["catalog_verified"] and metadata.get(b"origin_sha256") != origin["source_sha256"].encode("ascii"):
+        raise ValueError("02 Bronze does not match the shared Origin checksum")
+    missing = {FIELD_NAME, SOURCE_ROW_COLUMN} - set(parquet.schema_arrow.names)
+    if missing:
+        raise ValueError(f"{bronze_path} is missing required columns: {sorted(missing)}")
 
     counts: Counter[str] = Counter()
     code_counts: Counter[str] = Counter()
@@ -93,9 +160,13 @@ def profile_violations(root: Path = PROJECT_ROOT, batch_size: int = 10_000) -> d
         "no_code_header": [],
         "unrecognized_pipe_separator": [],
     }
-    for batch in parquet.iter_batches(columns=[FIELD_NAME], batch_size=batch_size):
-        for raw in batch.column(0).to_pylist():
+    for batch in parquet.iter_batches(columns=[FIELD_NAME, SOURCE_ROW_COLUMN], batch_size=batch_size):
+        for raw, source_row_num in zip(batch.column(0).to_pylist(), batch.column(1).to_pylist()):
             counts["total_rows"] += 1
+            if source_row_num != counts["total_rows"]:
+                raise ValueError(
+                    f"Bronze source_row_num is not sequential at row {counts['total_rows']}"
+                )
             if raw is None:
                 counts["null_rows"] += 1
                 continue
@@ -183,12 +254,14 @@ def profile_violations(root: Path = PROJECT_ROOT, batch_size: int = 10_000) -> d
         "dataset": "food_inspections",
         "field": FIELD_NAME,
         "source": {
-            "origin_file": str(ORIGIN_RELATIVE.as_posix()),
-            "origin_file_bytes": origin_path.stat().st_size,
-            "origin_sha256": sha256(origin_path),
+            "origin_file": origin["source_file"],
+            "origin_file_bytes": origin["source_file_bytes"],
+            "origin_sha256": origin["source_sha256"],
+            "origin_storage_files": origin["storage_files"],
+            "origin_guard_sha256": origin["guard_sha256"],
             "bronze_file": str(BRONZE_RELATIVE.as_posix()),
             "bronze_file_bytes": bronze_path.stat().st_size,
-            "bronze_sha256": sha256(bronze_path),
+            "bronze_sha256": bronze_sha,
             "bronze_rows": parquet.metadata.num_rows,
             "bronze_columns": len(parquet.schema_arrow.names),
             "bronze_field_type": str(parquet.schema_arrow.field(FIELD_NAME).type),

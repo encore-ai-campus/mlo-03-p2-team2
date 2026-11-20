@@ -2,7 +2,7 @@
 
 ## 목적과 입력
 
-Silver는 원천 위반 문구를 분리하고 품질에 따라 정상·격리로 나눈다. Gold는 검증된 정상 조각을 분석 가능한 차원(Dimension: 위반 종류의 식별 정보)과 사실(Fact: 검사에서 발생한 위반 사건)로 연결하는 Star Schema다. 입력은 `data/02_silver/food_inspections/violations/inspection_violations_accepted.parquet`이며 quarantine은 Gold에 넣지 않는다. 실행: `python -m src.gold.violations`.
+Silver는 원천 위반 문구를 분리하고 품질에 따라 정상·격리로 나눈다. Gold는 검증된 정상 조각을 분석 가능한 차원(Dimension: 위반 종류의 식별 정보)과 사실(Fact: 검사에서 발생한 위반 사건)로 연결하는 Star Schema다. 입력은 `data/02_silver/food_inspections/violations/inspection_violations_accepted.parquet`이며 quarantine은 Gold에 넣지 않는다. 실행: `python -m src.domains.02_violation.gold`.
 
 기존 `data/03_gold/`에는 `dimensions/`, `facts/`, `marts/`의 `.gitkeep`만 있었고 `src/gold/` 및 inspection 부모 Gold 테이블은 없었다. 기존 팀 문서의 `inspection_key`는 확정된 부모 PK가 아닌 제안이다.
 

@@ -1,6 +1,6 @@
 """Partition Bronze Violations fragments into accepted and quarantine Parquet.
 
-Run from the repository root: python -m src.silver.violations_reconciliation
+Run from the repository root: python -m src.domains.02_violation.reconciliation
 """
 
 from __future__ import annotations
@@ -19,18 +19,18 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from src.bronze.paths import PROJECT_ROOT
-from src.profiling.profile_violations import BRONZE_RELATIVE, FRAGMENT_SEPARATOR, ORIGIN_RELATIVE, sha256
-from src.silver.violations import SILVER_SCHEMA, parse_fragment
+from .profiling import BRONZE_RELATIVE, FRAGMENT_SEPARATOR, origin_snapshot, sha256
+from .silver import SILVER_SCHEMA, parse_fragment
 
 
-ACCEPTED_RELATIVE = Path("data/02_silver/food_inspections/violations/inspection_violations_accepted.parquet")
-QUARANTINE_RELATIVE = Path("data/quarantine/food_inspections/violations/inspection_violations_quarantine.parquet")
-REPORT_RELATIVE = Path("reports/quality/violations_reconciliation.json")
-MAPPING_RELATIVE = Path("metadata/standards/violations_reconciliation_mapping.csv")
-LOG_RELATIVE = Path("logs/violations_reconciliation_runs.jsonl")
+ACCEPTED_RELATIVE = Path("data/02_silver/02_violation/02_inspection_violations_accepted.parquet")
+QUARANTINE_RELATIVE = Path("data/02_silver/02_violation/02_inspection_violations_quarantine.parquet")
+REPORT_RELATIVE = Path("reports/runs/02_violation/violations_reconciliation.json")
+MAPPING_RELATIVE = Path("metadata/standards/02_violation/violations_reconciliation_mapping.csv")
+LOG_RELATIVE = Path("logs/02_violation/violations_reconciliation_runs.jsonl")
 QUARANTINE_SCHEMA = SILVER_SCHEMA.append(pa.field("rejection_reason", pa.string(), nullable=False))
 CODE_PATTERN = re.compile(r"\d+[A-Z]?\Z")
-SOURCE_COLUMNS = ["Inspection ID", "Violations", "_SRC_FILE", "_LOAD_DTM"]
+SOURCE_COLUMNS = ["Inspection ID", "Violations", "source_row_num"]
 CHUNK = 10_000
 
 
@@ -48,8 +48,8 @@ def _reason(row: dict) -> str | None:
     """Only fully parsed, traceable fragments enter the accepted table."""
     if not row["inspection_id"]:
         return "MISSING_INSPECTION_ID"
-    if not row["_SRC_FILE"] or not row["_LOAD_DTM"]:
-        return "MISSING_LINEAGE_METADATA"
+    if row["source_row_num"] is None or row["source_row_num"] < 1:
+        return "INVALID_SOURCE_ROW_NUM"
     if row["parsing_status"] != "PARSED":
         return row["parsing_status"]
     if row["violation_code"] is None or not CODE_PATTERN.fullmatch(row["violation_code"]):
@@ -93,11 +93,11 @@ def run(root: Path = PROJECT_ROOT, output_root: Path | None = None) -> dict:
     root = Path(root)
     output_root = Path(output_root) if output_root is not None else root
     bronze_path = root / BRONZE_RELATIVE
-    origin_path = root / ORIGIN_RELATIVE
-    for path in (bronze_path, origin_path):
-        if not path.is_file():
-            raise FileNotFoundError(path)
-    bronze_before, origin_before = sha256(bronze_path), sha256(origin_path)
+    if not bronze_path.is_file():
+        raise FileNotFoundError(bronze_path)
+    origin_before = origin_snapshot(root)
+    bronze_before = sha256(bronze_path)
+    origin_before_sha = origin_before["source_sha256"]
     started = datetime.now(timezone.utc).isoformat()
     counts, reasons = Counter(), Counter()
     expected_lineage = hashlib.sha256()
@@ -118,6 +118,8 @@ def run(root: Path = PROJECT_ROOT, output_root: Path | None = None) -> dict:
             writers = [accepted_writer, quarantine_writer]
             for row_number, source_row in enumerate(_rows(bronze_path, SOURCE_COLUMNS), 1):
                 counts["bronze_inspections"] += 1
+                if source_row["source_row_num"] != row_number:
+                    raise ValueError(f"Bronze source_row_num is not sequential at row {row_number}")
                 raw = source_row["Violations"]
                 if raw is None or not raw.strip():
                     counts["empty_inspections"] += 1
@@ -135,14 +137,11 @@ def run(root: Path = PROJECT_ROOT, output_root: Path | None = None) -> dict:
                                "violation_comments": None, "parsing_status": "UNRECOGNIZED_SEPARATOR"}
                               if bad_separator else parse_fragment(fragment))
                     item = {"inspection_id": source_row["Inspection ID"],
-                            "bronze_row_number": row_number, "item_sequence_num": sequence,
-                            "_SRC_FILE": source_row["_SRC_FILE"], "_LOAD_DTM": source_row["_LOAD_DTM"],
+                            "source_row_num": source_row["source_row_num"], "item_sequence_num": sequence,
                             "source_violations_fragment": fragment, **parsed}
-                    expected_lineage.update(_record_bytes({"bronze_row_number": row_number,
+                    expected_lineage.update(_record_bytes({"source_row_num": source_row["source_row_num"],
                                                            "item_sequence_num": sequence,
                                                            "inspection_id": item["inspection_id"],
-                                                           "_SRC_FILE": item["_SRC_FILE"],
-                                                           "_LOAD_DTM": item["_LOAD_DTM"],
                                                            "source_violations_fragment": fragment}))
                     reason = _reason(item)
                     partition = 1 if reason else 0
@@ -176,13 +175,13 @@ def run(root: Path = PROJECT_ROOT, output_root: Path | None = None) -> dict:
         quarantine_iter = iter(_rows(temps[1], QUARANTINE_SCHEMA.names))
         a, q = next(accepted_iter, None), next(quarantine_iter, None)
         while a is not None or q is not None:
-            use_accepted = q is None or (a is not None and (a["bronze_row_number"], a["item_sequence_num"]) < (q["bronze_row_number"], q["item_sequence_num"]))
+            use_accepted = q is None or (a is not None and (a["source_row_num"], a["item_sequence_num"]) < (q["source_row_num"], q["item_sequence_num"]))
             row = a if use_accepted else q
-            key = (row["bronze_row_number"], row["item_sequence_num"])
+            key = (row["source_row_num"], row["item_sequence_num"])
             if key in seen:
                 issues["duplicate_grain"] += 1
             seen.add(key)
-            lineage.update(_record_bytes({name: row[name] for name in ("bronze_row_number", "item_sequence_num", "inspection_id", "_SRC_FILE", "_LOAD_DTM", "source_violations_fragment")}))
+            lineage.update(_record_bytes({name: row[name] for name in ("source_row_num", "item_sequence_num", "inspection_id", "source_violations_fragment")}))
             if use_accepted:
                 if _reason(row) is not None:
                     issues["misclassified_accepted"] += 1
@@ -192,12 +191,18 @@ def run(root: Path = PROJECT_ROOT, output_root: Path | None = None) -> dict:
                     issues["misclassified_quarantine"] += 1
                 q = next(quarantine_iter, None)
         issues["lineage_or_missing_fragment"] = int(lineage.hexdigest() != expected_lineage.hexdigest())
-        issues["input_hash_changed"] = int(sha256(bronze_path) != bronze_before or sha256(origin_path) != origin_before)
+        origin_after = origin_snapshot(root)
+        issues["input_hash_changed"] = int(
+            sha256(bronze_path) != bronze_before
+            or origin_after["source_sha256"] != origin_before_sha
+            or origin_after["guard_sha256"] != origin_before["guard_sha256"]
+        )
         status = "PASS" if not any(issues.values()) else "FAIL"
         unexpected_reasons = {reason: count for reason, count in reasons.items()
                               if reason != "MISSING_COMMENTS_MARKER"}
         result = {"status": status, "source_bronze": BRONZE_RELATIVE.as_posix(),
-                  "source_bronze_sha256": bronze_before, "origin_sha256": origin_before,
+                  "source_bronze_sha256": bronze_before, "origin_sha256": origin_before_sha,
+                  "origin_guard_sha256": origin_before["guard_sha256"],
                   "accepted_file": ACCEPTED_RELATIVE.as_posix(), "quarantine_file": QUARANTINE_RELATIVE.as_posix(),
                   "counts": dict(counts), "quarantine_reasons": dict(reasons),
                   "unexpected_quarantine_reasons": unexpected_reasons,

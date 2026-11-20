@@ -1,6 +1,6 @@
 """Read-only quality checks for the Food Inspections Violations Silver table.
 
-Run from the repository root with: python -m src.quality.violations_quality
+Run from the repository root with: python -m src.domains.02_violation.quality
 """
 
 from __future__ import annotations
@@ -18,23 +18,24 @@ import uuid
 import pyarrow.parquet as pq
 
 from src.bronze.paths import PROJECT_ROOT
-from src.profiling.profile_violations import (
+from .profiling import (
     BRONZE_RELATIVE,
     CODE_HEADER,
     FRAGMENT_SEPARATOR,
     ORIGIN_RELATIVE,
     OUTPUT_RELATIVE as PROFILE_RELATIVE,
     COMMENTS_MARKER,
+    origin_snapshot,
     sha256,
 )
-from src.silver.violations import SILVER_RELATIVE, MAPPING_RELATIVE, SILVER_SCHEMA
+from .silver import SILVER_RELATIVE, MAPPING_RELATIVE, SILVER_SCHEMA
 
 
-REPORT_RELATIVE = Path("reports/quality/violations_quality_report.csv")
-RUN_LOG_RELATIVE = Path("logs/violations_quality_runs.jsonl")
+REPORT_RELATIVE = Path("reports/runs/02_violation/violations_quality_report.csv")
+RUN_LOG_RELATIVE = Path("logs/02_violation/violations_quality_runs.jsonl")
 INSPECTION_ID = "Inspection ID"
 VIOLATIONS = "Violations"
-LINEAGE_COLUMNS = (INSPECTION_ID, VIOLATIONS, "_SRC_FILE", "_LOAD_DTM")
+LINEAGE_COLUMNS = (INSPECTION_ID, VIOLATIONS, "source_row_num")
 SILVER_COLUMNS = list(SILVER_SCHEMA.names)
 CODE_VALUE_PATTERN = re.compile(r"\d+[A-Z]?\Z")
 EXPECTED_STATUSES = {
@@ -49,6 +50,7 @@ INTENTIONAL_NULL_COLUMNS = {"violation_description", "violation_comments"}
 MAPPING_EXPECTED_TARGETS = {
     "source_violations_fragment",
     "inspection_id",
+    "source_row_num",
     "violation_code",
     "violation_description",
     "violation_comments",
@@ -212,7 +214,7 @@ def _append_log(path: Path, record: dict) -> None:
 def run(root: Path = PROJECT_ROOT) -> dict:
     """Recompute Bronze expectations and compare them with Silver and its Mapping."""
     root = Path(root)
-    origin_path = root / ORIGIN_RELATIVE
+    origin_before_snapshot = origin_snapshot(root)
     bronze_path = root / BRONZE_RELATIVE
     silver_path = root / SILVER_RELATIVE
     profile_path = root / PROFILE_RELATIVE
@@ -220,7 +222,7 @@ def run(root: Path = PROJECT_ROOT) -> dict:
     report_path = root / REPORT_RELATIVE
     log_path = root / RUN_LOG_RELATIVE
 
-    for path in (origin_path, bronze_path, silver_path, profile_path, mapping_path):
+    for path in (bronze_path, silver_path, profile_path, mapping_path):
         if not path.is_file():
             raise FileNotFoundError(path)
     started = utc_now()
@@ -232,7 +234,7 @@ def run(root: Path = PROJECT_ROOT) -> dict:
         "status": "RUNNING",
     }
     try:
-        origin_before = sha256(origin_path)
+        origin_before = origin_before_snapshot["source_sha256"]
         bronze_before = sha256(bronze_path)
         silver_before = sha256(silver_path)
         mapping_hash = sha256(mapping_path)
@@ -275,12 +277,12 @@ def run(root: Path = PROJECT_ROOT) -> dict:
             if code is not None:
                 actual_code_set.add(code)
                 code_format_failures += not bool(CODE_VALUE_PATTERN.fullmatch(code))
-            bronze_row_number = row["bronze_row_number"]
+            source_row_num = row["source_row_num"]
             sequence = row["item_sequence_num"]
-            if bronze_row_number is None or sequence is None or bronze_row_number < 1 or sequence < 1:
+            if source_row_num is None or sequence is None or source_row_num < 1 or sequence < 1:
                 sequence_invalid_rows += 1
             else:
-                key = (int(bronze_row_number) << 32) | int(sequence)
+                key = (int(source_row_num) << 32) | int(sequence)
                 if key in seen_grain_keys:
                     duplicate_grain_keys += 1
                 else:
@@ -288,24 +290,26 @@ def run(root: Path = PROJECT_ROOT) -> dict:
 
         for row_number, source in enumerate(_source_records(bronze), start=1):
             source_counts["bronze_rows"] += 1
+            if source["source_row_num"] != row_number:
+                lineage_issue_rows += 1
             raw = source[VIOLATIONS]
             if raw is None:
                 source_counts["null_cells"] += 1
-                if actual_row is not None and actual_row["bronze_row_number"] == row_number:
+                if actual_row is not None and actual_row["source_row_num"] == source["source_row_num"]:
                     blank_source_output_rows += 1
                     inspect_actual(actual_row)
                     actual_row = next(actual_row_iter, None)
                 continue
             if raw == "":
                 source_counts["empty_cells"] += 1
-                if actual_row is not None and actual_row["bronze_row_number"] == row_number:
+                if actual_row is not None and actual_row["source_row_num"] == source["source_row_num"]:
                     blank_source_output_rows += 1
                     inspect_actual(actual_row)
                     actual_row = next(actual_row_iter, None)
                 continue
             if not raw.strip():
                 source_counts["whitespace_cells"] += 1
-                if actual_row is not None and actual_row["bronze_row_number"] == row_number:
+                if actual_row is not None and actual_row["source_row_num"] == source["source_row_num"]:
                     blank_source_output_rows += 1
                     inspect_actual(actual_row)
                     actual_row = next(actual_row_iter, None)
@@ -333,15 +337,13 @@ def run(root: Path = PROJECT_ROOT) -> dict:
                     continue
                 inspect_actual(actual_row)
                 current_key = (
-                    actual_row["bronze_row_number"],
+                    actual_row["source_row_num"],
                     actual_row["item_sequence_num"],
                 )
-                row_lineage_mismatch = current_key != (row_number, sequence) or (
+                row_lineage_mismatch = current_key != (source["source_row_num"], sequence) or (
                     actual_row["inspection_id"] != source[INSPECTION_ID]
-                    or actual_row["bronze_row_number"] != row_number
+                    or actual_row["source_row_num"] != source["source_row_num"]
                     or actual_row["item_sequence_num"] != sequence
-                    or actual_row["_SRC_FILE"] != source["_SRC_FILE"]
-                    or actual_row["_LOAD_DTM"] != source["_LOAD_DTM"]
                     or actual_row["source_violations_fragment"] != fragment
                 )
                 if row_lineage_mismatch:
@@ -406,6 +408,7 @@ def run(root: Path = PROJECT_ROOT) -> dict:
         mapping_expected = {
             "source_violations_fragment": output_rows,
             "inspection_id": output_rows,
+            "source_row_num": output_rows,
             "violation_code": output_rows - null_counts["violation_code"],
             "violation_description": output_rows - null_counts["violation_description"],
             "violation_comments": output_rows - null_counts["violation_comments"],
@@ -492,15 +495,15 @@ def run(root: Path = PROJECT_ROOT) -> dict:
         )
         _add_rule(
             rules, "bronze_lineage_and_fragment_match",
-            "bronze_row_number/item_sequence_num/inspection_id/source_violations_fragment",
+            "source_row_num/item_sequence_num/inspection_id/source_violations_fragment",
             source_counts["candidate_records"], lineage_issue_rows,
-            "Compared every Silver record in order with its Bronze row, source ID, lineage columns, and raw fragment.",
+            "Compared every Silver record with its Bronze source row number, source ID, and raw fragment.",
         )
         _add_rule(
             rules, "silver_grain_key_unique",
-            "bronze_row_number + item_sequence_num", output_rows,
+            "source_row_num + item_sequence_num", output_rows,
             duplicate_grain_keys + sequence_invalid_rows,
-            "Grain key identifies one violation fragment within its Bronze inspection row; repeated codes are allowed.",
+            "Grain key identifies one violation fragment within its source inspection row; repeated codes are allowed.",
         )
         for column in SILVER_COLUMNS:
             allowed_nulls = (
@@ -538,11 +541,13 @@ def run(root: Path = PROJECT_ROOT) -> dict:
                 f"Silver readback rows={output_rows}, metadata={silver.metadata.num_rows}.",
             )
 
-        origin_after = sha256(origin_path)
+        origin_after_snapshot = origin_snapshot(root)
+        origin_after = origin_after_snapshot["source_sha256"]
         bronze_after = sha256(bronze_path)
         silver_after = sha256(silver_path)
         hashes_unchanged = (
             origin_before == origin_after
+            and origin_before_snapshot["guard_sha256"] == origin_after_snapshot["guard_sha256"]
             and bronze_before == bronze_after
             and silver_before == silver_after
         )
@@ -551,6 +556,8 @@ def run(root: Path = PROJECT_ROOT) -> dict:
         hash_rule["status"] = "PASS" if hashes_unchanged else "FAIL"
         hash_rule["note"] = (
             f"Origin before/after={origin_before}/{origin_after}; "
+            f"Origin guard before/after={origin_before_snapshot['guard_sha256']}/"
+            f"{origin_after_snapshot['guard_sha256']}; "
             f"Bronze before/after={bronze_before}/{bronze_after}; "
             f"Silver before/after={silver_before}/{silver_after}."
         )
@@ -572,6 +579,9 @@ def run(root: Path = PROJECT_ROOT) -> dict:
             "bronze_sha256_after": bronze_after,
             "origin_sha256_before": origin_before,
             "origin_sha256_after": origin_after,
+            "origin_guard_sha256_before": origin_before_snapshot["guard_sha256"],
+            "origin_guard_sha256_after": origin_after_snapshot["guard_sha256"],
+            "origin_storage_files": origin_before_snapshot["storage_files"],
             "silver_sha256_before": silver_before,
             "silver_sha256_after": silver_after,
             "mapping_sha256": mapping_hash,

@@ -3,13 +3,16 @@
 import csv
 import json
 import hashlib
+from importlib import import_module
 from pathlib import Path
 
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from src.profiling.profile_violations import profile_violations
-from src.silver.violations import SILVER_SCHEMA, parse_fragment, run
+profiling = import_module("src.domains.02_violation.profiling")
+profile_violations = profiling.profile_violations
+silver = import_module("src.domains.02_violation.silver")
+SILVER_SCHEMA, parse_fragment, run = silver.SILVER_SCHEMA, silver.parse_fragment, silver.run
 
 
 def test_parse_complete_record_and_missing_comments_exception():
@@ -40,8 +43,8 @@ def test_unparseable_header_is_preserved_as_status():
 
 
 def test_pipeline_writes_only_nonempty_fragments_and_reconciles_profile(tmp_path: Path):
-    bronze = tmp_path / "data/01_bronze/food_inspections/food_inspections.parquet"
-    origin = tmp_path / "data/00_origin/food_inspections/food_inspections.csv"
+    bronze = tmp_path / profiling.BRONZE_RELATIVE
+    origin = tmp_path / profiling.ORIGIN_RELATIVE
     bronze.parent.mkdir(parents=True)
     origin.parent.mkdir(parents=True)
     origin.write_bytes(b"fixture-origin")
@@ -49,25 +52,22 @@ def test_pipeline_writes_only_nonempty_fragments_and_reconciles_profile(tmp_path
         {
             "Inspection ID": "0001",
             "Violations": "16. SURFACES CLEAN - Comments: CLEAN | 38. PESTS ABSENT - Comments: SEAL",
-            "_SRC_FILE": "fixture.csv",
-            "_LOAD_DTM": "2026-11-20T00:00:00Z",
+            "source_row_num": 1,
         },
         {
             "Inspection ID": "0002",
             "Violations": "1. PERSON IN CHARGE PRESENT",
-            "_SRC_FILE": "fixture.csv",
-            "_LOAD_DTM": "2026-11-20T00:00:00Z",
+            "source_row_num": 2,
         },
         {
             "Inspection ID": "0003",
             "Violations": "",
-            "_SRC_FILE": "fixture.csv",
-            "_LOAD_DTM": "2026-11-20T00:00:00Z",
+            "source_row_num": 3,
         },
     ]
     pq.write_table(pa.Table.from_pylist(rows), bronze)
     profile = profile_violations(tmp_path, batch_size=2)
-    profile_path = tmp_path / "reports/profiling/violations_profile.json"
+    profile_path = tmp_path / "reports/runs/02_violation/violations_profile.json"
     profile_path.parent.mkdir(parents=True)
     profile_path.write_text(json.dumps(profile), encoding="utf-8")
     bronze_hash_before = hashlib.sha256(bronze.read_bytes()).hexdigest()
@@ -75,7 +75,7 @@ def test_pipeline_writes_only_nonempty_fragments_and_reconciles_profile(tmp_path
 
     result = run(tmp_path)
 
-    output = tmp_path / "data/02_silver/food_inspections/violations/inspection_violations.parquet"
+    output = tmp_path / "data/02_silver/02_violation/02_inspection_violations.parquet"
     silver = pq.ParquetFile(output)
     assert silver.metadata.num_rows == 3
     assert silver.schema_arrow == SILVER_SCHEMA
@@ -99,4 +99,4 @@ def test_pipeline_writes_only_nonempty_fragments_and_reconciles_profile(tmp_path
     with (tmp_path / "metadata/standards/violations_mapping.csv").open(encoding="utf-8", newline="") as stream:
         mappings = list(csv.DictReader(stream))
     assert any(r["target_column"] == "violation_code" and r["affected_rows"] == "3" for r in mappings)
-    assert (tmp_path / "logs/violations_silver_runs.jsonl").is_file()
+    assert (tmp_path / "logs/02_violation/violations_silver_runs.jsonl").is_file()

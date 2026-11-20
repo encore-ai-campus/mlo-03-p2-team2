@@ -1,6 +1,6 @@
 """Create Silver violation records from Food Inspections Bronze.
 
-Run from the repository root with: python -m src.silver.violations
+Run from the repository root with: python -m src.domains.02_violation.silver
 """
 
 from __future__ import annotations
@@ -18,36 +18,34 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from src.bronze.paths import PROJECT_ROOT
-from src.profiling.profile_violations import (
+from .profiling import (
     BRONZE_RELATIVE,
     CODE_HEADER,
     FRAGMENT_SEPARATOR,
     ORIGIN_RELATIVE,
     OUTPUT_RELATIVE as PROFILE_RELATIVE,
     COMMENTS_MARKER,
+    origin_snapshot,
     sha256,
 )
 
 
 SILVER_RELATIVE = Path(
-    "data/02_silver/food_inspections/violations/inspection_violations.parquet"
+    "data/02_silver/02_violation/02_inspection_violations.parquet"
 )
-MAPPING_RELATIVE = Path("metadata/standards/violations_mapping.csv")
-RUN_LOG_RELATIVE = Path("logs/violations_silver_runs.jsonl")
+MAPPING_RELATIVE = Path("metadata/standards/02_violation/violations_mapping.csv")
+RUN_LOG_RELATIVE = Path("logs/02_violation/violations_silver_runs.jsonl")
 BATCH_SIZE = 5_000
 WRITE_BATCH_SIZE = 25_000
 SOURCE_DATASET = "food_inspections"
 SOURCE_COLUMN = "Violations"
 INSPECTION_ID_COLUMN = "Inspection ID"
-SOURCE_FILE_COLUMN = "_SRC_FILE"
-LOAD_DTM_COLUMN = "_LOAD_DTM"
+SOURCE_ROW_COLUMN = "source_row_num"
 
 SILVER_SCHEMA = pa.schema([
     pa.field("inspection_id", pa.string()),
-    pa.field("bronze_row_number", pa.int64(), nullable=False),
+    pa.field("source_row_num", pa.int64(), nullable=False),
     pa.field("item_sequence_num", pa.int32(), nullable=False),
-    pa.field("_SRC_FILE", pa.string()),
-    pa.field("_LOAD_DTM", pa.string()),
     pa.field("source_violations_fragment", pa.string(), nullable=False),
     pa.field("violation_code", pa.string()),
     pa.field("violation_description", pa.string()),
@@ -144,7 +142,16 @@ def _mapping_rows(counts: Counter, actual: dict, silver_path: str) -> list[dict]
             "Same identifier repeated for each fragment from that inspection.",
             actual["output_rows"],
             "Silver records",
-            "Paired with bronze_row_number, _SRC_FILE, and the original Bronze row.",
+            "Copied from the shared Bronze row and repeated for each fragment.",
+        ),
+        (
+            "source_row_num",
+            "Copy the source row number preserved in the shared Bronze Parquet.",
+            "Positive integer source row number",
+            "The original inspection record number is repeated for each violation fragment.",
+            actual["output_rows"],
+            "Silver records",
+            "Used with item_sequence_num to identify a violation fragment within its source row.",
         ),
         (
             "violation_code",
@@ -287,7 +294,7 @@ def run(root: Path = PROJECT_ROOT) -> dict:
     """Stream only Inspection ID and Violations into a dedicated Silver child table."""
     root = Path(root)
     bronze_path = root / BRONZE_RELATIVE
-    origin_path = root / ORIGIN_RELATIVE
+    origin_before = origin_snapshot(root)
     profile_path = root / PROFILE_RELATIVE
     final_path = root / SILVER_RELATIVE
     mapping_path = root / MAPPING_RELATIVE
@@ -301,7 +308,8 @@ def run(root: Path = PROJECT_ROOT) -> dict:
     try:
         profiling = json.loads(profile_path.read_text(encoding="utf-8"))
         expected = profiling["counts"]
-        input_origin_sha = sha256(origin_path)
+        input_origin_sha = origin_before["source_sha256"]
+        input_origin_guard_sha = origin_before["guard_sha256"]
         input_bronze_sha = sha256(bronze_path)
         profiling_bronze_sha = profiling["source"]["bronze_sha256"]
         if input_bronze_sha != profiling_bronze_sha:
@@ -324,13 +332,14 @@ def run(root: Path = PROJECT_ROOT) -> dict:
 
         parquet = pq.ParquetFile(bronze_path)
         required_columns = {
-            INSPECTION_ID_COLUMN, SOURCE_COLUMN, SOURCE_FILE_COLUMN, LOAD_DTM_COLUMN,
+            INSPECTION_ID_COLUMN, SOURCE_COLUMN, SOURCE_ROW_COLUMN,
         }
         missing = required_columns - set(parquet.schema_arrow.names)
         if missing:
             raise ValueError(f"Bronze file is missing required columns: {sorted(missing)}")
 
         final_path.parent.mkdir(parents=True, exist_ok=True)
+        mapping_path.parent.mkdir(parents=True, exist_ok=True)
         temp_output = final_path.with_name(f".{final_path.name}.{uuid.uuid4().hex}.tmp")
         temp_mapping = mapping_path.with_name(f".{mapping_path.name}.{uuid.uuid4().hex}.tmp")
         counters: Counter = Counter()
@@ -339,12 +348,16 @@ def run(root: Path = PROJECT_ROOT) -> dict:
         with pq.ParquetWriter(temp_output, SILVER_SCHEMA, compression="zstd") as writer:
             row_number = 0
             for batch in parquet.iter_batches(
-                columns=[INSPECTION_ID_COLUMN, SOURCE_COLUMN, SOURCE_FILE_COLUMN, LOAD_DTM_COLUMN],
+                columns=[INSPECTION_ID_COLUMN, SOURCE_COLUMN, SOURCE_ROW_COLUMN],
                 batch_size=BATCH_SIZE,
             ):
                 for source_row in batch.to_pylist():
                     row_number += 1
                     counters["input_rows"] += 1
+                    if source_row[SOURCE_ROW_COLUMN] != row_number:
+                        raise ValueError(
+                            f"Bronze source_row_num is not sequential at row {row_number}"
+                        )
                     raw = source_row[SOURCE_COLUMN]
                     if raw is None:
                         counters["null_cells"] += 1
@@ -387,10 +400,8 @@ def run(root: Path = PROJECT_ROOT) -> dict:
                             code_values.add(parsed["violation_code"])
                         pending.append({
                             "inspection_id": source_row[INSPECTION_ID_COLUMN],
-                            "bronze_row_number": row_number,
+                            "source_row_num": source_row[SOURCE_ROW_COLUMN],
                             "item_sequence_num": sequence,
-                            "_SRC_FILE": source_row[SOURCE_FILE_COLUMN],
-                            "_LOAD_DTM": source_row[LOAD_DTM_COLUMN],
                             "source_violations_fragment": fragment,
                             **parsed,
                         })
@@ -449,9 +460,11 @@ def run(root: Path = PROJECT_ROOT) -> dict:
         _write_mapping(temp_mapping, mapping_rows)
         mapping_hash = sha256(temp_mapping)
         output_hash = sha256(temp_output)
-        origin_after_sha = sha256(origin_path)
+        origin_after = origin_snapshot(root)
+        origin_after_sha = origin_after["source_sha256"]
         bronze_after_sha = sha256(bronze_path)
-        if origin_after_sha != input_origin_sha:
+        if (origin_after_sha != input_origin_sha
+                or origin_after["guard_sha256"] != input_origin_guard_sha):
             raise RuntimeError("Origin SHA-256 changed during Silver processing")
         if bronze_after_sha != input_bronze_sha:
             raise RuntimeError("Bronze SHA-256 changed during Silver processing")
@@ -492,6 +505,8 @@ def run(root: Path = PROJECT_ROOT) -> dict:
             "null_violation_description": readback["output_rows"] - readback["description_rows"],
             "null_violation_comments": readback["output_rows"] - readback["comments_rows"],
             "source_origin_sha256_after": origin_after_sha,
+            "source_origin_guard_sha256_before": input_origin_guard_sha,
+            "source_origin_guard_sha256_after": origin_after["guard_sha256"],
             "source_bronze_sha256_after": bronze_after_sha,
         })
         _append_run_log(root, record)

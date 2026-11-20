@@ -1,6 +1,9 @@
 """Checks for the observed Violations text patterns."""
 
-from src.profiling.profile_violations import FRAGMENT_SEPARATOR, parse_fragment
+from importlib import import_module
+
+profiling = import_module("src.domains.02_violation.profiling")
+FRAGMENT_SEPARATOR, parse_fragment = profiling.FRAGMENT_SEPARATOR, profiling.parse_fragment
 
 
 def test_canonical_violation_fragment_captures_code_description_and_comments():

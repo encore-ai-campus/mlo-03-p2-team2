@@ -1,6 +1,6 @@
 """Build the Violations star from accepted Silver only.
 
-Run: python -m src.gold.violations
+Run: python -m src.domains.02_violation.gold
 """
 
 from __future__ import annotations
@@ -17,28 +17,26 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from src.bronze.paths import PROJECT_ROOT
-from src.profiling.profile_violations import sha256
-from src.silver.violations_reconciliation import ACCEPTED_RELATIVE, QUARANTINE_RELATIVE, REPORT_RELATIVE
+from .profiling import sha256
+from .reconciliation import ACCEPTED_RELATIVE, QUARANTINE_RELATIVE, REPORT_RELATIVE
 
 
-DIM_RELATIVE = Path("data/03_gold/dimensions/dim_violation.parquet")
-FACT_RELATIVE = Path("data/03_gold/facts/fact_inspection_violation.parquet")
-MAPPING_RELATIVE = Path("metadata/standards/violations_gold_mapping.csv")
-LOG_RELATIVE = Path("logs/violations_gold_runs.jsonl")
+DIM_RELATIVE = Path("data/03_gold/02_violation/02_dim_violation.parquet")
+FACT_RELATIVE = Path("data/03_gold/02_violation/02_fact_inspection_violation.parquet")
+MAPPING_RELATIVE = Path("metadata/standards/02_violation/violations_gold_mapping.csv")
+LOG_RELATIVE = Path("logs/02_violation/violations_gold_runs.jsonl")
 DIM_SCHEMA = pa.schema([
     pa.field("violation_key", pa.int32(), nullable=False),
     pa.field("violation_code", pa.string(), nullable=False),
     pa.field("violation_description", pa.string(), nullable=False),
 ])
 FACT_SCHEMA = pa.schema([
-    pa.field("bronze_row_number", pa.int64(), nullable=False),
+    pa.field("source_row_num", pa.int64(), nullable=False),
     pa.field("item_sequence_num", pa.int32(), nullable=False),
     pa.field("inspection_id", pa.string(), nullable=False),
     pa.field("violation_key", pa.int32(), nullable=False),
     pa.field("violation_comments", pa.string(), nullable=False),
     pa.field("source_violations_fragment", pa.string(), nullable=False),
-    pa.field("_SRC_FILE", pa.string(), nullable=False),
-    pa.field("_LOAD_DTM", pa.string(), nullable=False),
 ])
 CHUNK = 20_000
 
@@ -127,7 +125,7 @@ def build(root: Path = PROJECT_ROOT, output_root: Path | None = None) -> dict:
             for batch in pq.ParquetFile(accepted).iter_batches(batch_size=CHUNK):
                 output = []
                 for row in batch.to_pylist():
-                    identifier = (row["bronze_row_number"], row["item_sequence_num"])
+                    identifier = (row["source_row_num"], row["item_sequence_num"])
                     if identifier in grain:
                         raise ValueError(f"Duplicate accepted fragment grain: {identifier}")
                     grain.add(identifier)

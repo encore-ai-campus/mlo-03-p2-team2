@@ -6,7 +6,7 @@
 - 브랜치: feature/violations-silver
 - 기준 커밋: c0adae473070c96cee6d143cd8620d4850220960
 - 범위: Food Inspections의 Violations 컬럼만 분리·표준화
-- 실행 명령: python -m src.silver.violations
+- 실행 명령: python -m src.domains.02_violation.silver
 
 전체 65개 컬럼이나 다른 데이터셋의 Silver는 이 브랜치에 포함하지 않았다.
 

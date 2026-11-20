@@ -16,7 +16,7 @@ Origin 원천은 data/00_origin/food_inspections/food_inspections.csv이며, 원
 
 재실행 명령:
 
-    python -m src.profiling.profile_violations
+    python -m src.domains.02_violation.profiling
 
 ## 실제 측정 결과
 
