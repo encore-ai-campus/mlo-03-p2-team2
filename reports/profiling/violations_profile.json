@@ -1,0 +1,154 @@
+{
+  "profiled_at_utc": "2026-11-20T03:35:05+00:00",
+  "dataset": "food_inspections",
+  "field": "Violations",
+  "source": {
+    "origin_file": "data/00_origin/food_inspections/food_inspections.csv",
+    "origin_file_bytes": 356846515,
+    "origin_sha256": "c97464b9aa02801c7e7bedca876d0d6fff482fb56366ad35befe5c68897e4fe7",
+    "bronze_file": "data/01_bronze/food_inspections/food_inspections.parquet",
+    "bronze_file_bytes": 65058897,
+    "bronze_sha256": "cbc2b9eb8d5feb883d93619d250193ec6d9d59e572ba4f4e9f0b26a9c40c79c5",
+    "bronze_rows": 318552,
+    "bronze_columns": 19,
+    "bronze_field_type": "string"
+  },
+  "method": {
+    "batch_size": 10000,
+    "fragment_separator_regex": "\\s+\\|\\s+",
+    "code_header_regex": "^(?P<code>\\d+[A-Z]?)\\.\\s+(?P<body>.+)$",
+    "description_comments_regex": "^(?P<code>\\d+[A-Z]?)\\.\\s+(?P<description>.*?)(?:\\s+-\\s+Comments:|\\s+Comments:)(?P<comments>.*)$",
+    "fully_parseable_definition": "code header + nonempty description + Comments marker"
+  },
+  "counts": {
+    "candidate_fragments": 1030806,
+    "canonical_description_comments_pattern": 1029015,
+    "code_header_failures": 0,
+    "code_header_matches": 1030806,
+    "comments_marker_fragments": 1029015,
+    "empty_descriptions": 0,
+    "empty_string_rows": 90000,
+    "fully_parseable_fragments": 1029015,
+    "literal_pipe_characters": 802254,
+    "missing_comments_marker_fragments": 1791,
+    "nonempty_comments": 1029015,
+    "nonempty_descriptions": 1030806,
+    "nonempty_rows": 228552,
+    "null_rows": 0,
+    "recognized_pipe_separators": 802254,
+    "rows_with_all_fragments_parseable": 227371,
+    "rows_with_literal_pipe": 197271,
+    "rows_with_multiple_fragments": 197271,
+    "rows_with_no_fully_parseable_fragments": 184,
+    "rows_with_some_fragments_unparseable": 997,
+    "rows_with_unrecognized_pipe_separator": 0,
+    "standard_description_comments_pattern_matches": 1029015,
+    "total_rows": 318552,
+    "whitespace_only_rows": 0
+  },
+  "code_pattern": {
+    "distinct_codes": 65,
+    "top_20_codes_by_fragment_count": [
+      {
+        "code": "55",
+        "fragments": 86407
+      },
+      {
+        "code": "38",
+        "fragments": 78197
+      },
+      {
+        "code": "34",
+        "fragments": 71800
+      },
+      {
+        "code": "33",
+        "fragments": 67668
+      },
+      {
+        "code": "35",
+        "fragments": 65992
+      },
+      {
+        "code": "32",
+        "fragments": 55393
+      },
+      {
+        "code": "41",
+        "fragments": 40563
+      },
+      {
+        "code": "47",
+        "fragments": 39823
+      },
+      {
+        "code": "36",
+        "fragments": 35976
+      },
+      {
+        "code": "49",
+        "fragments": 31373
+      },
+      {
+        "code": "10",
+        "fragments": 29786
+      },
+      {
+        "code": "51",
+        "fragments": 28852
+      },
+      {
+        "code": "3",
+        "fragments": 27656
+      },
+      {
+        "code": "56",
+        "fragments": 25094
+      },
+      {
+        "code": "37",
+        "fragments": 20959
+      },
+      {
+        "code": "58",
+        "fragments": 20565
+      },
+      {
+        "code": "40",
+        "fragments": 20519
+      },
+      {
+        "code": "5",
+        "fragments": 19477
+      },
+      {
+        "code": "53",
+        "fragments": 17520
+      },
+      {
+        "code": "2",
+        "fragments": 17377
+      }
+    ]
+  },
+  "examples": {
+    "nonempty_original_values": [
+      "16. FOOD-CONTACT SURFACES: CLEANED & SANITIZED - Comments: OBSERVED BLACK AND ORANGE MOLDLIKE SUBSTANCE ON UPPER INTERIOR COMPONENTS OF ICE MACHINE. INSTRUCTED TO DESTROY ICE, CLEAN AND SANITIZE INTERIOR COMPONENTS OF ICE MACHINE TO PREVENT CONTAMINATION OF ICE.  | 38. INSECTS, RODENTS, & ANIMALS NOT PRESENT - Comments: OBSERVED OPENING AT BASE OF LEFT FRONT ENTRANCE DOOR. INSTRUCTED TO SEAL ALL OUTER OPENINGS TO PREVENT PEST ENTRANCE. | 43. IN-USE UTENSILS: PROPERLY STORED - Comments: OBSERVED …",
+      "5. PROCEDURES FOR RESPONDING TO VOMITING AND DIARRHEAL EVENTS - Comments: FOUND NO VOMIT AND DIARRHEAL CLEAN UP PROCEDURE WITH SPILL KIT.PRIORITY FOUNDATION.NO CITATION ISSUED.MUST PROVIDE. | 38. INSECTS, RODENTS, & ANIMALS NOT PRESENT - Comments: FOUND NO PEST CONTROL LOG BOOK AT PREMISES.PRIORITY FOUNDATION.NO CITATION ISSUED/7-38-020C.MUST PROVIDE. | 51. PLUMBING INSTALLED; PROPER BACKFLOW DEVICES - Comments: FOUND NO BACKFLOW PREVENTION DEVICES AT MOP SINK FAUCET.MUST PROVIDE WHERE THEY CAN …",
+      "5. PROCEDURES FOR RESPONDING TO VOMITING AND DIARRHEAL EVENTS - Comments: 2-501.11: OBSERVED ALL NECESSARY ITEMS NOT ON PREMISES FOR COMPLYING WITH PROCEDURE AVAILABLE ON SITE WHEN EMPLOYEES RESPOND TO VOMITTING OR DIARRHEAL EVENTS. INSTRUCTED TO OBTAIN AND MAINTAIN ON PREMISES ALL NECESSARY ITEMS TO FOLLOW THE WRITTEN PROCEDURE FOR EMPLOYEES TO FOLLOW WHEN RESPONDING TO VOMITTING OR DIARRHEAL EVENTS. PRIORITY FOUNDATION VIOLATION | 47. FOOD & NON-FOOD CONTACT SURFACES CLEANABLE, PROPERLY DESIGN…",
+      "45. SINGLE-USE/SINGLE-SERVICE ARTICLES: PROPERLY STORED & USED - Comments: OBSERVED SINGLE SERVICE ARTICLES STORED IN FLOOR IN REAR PREP AREA.INSTRUCTED MANAGER TO ELEVATE ALL SINGLE SERVICE ARTICLES SIX INCHES OFF FLOOR. | 55. PHYSICAL FACILITIES INSTALLED, MAINTAINED & CLEAN - Comments: OBSERVED CLUTTER STORED ON FLOOR IN REAR STORAGE AREA. INSTRUCTED MANAGER TO REMOVE ALL UNUSED ARTICLES AND EQUIPMENT TO PREVENT PEST HARBORAGE.",
+      "16. FOOD-CONTACT SURFACES: CLEANED & SANITIZED - Comments: OBSERVED BLACK MOLDLIKE SUBSTANCE ON UPPER INTERIOR COMPONENTS OF ICE MACHINE. INSTRUCTED TO DESTROY ICE, CLEAN AND SANITIZE INTERIOR OF ICE MACHINE TO PREVENT CONTAMINATION OF ICE. | 38. INSECTS, RODENTS, & ANIMALS NOT PRESENT - Comments: OBSERVED OPENING AT BASE OF FRONT ENTRANCE OUTER DOOR. INSTRUCTED TO SEAL ALL OUTER OPENINGS TO PREVENT PEST ENTRANCE. | 47. FOOD & NON-FOOD CONTACT SURFACES CLEANABLE, PROPERLY DESIGNED, CONSTRUCTED &…"
+    ],
+    "exceptions": {
+      "missing_comments_marker": [
+        "1. PERSON IN CHARGE PRESENT, DEMONSTRATES KNOWLEDGE, AND PERFORMS DUTIES",
+        "47. FOOD & NON-FOOD CONTACT SURFACES CLEANABLE, PROPERLY DESIGNED, CONSTRUCTED & USED",
+        "54. GARBAGE & REFUSE PROPERLY DISPOSED; FACILITIES MAINTAINED",
+        "58. ALLERGEN TRAINING AS REQUIRED",
+        "1. PERSON IN CHARGE PRESENT, DEMONSTRATES KNOWLEDGE, AND PERFORMS DUTIES"
+      ],
+      "no_code_header": [],
+      "unrecognized_pipe_separator": []
+    }
+  }
+}
