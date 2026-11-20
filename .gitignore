@@ -22,6 +22,10 @@ htmlcov/
 
 # Raw inputs and generated datasets
 /origin/
+/data/00_origin/**
+/data/01_bronze/**
+/data/02_silver/**
+/data/03_gold/**
 /origin.zip
 /origin.zip.*
 /chicago-food-origin.zip

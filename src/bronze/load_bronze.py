@@ -147,9 +147,47 @@ def log_run(values: dict):
         writer.writerow(values)
 
 
+def source_url(source: Source) -> str | None:
+    """Look up the downloaded source URL without changing the origin manifest."""
+    manifest = source.path.parent.parent / "download_manifest.csv"
+    if not manifest.is_file():
+        return None
+    with manifest.open(encoding="utf-8-sig", newline="") as stream:
+        for row in csv.DictReader(stream):
+            if row.get("File") == source.path.name:
+                return row.get("Source") or None
+    return None
+
+
+def log_run_details(source: Source, run_id: str, load_dtm: str,
+                    source_sha256: str | None, input_rows: int,
+                    output_rows: int, status: str, error: str):
+    """Append provenance fields separately, preserving the existing CSV log schema."""
+    details = RUN_LOG.parent / "bronze_run_details.jsonl"
+    details.parent.mkdir(parents=True, exist_ok=True)
+    record = {
+        "pipeline_run_id": run_id,
+        "source_file": source.path.name,
+        "source_path": str(source.path.resolve()),
+        "source_url": source_url(source),
+        "load_dtm": load_dtm,
+        "bronze_file": source.output.name,
+        "bronze_path": str(source.output.resolve()),
+        "input_rows": input_rows,
+        "output_rows": output_rows,
+        "source_sha256": source_sha256,
+        "status": status,
+        "error": error,
+    }
+    with details.open("a", encoding="utf-8") as stream:
+        stream.write(json.dumps(record, ensure_ascii=False) + "\n")
+
+
 def load_source(source: Source, run_id: str, load_dtm: str) -> int:
     started = utc_now()
     count = 0
+    before = None
+    error = ""
     temp = source.output.with_suffix(".parquet.tmp")
     try:
         before = verify_source(source)
@@ -173,8 +211,9 @@ def load_source(source: Source, run_id: str, load_dtm: str) -> int:
         os.replace(temp, source.output)  # Full refresh; previous successful output survives failed validation.
         status = "SUCCESS"
         return count
-    except Exception:
+    except Exception as exc:
         status = "FAILED"
+        error = f"{type(exc).__name__}: {exc}"
         raise
     finally:
         if temp.exists():
@@ -183,6 +222,8 @@ def load_source(source: Source, run_id: str, load_dtm: str) -> int:
                  "SOURCE_FILE": source.relative_path, "START_DTM": started,
                  "END_DTM": utc_now(), "INPUT_ROWS": count, "OUTPUT_ROWS": count if status == "SUCCESS" else 0,
                  "STATUS": status})
+        log_run_details(source, run_id, load_dtm, before, count,
+                        count if status == "SUCCESS" else 0, status, error)
 
 
 def main():

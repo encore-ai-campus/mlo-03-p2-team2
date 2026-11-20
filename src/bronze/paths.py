@@ -6,8 +6,9 @@ import os
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
-ORIGIN_ROOT = Path(os.environ.get("CHICAGO_RAW_DIR", PROJECT_ROOT / "origin"))
-BRONZE_ROOT = PROJECT_ROOT / "data" / "bronze"
+_raw_dir = Path(os.environ.get("CHICAGO_RAW_DIR", "data/00_origin"))
+ORIGIN_ROOT = _raw_dir if _raw_dir.is_absolute() else PROJECT_ROOT / _raw_dir
+BRONZE_ROOT = PROJECT_ROOT / "data" / "01_bronze"
 RUN_LOG = PROJECT_ROOT / "logs" / "pipeline_runs.csv"
 
 

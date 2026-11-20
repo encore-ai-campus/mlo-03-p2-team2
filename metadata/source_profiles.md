@@ -12,13 +12,13 @@
 
 ## 데이터 출처
 
-세 파일은 `origin/download_manifest.csv`에 시카고시 오픈데이터 다운로드 URL과 SHA-256이 기록된 동일 스냅샷이다. 원천 파일 경로와 제공 컬럼 메타데이터는 아래 데이터셋별로 제시한다.
+세 파일은 `data/00_origin/download_manifest.csv`에 시카고시 오픈데이터 다운로드 URL과 SHA-256이 기록된 동일 스냅샷이다. 원천 파일 경로와 제공 컬럼 메타데이터는 아래 데이터셋별로 제시한다.
 
 ## food_inspections
 
-- 파일: `origin/food_inspections/food_inspections.csv` · 형식: CSV · 인코딩: UTF-8 (optional BOM) · 318,552행 × 17컬럼
+- 파일: `data/00_origin/food_inspections/food_inspections.csv` · 형식: CSV · 인코딩: UTF-8 (optional BOM) · 318,552행 × 17컬럼
 - 출처 URL(원본 manifest): https://data.cityofchicago.org/api/v3/views/4ijn-s7e5/export.csv?accessType=DOWNLOAD
-- 제공 컬럼 메타데이터: `origin/food_inspections/food_columns.json`. 메타데이터에만 있는 항목: ['Census Tracts', 'Community Areas', 'Historical Wards 2003-2015', 'Location (address)', 'Location (city)', 'Location (state)', 'Location (zip)', 'Wards', 'Zip Codes']. 실제 속성에만 있는 항목: 없음.
+- 제공 컬럼 메타데이터: `data/00_origin/food_inspections/food_columns.json`. 메타데이터에만 있는 항목: ['Census Tracts', 'Community Areas', 'Historical Wards 2003-2015', 'Location (address)', 'Location (city)', 'Location (state)', 'Location (zip)', 'Wards', 'Zip Codes']. 실제 속성에만 있는 항목: 없음.
 - 원본 컬럼 목록·의미·타입·샘플: [data_dictionary.md](data_dictionary.md). 재현 가능한 전체 측정값: [source_profiles.json](source_profiles.json).
 - 완전 동일 행 후보: 0건.
 
@@ -71,9 +71,9 @@ ZIP의 미국 5자리 또는 ZIP+4 정규식 불일치: **0건**. 예시: 없음
 
 ## business_licenses
 
-- 파일: `origin/business_licenses/business_licenses.csv` · 형식: CSV · 인코딩: UTF-8 (optional BOM) · 1,212,132행 × 37컬럼
+- 파일: `data/00_origin/business_licenses/business_licenses.csv` · 형식: CSV · 인코딩: UTF-8 (optional BOM) · 1,212,132행 × 37컬럼
 - 출처 URL(원본 manifest): https://data.cityofchicago.org/api/v3/views/r5kz-chrr/export.csv?accessType=DOWNLOAD
-- 제공 컬럼 메타데이터: `origin/business_licenses/license_columns.json`. 메타데이터에만 있는 항목: ['Census Tracts', 'Community Areas', 'Historical Wards 2003-2015', 'LOCATION (address)', 'LOCATION (city)', 'LOCATION (state)', 'LOCATION (zip)', 'Wards', 'Zip Codes']. 실제 속성에만 있는 항목: 없음.
+- 제공 컬럼 메타데이터: `data/00_origin/business_licenses/license_columns.json`. 메타데이터에만 있는 항목: ['Census Tracts', 'Community Areas', 'Historical Wards 2003-2015', 'LOCATION (address)', 'LOCATION (city)', 'LOCATION (state)', 'LOCATION (zip)', 'Wards', 'Zip Codes']. 실제 속성에만 있는 항목: 없음.
 - 원본 컬럼 목록·의미·타입·샘플: [data_dictionary.md](data_dictionary.md). 재현 가능한 전체 측정값: [source_profiles.json](source_profiles.json).
 - 완전 동일 행 후보: 0건.
 
@@ -157,9 +157,9 @@ ZIP의 미국 5자리 또는 ZIP+4 정규식 불일치: **166건**. 예시: H3P3
 
 ## community_areas
 
-- 파일: `origin/community_areas/community_areas.geojson` · 형식: GeoJSON FeatureCollection · 인코딩: UTF-8 · 77행 × 11컬럼
+- 파일: `data/00_origin/community_areas/community_areas.geojson` · 형식: GeoJSON FeatureCollection · 인코딩: UTF-8 · 77행 × 11컬럼
 - 출처 URL(원본 manifest): https://data.cityofchicago.org/api/v3/views/igwz-8jzy/query.geojson?accessType=DOWNLOAD
-- 제공 컬럼 메타데이터: `origin/community_areas/area_columns.json`. 메타데이터에만 있는 항목: 없음. 실제 속성에만 있는 항목: [':created_at', ':id', ':updated_at', ':version'].
+- 제공 컬럼 메타데이터: `data/00_origin/community_areas/area_columns.json`. 메타데이터에만 있는 항목: 없음. 실제 속성에만 있는 항목: [':created_at', ':id', ':updated_at', ':version'].
 - 원본 컬럼 목록·의미·타입·샘플: [data_dictionary.md](data_dictionary.md). 재현 가능한 전체 측정값: [source_profiles.json](source_profiles.json).
 - 완전 동일 행 후보: 0건.
 

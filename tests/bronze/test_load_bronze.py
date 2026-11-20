@@ -38,6 +38,12 @@ def test_csv_full_refresh_preserves_values(tmp_path, monkeypatch):
     assert source.path.read_text(encoding="utf-8") == content
     with load_bronze.RUN_LOG.open(encoding="utf-8", newline="") as stream:
         assert [row["STATUS"] for row in csv.DictReader(stream)] == ["SUCCESS", "SUCCESS"]
+    details = [json.loads(line) for line in (tmp_path / "logs" / "bronze_run_details.jsonl").read_text(encoding="utf-8").splitlines()]
+    assert len(details) == 2
+    assert details[-1]["source_file"] == "food_inspections.csv"
+    assert details[-1]["bronze_file"] == "food_inspections.parquet"
+    assert details[-1]["source_sha256"] == hashlib.sha256(source.path.read_bytes()).hexdigest().upper()
+    assert details[-1]["output_rows"] == 2 and details[-1]["status"] == "SUCCESS"
 
 
 def test_geojson_geometry_and_properties_survive(tmp_path, monkeypatch):

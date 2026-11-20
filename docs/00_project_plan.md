@@ -14,7 +14,7 @@
 | `business_licenses.csv` | 1,212,132행 | 인허가 발급·갱신·상태와 유효기간. [시카고시 Business Licenses](https://catalog.data.gov/dataset/business-licenses) |
 | `community_areas.geojson` | 77개 지역 | 점검 위치의 커뮤니티 지역을 파악하는 경계. [시카고시 Boundaries – Community Areas](https://catalog.data.gov/dataset/boundaries-community-areas) |
 
-세 데이터 파일과 대응하는 컬럼 설명 JSON은 각자 로컬 `origin/`에 둡니다. 팀은 같은 스냅샷을 사용하며 검증 정보는 `metadata/source_catalog/verification/`에 둡니다. [원천 설정 예시](../config/sources.example.yaml)
+세 데이터 파일과 대응하는 컬럼 설명 JSON은 각자 로컬 `data/00_origin/`에 둡니다. 팀은 같은 스냅샷을 사용하며 검증 정보는 `metadata/source_catalog/verification/`에 둡니다. [원천 설정 예시](../config/sources.example.yaml)
 
 ## 다섯 가지 분석 관점
 

@@ -5,9 +5,9 @@
 
 | 원천 | Origin 경로 | Bronze Parquet 경로 | Origin 행·열 | Bronze 행·열 |
 | --- | --- | --- | ---: | ---: |
-| 점검 | `origin/food_inspections/food_inspections.csv` | `data/bronze/food_inspections/food_inspections.parquet` | 318,552 × 17 | 318,552 × 19 |
-| 인허가 | `origin/business_licenses/business_licenses.csv` | `data/bronze/business_licenses/business_licenses.parquet` | 1,212,132 × 37 | 1,212,132 × 39 |
-| 지역 | `origin/community_areas/community_areas.geojson` | `data/bronze/community_areas/community_areas.parquet` | 77 Feature × 11 필드¹ | 77 × 13 |
+| 점검 | `data/00_origin/food_inspections/food_inspections.csv` | `data/01_bronze/food_inspections/food_inspections.parquet` | 318,552 × 17 | 318,552 × 19 |
+| 인허가 | `data/00_origin/business_licenses/business_licenses.csv` | `data/01_bronze/business_licenses/business_licenses.parquet` | 1,212,132 × 37 | 1,212,132 × 39 |
+| 지역 | `data/00_origin/community_areas/community_areas.geojson` | `data/01_bronze/community_areas/community_areas.parquet` | 77 Feature × 11 필드¹ | 77 × 13 |
 
 ¹ 지역 11필드는 GeoJSON Feature의 `type`, `geometry`, `properties` 9개를 센다. 팀 인벤토리의 9개는 `properties`만 센 값이다.
 
