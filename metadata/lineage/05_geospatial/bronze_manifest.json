@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "domain": "05_geospatial",
+  "source_mode": "team",
+  "batch_id": "11b4c745f6de3592c100",
+  "bronze_format_version": 3,
+  "batch_signature": "11b4c745f6de3592c100a0872868cd80888dafe940702b28db368fec0c7c8827",
+  "source_snapshot_signature": "0cf871c9b47b38723aae14695a30f55616e274eaab54f003fc247ab36049a784",
+  "ingestion_code_sha256": "48e9589b1ec5c9053d14b66d1bb6aac4c1b35d41af3950817352281406e1bd17",
+  "loaded_at_utc": "2026-11-20T08:17:22.601+00:00",
+  "ingestion_finished_at_utc": "2026-11-20T08:17:24.838+00:00",
+  "entries": [
+    {
+      "table": "food_inspections",
+      "source_file": "data/00_origin/food_inspections.csv",
+      "source_format": "csv",
+      "source_sha256": "b43beb7fae834a8698ca162004caf2929cb2eca7ff75c27b4db6bf07aa103c98",
+      "source_size_bytes": 356934166,
+      "bronze_columns": [
+        "Inspection ID",
+        "DBA Name",
+        "AKA Name",
+        "License #",
+        "Facility Type",
+        "Risk",
+        "Address",
+        "City",
+        "State",
+        "Zip",
+        "Inspection Date",
+        "Inspection Type",
+        "Results",
+        "Violations",
+        "Latitude",
+        "Longitude",
+        "Location"
+      ],
+      "empty_records": 0,
+      "bronze_file": "data/01_bronze/05_geospatial/11b4c745f6de3592c100/food_inspections.parquet",
+      "bronze_sha256": "b3989427d510a78f1ccfc5e4b0c160abc46d9de4b54cdd0e4e7cf6a5b0fac4c6",
+      "bronze_size_bytes": 67274324,
+      "row_count": 318627,
+      "source_read_started_at_utc": "2026-11-20T08:17:22.601+00:00",
+      "source_read_finished_at_utc": "2026-11-20T08:17:24.805+00:00"
+    },
+    {
+      "table": "community_areas",
+      "source_file": "data/00_origin/community_areas.geojson",
+      "source_format": "geojson",
+      "source_sha256": "c4b9c42adc19baca0a9c6ee3e84b302d40073d3ad99ee3d8b101d5d8217b0d16",
+      "source_size_bytes": 2082874,
+      "bronze_columns": [
+        "the_geom",
+        "AREA_NUMBE",
+        "COMMUNITY",
+        "AREA_NUM_1",
+        "SHAPE_AREA",
+        "SHAPE_LEN"
+      ],
+      "empty_records": 0,
+      "bronze_file": "data/01_bronze/05_geospatial/11b4c745f6de3592c100/community_areas.parquet",
+      "bronze_sha256": "63dbd56e8b8199b4cbaf95a85ed910d290c15baa2bc924ac465aeb4804f5e2e2",
+      "bronze_size_bytes": 625568,
+      "row_count": 77,
+      "source_read_started_at_utc": "2026-11-20T08:17:24.805+00:00",
+      "source_read_finished_at_utc": "2026-11-20T08:17:24.838+00:00"
+    }
+  ]
+}
