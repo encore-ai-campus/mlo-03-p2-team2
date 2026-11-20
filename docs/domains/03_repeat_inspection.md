@@ -43,9 +43,9 @@
 - **이력 연결 키** `license_number_key`가 있는 점검끼리 점검일 순으로 연결합니다. 면허번호가 같은 점검 이력으로 해석하며, 번호가 없으면 이력 연결 상태에 사유를 남깁니다. 동일 날짜 때문에 선후 관계가 모호하면 `source_row_num`을 날짜 내 발생 순서로 사용하지 않고 미확정으로 표시합니다.
 - **반복 위반** 같은 면허번호에서 `PASS`, `PASS W/ CONDITIONS`, `FAIL`인 점검을 고른 뒤 날짜순으로 정렬합니다. 이 목록에서 기준 점검일보다 늦은 점검 중 가장 이른 날짜의 점검을 다음 비교 대상으로 봅니다. 기준 점검에서 같은 위반 코드가 여러 번 추출돼도 한 번만 셉니다. 분모는 두 점검에서 위반 코드 관측과 파싱 상태를 확인할 수 있는 쌍의 기준 점검 위반 코드 수입니다. 위반 원문 공란·파싱 실패로 재발 여부를 판단할 수 없으면 별도 상태로 기록합니다. **2018-07-01 이후**를 초기 비교 범위로 제안합니다. [시카고 점검 절차 변경 이후 데이터](https://data.cityofchicago.org/Health-Human-Services/Food-Inspections-7-1-2018-Present/qizy-d2wf)
 - **재검사** 재검사로 분류된 점검을 같은 면허번호의 **더 이른 가장 최근 `FAIL`**에 연결합니다. 기준 `FAIL` 한 건에는 기간 안에서 처음 관측된 재검사 한 건을 붙입니다. 초안 기간은 **1~30일**이며, 동일 날짜에 후보가 여러 개라 선후를 판단하기 어려운 경우 미확정으로 둡니다. 미연결, 면허번호 없음, 관측 기간 부족은 구분합니다. 결과 전이는 `PASS`, `PASS W/ CONDITIONS`, `FAIL`을 각각 집계하고 나머지 결과는 별도 범주로 표시합니다.
-- **공유 결과 키** `repeat_violation_mart`는 `base_inspection_key + followup_inspection_key + violation_cd`, `inspection_reinspection_mart`는 `base_inspection_key`입니다. 공용 점검 테이블과 결합할 때 반복 위반 상세는 조인 전에 기준 점검 단위로 집계합니다.
+- **공유 결과 키** `repeat_violation_mart`는 `base_inspection_key + code_system_version + violation_cd`, `inspection_reinspection_mart`는 `base_inspection_key`입니다. 공용 점검 테이블과 결합할 때 반복 위반 상세는 조인 전에 기준 점검 단위로 집계합니다.
 
-현재 구현은 기준 불합격일로부터 1~30일 사이의 재검사를 연결합니다. 미연결 건 중 관측 종료일까지 30일 미만인 건은 `insufficient_observation`으로 기록합니다. 반복 위반 마트의 실제 `violation_cd`는 `int64`입니다.
+현재 구현은 기준 불합격일로부터 1~30일 사이의 재검사를 연결합니다. 미연결 건 중 관측 종료일까지 30일 미만인 건은 `insufficient_observation`으로 기록합니다.
 
 | 제공 컬럼 | 타입 | 한 행에서의 의미 | 다른 관점의 사용 방법 |
 | --- | --- | --- | --- |
@@ -55,6 +55,7 @@
 | `days_to_followup_num` | `int64`, null 허용 | 기준 점검일부터 후속 점검일까지의 일수 | 재검사 소요 기간 집계 |
 | `base_result_cd` / `followup_result_cd` | `string`, 후속 결과 null 허용 | 기준·후속 점검의 공용 결과 코드 | 결과 전이 집계 |
 | `violation_cd` | `string` | 기준 점검에서 관측된 위반 코드 | ② 위반 유형별 재발 집계 |
+| `code_system_version` | `string` | 반복 위반 분석에 사용한 코드 체계 버전. 현재 마트는 변경일인 `2018-07-01`로 기록 | 코드 번호가 같은 경우에도 코드 체계 버전을 구분 |
 | `repeat_flag` | `bool`, null 허용 | 같은 위반 코드의 재관측 여부. 판단 불가는 `null` | 반복 위반 분자와 분모 구분 |
 | `reinspection_match_status_cd` | `string` | 연결 확정·미관측·동일 날짜 모호·면허번호 없음·관측 기간 부족 등의 상태 | 연결 가능 범위와 제외 사유 집계 |
 
@@ -91,6 +92,26 @@ python src/domains/03_repeat_inspection/build_food_inspections_silver.py
 python src/domains/03_repeat_inspection/build_inspection_marts.py
 ```
 
-Silver와 Gold Parquet은 각각 `data/silver/03_repeat_inspection/`과 `data/gold/marts/03_repeat_inspection/`에 생성됩니다. 새 HTML은 `reports/runs/03_repeat_inspection/`에서 열 수 있습니다. [기존 점검 분석 리포트](../../reports/03_repeat_inspection/inspection_analysis.html)와 [데이터 프로파일](../../reports/03_repeat_inspection/data_profile.html)도 함께 확인할 수 있습니다.
+Silver와 Gold Parquet은 각각 `data/silver/03_repeat_inspection/`과 `data/gold/marts/03_repeat_inspection/`에 생성됩니다. 로컬 방식의 새 HTML은 `reports/runs/03_repeat_inspection/`에서 열 수 있습니다. [데이터 프로파일](../../reports/03_repeat_inspection/data_profile.html)
 
 Windows 터미널에서 품질 조사 스크립트의 문자 인코딩 오류를 피하려면 `python -X utf8 src/domains/03_repeat_inspection/quality_datasets.py community_areas`처럼 실행합니다. 스크립트에 지정된 CSV를 `origin/03_repeat_inspection/`에서 읽습니다.
+
+## 8. 팀 통합 방식으로 실행
+
+01번 점검 Silver와 매니페스트의 실제 경로를 각각 `--fact`와 `--inspection-manifest`로 지정합니다. 아래 예시는 01번 브랜치의 출력 경로입니다. `--domain02-root`는 02번의 정상·격리 Parquet과 품질 대사 보고서가 생성된 프로젝트 루트입니다. 브랜치를 하나로 합친 경우 저장소 루트에서 `.`을 전달합니다.
+
+```powershell
+$inspectionSilver = 'data/silver/food_inspections.parquet'
+$inspectionManifest = 'data/silver/metadata/inspection_silver_manifest.json'
+python src/domains/03_repeat_inspection/build_inspection_marts.py --fact $inspectionSilver --inspection-manifest $inspectionManifest --domain02-root .
+```
+
+01번 매니페스트로 점검 Silver 파일의 SHA-256과 행 수를 검증합니다. 매니페스트에 기록된 원천 `source_sha256`을 02번 품질 대사 보고서의 원천 해시와 비교하고, 02번의 점검 ID와 Bronze 행 순번을 Silver와 대조합니다. 02번의 정상 조각에서 점검별 고유 문자열 코드를 만들고, 격리 조각이 섞인 점검은 부분 파싱으로 표시합니다. 격리 조각만 있으면 파싱 실패, 원문이 비어 있으면 공란으로 구분합니다. 두 점검 모두 파싱 완료인 경우에만 재관측률을 계산합니다.
+
+통합 모드의 결과는 `data/02_silver/03_repeat_inspection/`과 `data/03_gold/marts/03_repeat_inspection/`에 생성됩니다. HTML은 `reports/runs/03_repeat_inspection/team/inspection_analysis.html`에 생성되며, 같은 점검 Silver를 기준으로 기존 03번 파서와 02번 산출물 적용 결과를 비교합니다.
+
+### 통합 규칙 적용 검증
+
+팀 초안의 원천 해시 `b43beb7f…`에 해당하는 318,627행으로 01번 브랜치 커밋 `0e1cd9b`의 Silver를 생성하고, 같은 원천으로 만든 02번 커밋 `767f39a`의 위반 결과를 연결했습니다. 01번 Silver를 사용한 반복 위반 333,856행 비교·130,574행 재관측(39.1%)은 03번 Silver로 실행한 결과와 일치했습니다. 재검사 마트와 점검 이력도 행별로 대조했습니다. [적용 전후 비교 리포트](../../reports/03_repeat_inspection/inspection_analysis.html)
+
+기존 비교 가능 코드 340,368행 중 6,512행이 비교 대상에서 빠졌습니다. 기준 점검의 파싱 미확정 3,637행, 후속 점검의 파싱 미확정 2,152행, 02번 정상 코드 목록에 없는 723행입니다. 두 방식 모두 비교 가능했던 행에서는 재관측 여부가 일치했습니다.

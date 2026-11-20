@@ -1,5 +1,6 @@
 from collections import Counter
 from html import escape
+import re
 from statistics import median
 
 import pyarrow.parquet as pq
@@ -45,10 +46,41 @@ def bar_chart(rows):
     return '<ul class="chart">' + "".join(entries) + "</ul>"
 
 
-def build_report(repeat_path, reinspection_path, observation_end):
+def violation_code_order(code):
+    text = str(code)
+    prefix = re.match(r"[0-9]+", text)
+    return (int(prefix[0]), text) if prefix else (float("inf"), text)
+
+
+def comparison_table(baseline, eligible, repeated):
+    baseline_eligible, baseline_repeated = baseline
+    rows = (
+        ("비교 가능 코드 행", f"{baseline_eligible:,}", f"{eligible:,}"),
+        ("재관측 코드 행", f"{baseline_repeated:,}", f"{repeated:,}"),
+        (
+            "재관측률",
+            f"{baseline_repeated / baseline_eligible:.1%}" if baseline_eligible else "—",
+            f"{repeated / eligible:.1%}" if eligible else "—",
+        ),
+    )
+    cells = "".join(
+        f'<tr><th scope="row">{label}</th><td>{previous}</td><td>{current}</td></tr>'
+        for label, previous, current in rows
+    )
+    return f"""<h3 id="rule-comparison">위반 처리 기준 적용 전후</h3>
+<table aria-labelledby="rule-comparison">
+  <thead><tr><th scope="col">지표</th><th scope="col">기존 03번 파서</th><th scope="col">02번 산출물 적용</th></tr></thead>
+  <tbody>{cells}</tbody>
+</table>
+<p>같은 점검 Silver에 두 위반 처리 방식을 적용했습니다. 02번에서 격리된 위반 조각이 있는 점검은 재관측 여부를 확정할 수 없는 점검으로 처리했습니다.</p>"""
+
+
+def build_report(repeat_path, reinspection_path, observation_end, *, baseline=None):
     repeat_counts = Counter()
     comparison_counts = Counter()
     repeat = pq.ParquetFile(repeat_path)
+    metadata = repeat.schema_arrow.metadata or {}
+    inspection_source = "01번 점검 Silver" if b"inspection_silver_sha256" in metadata else "03번 로컬 점검 Silver"
     for batch in repeat.iter_batches(columns=["violation_cd", "repeat_flag", "comparison_status_cd"]):
         for row in batch.to_pylist():
             comparison_counts[row["comparison_status_cd"]] += 1
@@ -58,7 +90,7 @@ def build_report(repeat_path, reinspection_path, observation_end):
         code: repeat_counts[code, True] + repeat_counts[code, False]
         for code, _ in repeat_counts
     }
-    top_codes = sorted(code_totals, key=lambda code: (-code_totals[code], code))[:10]
+    top_codes = sorted(code_totals, key=lambda code: (-code_totals[code], violation_code_order(code)))[:10]
     repeat_chart = bar_chart(
         (f"위반 {code}번", repeat_counts[code, True], code_totals[code],
          f"{repeat_counts[code, True] / code_totals[code]:.1%} ({repeat_counts[code, True]:,}/{code_totals[code]:,})")
@@ -67,6 +99,7 @@ def build_report(repeat_path, reinspection_path, observation_end):
     eligible = comparison_counts["comparable"]
     repeated = sum(count for (_, flag), count in repeat_counts.items() if flag)
     repeat_rate = f"{repeated / eligible:.1%}" if eligible else "—"
+    rule_comparison = comparison_table(baseline, eligible, repeated) if baseline is not None else ""
     excluded_rows = []
     excluded_details = []
     for status, count in comparison_counts.most_common():
@@ -135,7 +168,7 @@ def build_report(repeat_path, reinspection_path, observation_end):
 </style>
 <main>
 <h1>시카고 식품 위생 점검 분석</h1>
-<p>로컬 점검 데이터 · 관측 종료일 {observation_end.isoformat()}</p>
+<p>{inspection_source} · 관측 종료일 {observation_end.isoformat()}</p>
 <section aria-labelledby="reinspection">
 <h2 id="reinspection">불합격 후 30일 이내 첫 재검사</h2>
 <p>불합격 {len(reinspections):,}건 중 {len(matched):,}건을 연결했습니다. 연결 건 중 <strong>FAIL → PASS {pass_rate}</strong> ({passed:,}건)이며, 첫 재검사까지 걸린 기간의 중앙값은 <strong>{delay_median}</strong>입니다.</p>
@@ -159,6 +192,7 @@ def build_report(repeat_path, reinspection_path, observation_end):
 <h2 id="repeat">같은 위반 코드의 재관측</h2>
 <p>기준 점검의 위반 코드 <strong>{eligible:,}건</strong>은 모두 다음 점검 기록과 비교할 수 있었습니다. 그중 <strong>{repeated:,}건 ({repeat_rate})</strong>에서 같은 위반 코드가 다시 나왔고, 나머지 <strong>{eligible - repeated:,}건</strong>에서는 같은 코드가 나오지 않았습니다.</p>
 <p>2018-07-01 이후 같은 면허번호의 비교 대상 점검을 날짜순으로 비교했습니다. 기준 점검과 다음 점검의 위반 원문이 모두 파싱된 경우를 재관측률의 분모에 포함했습니다.</p>
+{rule_comparison}
 <h3>비교 건수가 많은 위반 코드 10개</h3>
 <p>정렬 기준은 비교 가능 건수 내림차순이며, 동률이면 위반 코드 번호 오름차순입니다. 막대는 비교 가능 건수 중 같은 위반 코드가 다음 점검에서도 관측된 비율입니다.</p>
 {repeat_chart}

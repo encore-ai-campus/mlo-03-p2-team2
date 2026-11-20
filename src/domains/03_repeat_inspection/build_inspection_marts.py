@@ -1,9 +1,11 @@
+import json
 import re
 import tempfile
 from argparse import ArgumentParser
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import date
+from hashlib import file_digest
 from itertools import islice
 from pathlib import Path
 
@@ -11,12 +13,15 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from inspection_mart_report import build_report
+from violation_inputs import load_domain02_violations
 
 
 PROJECT = Path(__file__).resolve().parents[3]
 DOMAIN = "03_repeat_inspection"
 SILVER_DIR = PROJECT / "data" / "silver" / DOMAIN
 GOLD_DIR = PROJECT / "data" / "gold" / "marts" / DOMAIN
+TEAM_SILVER_DIR = PROJECT / "data" / "02_silver" / DOMAIN
+TEAM_GOLD_DIR = PROJECT / "data" / "03_gold" / "marts" / DOMAIN
 REPORT_DIR = PROJECT / "reports" / "runs" / DOMAIN
 VIOLATION_START = date(2018, 7, 1)
 REINSPECTION_MAX_DAYS = 30
@@ -47,7 +52,8 @@ PAIR_FIELDS = [
     ("followup_result_cd", pa.string()),
 ]
 REPEAT_SCHEMA = pa.schema(PAIR_FIELDS + [
-    ("violation_cd", pa.int64()),
+    ("code_system_version", pa.string()),
+    ("violation_cd", pa.string()),
     ("repeat_flag", pa.bool_()),
     ("base_violation_parse_status_cd", pa.string()),
     ("followup_violation_parse_status_cd", pa.string()),
@@ -78,7 +84,7 @@ def parse_violations(text):
     for part in text.split("|"):
         match = VIOLATION_PREFIX.match(part)
         if match:
-            codes.add(int(match[1]))
+            codes.add(match[1])
         else:
             unparsed = True
     if unparsed:
@@ -172,6 +178,7 @@ def repeat_rows(histories, violations):
                 for code in sorted(codes):
                     yield {
                         **pair_record(base, followup),
+                        "code_system_version": VIOLATION_START.isoformat(),
                         "violation_cd": code,
                         "repeat_flag": code in followup_codes if status == "comparable" else None,
                         "base_violation_parse_status_cd": base_parse,
@@ -233,15 +240,45 @@ def write_parquet(path, schema, metadata, records):
             writer.write_table(pa.Table.from_pylist(batch, schema=schema))
 
 
-def build(fact_path, silver_dir, gold_dir, report_dir=None):
-    fact = pq.ParquetFile(fact_path)
-    rows, violations = load_fact(fact)
-    observation_end = max(row.inspection_dtm for row in rows if row.inspection_dtm)
-    histories = group_history(rows)
+def inspection_metadata(fact, fact_path, manifest_path):
     metadata = {
         key: value for key, value in (fact.schema_arrow.metadata or {}).items()
         if key in {b"source_sha256", b"snapshot_date", b"code_map"}
     }
+    if manifest_path is not None:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        with fact_path.open("rb") as file:
+            artifact_sha = file_digest(file, "sha256").hexdigest()
+        if manifest["artifacts"].get(fact_path.name) != artifact_sha:
+            raise ValueError("Inspection Silver SHA-256 differs from its manifest")
+        if fact.metadata.num_rows != manifest["silver_rows"]:
+            raise ValueError("Inspection Silver row count differs from its manifest")
+        source_sha = manifest["source_sha256"].lower().encode("ascii")
+        if metadata.get(b"source_sha256", source_sha).lower() != source_sha:
+            raise ValueError("Inspection Silver source SHA-256 differs from its manifest")
+        metadata[b"source_sha256"] = source_sha
+        metadata[b"inspection_silver_sha256"] = artifact_sha.encode("ascii")
+    return metadata
+
+
+def build(fact_path, silver_dir, gold_dir, report_dir=None, *, domain02_root=None, inspection_manifest=None):
+    fact = pq.ParquetFile(fact_path)
+    metadata = inspection_metadata(fact, fact_path, inspection_manifest)
+    rows, violations = load_fact(fact)
+    observation_end = max(row.inspection_dtm for row in rows if row.inspection_dtm)
+    histories = group_history(rows)
+    baseline = None
+    if domain02_root is not None:
+        team_violations = load_domain02_violations(
+            domain02_root, metadata.get(b"source_sha256"), rows, violations
+        )
+        eligible = repeated = 0
+        for row in repeat_rows(histories, violations):
+            flag = row["repeat_flag"]
+            eligible += flag is not None
+            repeated += flag is True
+        baseline = (eligible, repeated)
+        violations = team_violations
     metadata.update({
         b"violation_start": VIOLATION_START.isoformat().encode(),
         b"reinspection_early_cutoff_days": str(REINSPECTION_MAX_DAYS).encode(),
@@ -262,9 +299,12 @@ def build(fact_path, silver_dir, gold_dir, report_dir=None):
         reinspection = Path(staged_gold) / "inspection_reinspection_mart.parquet"
         report = Path(staged_report) / "inspection_analysis.html"
         write_parquet(history, HISTORY_SCHEMA, metadata, history_rows(rows, histories))
-        write_parquet(repeat, REPEAT_SCHEMA, metadata, repeat_rows(histories, violations))
+        repeat_metadata = {
+            **metadata, b"violation_source": b"domain02" if baseline is not None else b"domain03_local",
+        }
+        write_parquet(repeat, REPEAT_SCHEMA, repeat_metadata, repeat_rows(histories, violations))
         write_parquet(reinspection, REINSPECTION_SCHEMA, metadata, reinspection_rows(rows, histories, observation_end))
-        report.write_text(build_report(repeat, reinspection, observation_end), encoding="utf-8")
+        report.write_text(build_report(repeat, reinspection, observation_end, baseline=baseline), encoding="utf-8")
         history.replace(silver_dir / history.name)
         for path in (repeat, reinspection):
             path.replace(gold_dir / path.name)
@@ -273,15 +313,28 @@ def build(fact_path, silver_dir, gold_dir, report_dir=None):
 
 def main():
     parser = ArgumentParser(description="Build inspection history and both analysis marts.")
-    parser.add_argument("--fact", type=Path, default=SILVER_DIR / "food_inspections.parquet")
-    parser.add_argument("--silver-dir", type=Path, default=SILVER_DIR)
-    parser.add_argument("--gold-dir", type=Path, default=GOLD_DIR)
+    parser.add_argument("--fact", type=Path, help="Input inspection Silver Parquet")
+    parser.add_argument("--inspection-manifest", type=Path, help="Domain 01 Silver provenance manifest")
+    parser.add_argument("--silver-dir", type=Path)
+    parser.add_argument("--gold-dir", type=Path)
     parser.add_argument("--report-dir", type=Path, help="Directory for the generated HTML report")
+    parser.add_argument("--domain02-root", type=Path, help="Root containing Domain 02 Parquet and reconciliation report")
     args = parser.parse_args()
+    team_mode = args.domain02_root is not None
+    if team_mode and args.fact is None:
+        parser.error("--domain02-root requires --fact with the inspection Silver path")
+    silver_dir = args.silver_dir or (TEAM_SILVER_DIR if team_mode else SILVER_DIR)
+    gold_dir = args.gold_dir or (TEAM_GOLD_DIR if team_mode else GOLD_DIR)
     report_dir = args.report_dir
-    if report_dir is None and args.gold_dir == GOLD_DIR:
-        report_dir = REPORT_DIR
-    build(args.fact, args.silver_dir, args.gold_dir, report_dir)
+    if report_dir is None:
+        if team_mode and gold_dir == TEAM_GOLD_DIR:
+            report_dir = REPORT_DIR / "team"
+        elif gold_dir == GOLD_DIR:
+            report_dir = REPORT_DIR
+    build(
+        args.fact or SILVER_DIR / "food_inspections.parquet", silver_dir, gold_dir,
+        report_dir, domain02_root=args.domain02_root, inspection_manifest=args.inspection_manifest,
+    )
 
 
 if __name__ == "__main__":
