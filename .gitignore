@@ -46,6 +46,8 @@ download_manifest.csv
 !/data/README.md
 !/data/**/.gitkeep
 /reports/runs/
+/reports/01_inspection/*.json
+/reports/01_inspection/inspection_quality_issues.csv
 
 # Temporary and editor files
 *.part

@@ -2,14 +2,16 @@
 
 import pandas as pd
 
-from common import DECISIONS, GRAIN, MIN_DECISIONS, write_table
+from common import AI_READY, DECISIONS, GOLD, GRAIN, MIN_DECISIONS, PERFORMANCE_DETAIL, write_table
 
 
 def transform(data, output, metadata):
-    summary = pd.read_parquet(data / "gold/performance_detail.parquet")
+    summary = pd.read_parquet(data / GOLD / PERFORMANCE_DETAIL)
     if summary.duplicated(GRAIN).any():
         raise ValueError("AI Ready grain is not unique")
-    write_table(summary, output / "inspection_performance.parquet")
+    output = output / AI_READY
+    output.mkdir(parents=True)
+    write_table(summary, output / "01_inspection_performance.parquet")
     return {
         "ai_ready_rows": len(summary),
         "purpose": "Descriptive analytics and grounded Q&A on historical inspection performance",
@@ -27,6 +29,6 @@ def transform(data, output, metadata):
 
 
 if __name__ == "__main__":
-    from runner import DATA, run_stage
+    from runner import ROOT, run_stage
 
-    run_stage(DATA, 4)
+    run_stage(ROOT, 4)

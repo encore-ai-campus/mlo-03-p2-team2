@@ -3,7 +3,7 @@
 import pandas as pd
 import pyarrow as pa
 
-from common import DECISIONS, GRAIN, MIN_DECISIONS, write_table
+from common import DECISIONS, GOLD, GRAIN, MIN_DECISIONS, PERFORMANCE_DETAIL, SILVER, VALIDATED, write_table
 
 
 def summarize(frame, group):
@@ -37,7 +37,7 @@ def build_gold(selected, output):
         dimension = pd.DataFrame({key: fact[key], name: values}).drop_duplicates().sort_values(key)
         if not dimension[key].is_unique or not fact[key].isin(dimension[key]).all():
             raise ValueError(f"Invalid dimension references for {name}")
-        write_table(dimension, schema / f"dim_{name.removesuffix('_cd')}.parquet")
+        write_table(dimension, schema / f"01_dim_{name.removesuffix('_cd')}.parquet")
     dates = pd.to_datetime(selected["inspection_dtm"])
     start, end = dates.min(), dates.max()
     calendar = pd.DataFrame({"inspection_dtm": pd.date_range(start, end)})
@@ -46,12 +46,12 @@ def build_gold(selected, output):
     calendar["inspection_dtm"] = calendar["inspection_dtm"].astype(pd.ArrowDtype(pa.date32()))
     if not fact["inspection_dtm"].isin(calendar["inspection_dtm"]).all():
         raise ValueError("Invalid inspection date reference")
-    write_table(calendar, schema / "dim_date.parquet")
+    write_table(calendar, schema / "01_dim_date.parquet")
     fact["inspection_count_num"] = 1
     for code, name in zip(DECISIONS, ("pass", "conditional_pass", "fail"), strict=True):
         fact[f"{name}_count_num"] = selected["result_cd"].eq(code).fillna(False).astype("int64")
     fact["decision_count_num"] = fact[["pass_count_num", "conditional_pass_count_num", "fail_count_num"]].sum(axis=1)
-    write_table(fact, schema / "fact_inspection.parquet")
+    write_table(fact, schema / "01_fact_inspection.parquet")
 
     metrics = fact.assign(
         inspection_year_num=pd.to_datetime(fact["inspection_dtm"]).dt.year,
@@ -74,7 +74,7 @@ def build_gold(selected, output):
             raise ValueError(f"Aggregate reconciliation failed for {name}")
         summary.to_csv(analysis / f"performance_by_{name}.csv", index=False)
         if name == "month_facility_inspection_risk":
-            write_table(summary, output / "performance_detail.parquet")
+            write_table(summary, output / PERFORMANCE_DETAIL)
         if name in ("facility", "inspection_type", "facility_inspection"):
             ranking = summary.loc[
                 summary["decision_count_num"].ge(MIN_DECISIONS)
@@ -87,13 +87,13 @@ def build_gold(selected, output):
 
 
 def transform(data, output, metadata):
-    selected = pd.read_parquet(data / "silver/validated_inspections.parquet")
+    selected = pd.read_parquet(data / SILVER / VALIDATED)
     if metadata["source_rows"] != len(selected) + metadata["excluded_quality_rows"]:
         raise ValueError("Source-to-Gold reconciliation failed")
-    return build_gold(selected, output)
+    return build_gold(selected, output / GOLD)
 
 
 if __name__ == "__main__":
-    from runner import DATA, run_stage
+    from runner import ROOT, run_stage
 
-    run_stage(DATA, 3)
+    run_stage(ROOT, 3)

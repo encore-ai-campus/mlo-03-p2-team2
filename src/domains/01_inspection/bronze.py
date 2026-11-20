@@ -4,11 +4,15 @@ from datetime import datetime, timezone
 
 import pandas as pd
 
-from common import COLUMNS, DATA, ROOT, TABLE, digest, write_table
+from common import BRONZE, COLUMNS, ROOT, SOURCE, TABLE, digest, write_table
 
 
 def transform(_data, output, _metadata):
-    source = DATA / "origin/food_Inspections.csv"
+    source = ROOT / SOURCE
+    if not source.is_file():
+        raise FileNotFoundError(f"{source} is missing. Run python src/ingestion/restore_origin.py --restore")
+    output = output / BRONZE
+    output.mkdir(parents=True)
     checksum = digest(source)
     raw = pd.read_csv(source, dtype="string", keep_default_na=False, encoding="utf-8-sig")
     if list(raw.columns) != list(COLUMNS) or raw.isna().any().any():
@@ -22,6 +26,6 @@ def transform(_data, output, _metadata):
 
 
 if __name__ == "__main__":
-    from runner import DATA, run_stage
+    from runner import ROOT, run_stage
 
-    run_stage(DATA, 0)
+    run_stage(ROOT, 0)

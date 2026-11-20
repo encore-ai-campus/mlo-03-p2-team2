@@ -5,7 +5,7 @@ import csv
 import pandas as pd
 import pyarrow as pa
 
-from common import COLUMNS, ROOT, TABLE, write_table
+from common import BRONZE, CODE_MAP, COLUMNS, ROOT, RULE_FLAGS, SILVER, TABLE, write_table
 
 
 def standardize(raw):
@@ -33,7 +33,7 @@ def standardize(raw):
         parsed = pd.to_numeric(silver[name], errors="coerce")
         issues[f"invalid_{name}"] = silver[name].notna() & parsed.isna()
         silver[name] = parsed.astype("Float64")
-    with (ROOT / "docs/shared_code_map.csv").open(encoding="utf-8-sig", newline="") as file:
+    with (ROOT / CODE_MAP).open(encoding="utf-8-sig", newline="") as file:
         mappings = [row for row in csv.DictReader(file) if row["dataset"] == "food_inspections"]
     for name in ("result_cd", "risk_level_cd"):
         entries = [row for row in mappings if row["target_column"] == name]
@@ -51,17 +51,19 @@ def standardize(raw):
 
 
 def transform(data, output, _metadata):
-    raw = pd.read_parquet(data / "bronze" / TABLE)
+    raw = pd.read_parquet(data / BRONZE / TABLE)
     clean, issues = standardize(raw)
     if not raw["source_row_num"].equals(clean["source_row_num"]):
         raise ValueError("Source row preservation failed")
+    output = output / SILVER
+    output.mkdir(parents=True)
     write_table(clean, output / TABLE)
     write_table(pd.DataFrame(issues).assign(source_row_num=raw["source_row_num"]),
-                output / "inspection_rule_flags.parquet")
+                output / RULE_FLAGS)
     return {"silver_rows": len(clean)}
 
 
 if __name__ == "__main__":
-    from runner import DATA, run_stage
+    from runner import ROOT, run_stage
 
-    run_stage(DATA, 1)
+    run_stage(ROOT, 1)
