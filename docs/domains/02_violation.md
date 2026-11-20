@@ -10,3 +10,7 @@
 - 격리 데이터: Gold 분석에서 제외하며 `Accepted + Quarantine = 전체 candidate`를 계속 검증한다.
 
 실행 명령은 `python -m src.domains.02_violation.build_analysis_mart`이다. 출력은 `data/03_gold/marts/violations_analysis_mart.parquet`, `reports/violations_analysis.html`, 실행 로그는 `logs/violations_analysis_runs.jsonl`이다.
+
+## 실행 결과와 변경 기록
+
+[최신 원천 재실행 결과](02_violation/02_violation_types.md)와 단계별 변경 기록은 `docs/domains/02_violation/`에 둡니다.

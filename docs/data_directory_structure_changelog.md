@@ -53,9 +53,9 @@ src/
 | `README.md` | Origin 및 Bronze 출력의 옛 경로 | 새 입력·출력 경로, 데이터 폴더 역할, 실행 로그와 이 변경 기록 링크 | 팀원이 시작점에서 현재 구조와 작업 기록을 찾도록 함 |
 | `AGENTS.md`, `docs/00_project_plan.md` | `origin/` 경로 안내 | `data/00_origin/` 안내 | 공용 작업 규칙과 프로젝트 계획의 경로 일치 |
 | `docs/bronze.md` | 옛 Origin·Bronze 경로와 CSV 로그 설명 | 새 경로 및 JSONL 상세 로그 설명 추가 | Bronze 실행·로그 계약을 문서화 |
-| `docs/team_share/bronze_pipeline_changelog.md` | 과거 경로로 표시 | 현재 경로로 표시 | 공유용 Bronze 경로 표기를 현재 폴더와 맞춤 |
+| `docs/bronze_pipeline_changelog.md` | 과거 경로로 표시 | 현재 경로로 표시 | 공유용 Bronze 경로 표기를 현재 폴더와 맞춤 |
 | `metadata/source_profiles.md` | 측정값은 유지하고 옛 Origin 경로 표시 | 경로만 `data/00_origin/`으로 갱신 | 실제 결측률·중복·이상값 수치를 유지하면서 파일 위치만 반영 |
-| `docs/team_share/data_directory_structure_changelog.md` | 없음 | 이번 작업 기록 신규 작성 | 변경 배경과 검증 결과를 팀에 공유 |
+| `docs/data_directory_structure_changelog.md` | 없음 | 이번 작업 기록 신규 작성 | 변경 배경과 검증 결과를 팀에 공유 |
 
 기존 설정·코드 외의 별도 `src/` 이동은 하지 않았다. Bronze와 Profiling 코드는 이미 각각 해당 `src/` 하위 폴더에 있었다.
 

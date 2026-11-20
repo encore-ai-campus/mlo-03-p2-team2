@@ -18,9 +18,9 @@
 | `metadata/standards/type_mapping_review.csv` | 신규 | 원천·Bronze·기존 권장·팀 후보 타입 비교 | 변환·정밀도 예외 확인 |
 | `metadata/standards/code_mapping_review.csv` | 신규 | 실제 범주값 24종+Risk 공란과 팀 코드 예시 검토 | 코드 의미를 확정·검토·미등록으로 구분하기 위한 초안 |
 | `metadata/standards/integration_review.md` | 신규 | 번호/기간 JOIN과 날짜 예외·후보 상태 | 조건이 다른 두 집계를 혼동하지 않기 위함 |
-| `docs/team_share/silver_standardization_changelog.md` | 신규 | 이 변경 로그 | 팀원에게 변경·미확정을 공유 |
-| `docs/team_share/bronze_pipeline_changelog.md` | 신규 | 기존 Bronze 작업의 사실·검증 요약 | 팀 통합 시 입력·적재 계약 공유 |
-| `docs/team_share/source_profiling_changelog.md` | 신규 | 기존 Profiling 작업의 사실·검증 요약 | 팀 통합 시 품질 근거 공유 |
+| `docs/silver_standardization_changelog.md` | 신규 | 이 변경 로그 | 팀원에게 변경·미확정을 공유 |
+| `docs/bronze_pipeline_changelog.md` | 신규 | 기존 Bronze 작업의 사실·검증 요약 | 팀 통합 시 입력·적재 계약 공유 |
+| `docs/source_profiling_changelog.md` | 신규 | 기존 Profiling 작업의 사실·검증 요약 | 팀 통합 시 품질 근거 공유 |
 
 기존 `metadata/source_profiles.json`, `metadata/source_profiles.md`, `metadata/data_dictionary.md`, Origin, Bronze, Python 코드는 변경하지 않았다. 수정한 변환 규칙 원본은 저장소 밖 `C:\mlo-03-p2-team2-standards-backup-20261120\transformation_rules.md`에 SHA-256 확인 후 백업했다. 이전 브랜치 분리 백업도 유지한다.
 
