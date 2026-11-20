@@ -1,0 +1,270 @@
+{
+  "version": "1.2-geographic-team-draft",
+  "mapping_version": "team-integration-draft-20261120",
+  "basis": [
+    "docs/domains/05_geospatial/model.md",
+    "metadata/data_dictionary/05_geospatial/column_mapping.csv"
+  ],
+  "datasets": {
+    "food_inspections": {
+      "file": "food_inspections.csv",
+      "local_file": "Food_Inspections_20261120.csv",
+      "team_sha256": "b43beb7fae834a8698ca162004caf2929cb2eca7ff75c27b4db6bf07aa103c98",
+      "source_id": "4ijn-s7e5",
+      "url": "https://data.cityofchicago.org/Health-Human-Services/Food-Inspections/4ijn-s7e5",
+      "grain": "식품 위생 점검 1건",
+      "primary_key": "inspection_key",
+      "expected_code_columns": [
+        "Risk",
+        "Results"
+      ],
+      "columns": [
+        {
+          "source_column": "Inspection ID",
+          "standard_column": "inspection_key",
+          "source_declared_type": "number",
+          "draft_representation": "정수 형태",
+          "bronze_type": "string",
+          "silver_type": "string",
+          "transform": "text",
+          "meaning_ko": "한 점검을 구분하는 ID"
+        },
+        {
+          "source_column": "DBA Name",
+          "standard_column": "dba_name",
+          "source_declared_type": "text",
+          "draft_representation": "자유 텍스트",
+          "bronze_type": "string",
+          "silver_type": "string",
+          "transform": "text",
+          "meaning_ko": "영업에 사용하는 상호"
+        },
+        {
+          "source_column": "AKA Name",
+          "standard_column": "aka_name",
+          "source_declared_type": "text",
+          "draft_representation": "자유 텍스트",
+          "bronze_type": "string",
+          "silver_type": "string",
+          "transform": "text",
+          "meaning_ko": "다른 상호 또는 별칭"
+        },
+        {
+          "source_column": "License #",
+          "standard_column": "license_number_key",
+          "source_declared_type": "number",
+          "draft_representation": "정수 형태",
+          "bronze_type": "string",
+          "silver_type": "string",
+          "transform": "inspection_license",
+          "meaning_ko": "인허가와 연결할 면허번호 후보"
+        },
+        {
+          "source_column": "Facility Type",
+          "standard_column": "facility_type",
+          "source_declared_type": "text",
+          "draft_representation": "범주 텍스트",
+          "bronze_type": "string",
+          "silver_type": "string",
+          "transform": "text",
+          "meaning_ko": "시설 유형 원천 분류"
+        },
+        {
+          "source_column": "Risk",
+          "standard_column": "risk_level_cd",
+          "source_declared_type": "text",
+          "draft_representation": "위험등급 라벨",
+          "bronze_type": "string",
+          "silver_type": "string",
+          "transform": "code",
+          "meaning_ko": "시설 위험등급"
+        },
+        {
+          "source_column": "Address",
+          "standard_column": "address",
+          "source_declared_type": "text",
+          "draft_representation": "주소 텍스트",
+          "bronze_type": "string",
+          "silver_type": "string",
+          "transform": "text",
+          "meaning_ko": "점검 주소"
+        },
+        {
+          "source_column": "City",
+          "standard_column": "city",
+          "source_declared_type": "text",
+          "draft_representation": "도시명 텍스트",
+          "bronze_type": "string",
+          "silver_type": "string",
+          "transform": "text",
+          "meaning_ko": "점검 도시"
+        },
+        {
+          "source_column": "State",
+          "standard_column": "state_cd",
+          "source_declared_type": "text",
+          "draft_representation": "주 코드 텍스트",
+          "bronze_type": "string",
+          "silver_type": "string",
+          "transform": "text",
+          "meaning_ko": "점검 주소의 주"
+        },
+        {
+          "source_column": "Zip",
+          "standard_column": "zip_code",
+          "source_declared_type": "number",
+          "draft_representation": "숫자 5자리",
+          "bronze_type": "string",
+          "silver_type": "string",
+          "transform": "text",
+          "meaning_ko": "점검 주소의 우편번호"
+        },
+        {
+          "source_column": "Inspection Date",
+          "standard_column": "inspection_dtm",
+          "source_declared_type": "calendar_date",
+          "draft_representation": "MM/DD/YYYY",
+          "bronze_type": "string",
+          "silver_type": "date32",
+          "transform": "date",
+          "meaning_ko": "점검일"
+        },
+        {
+          "source_column": "Inspection Type",
+          "standard_column": "inspection_type",
+          "source_declared_type": "text",
+          "draft_representation": "범주 텍스트",
+          "bronze_type": "string",
+          "silver_type": "string",
+          "transform": "text",
+          "meaning_ko": "정기·민원·재검사 등 점검 사유 또는 유형"
+        },
+        {
+          "source_column": "Results",
+          "standard_column": "result_cd",
+          "source_declared_type": "text",
+          "draft_representation": "결과 라벨",
+          "bronze_type": "string",
+          "silver_type": "string",
+          "transform": "code",
+          "meaning_ko": "통과, 불합격 등 점검 결과"
+        },
+        {
+          "source_column": "Violations",
+          "standard_column": "violations_text",
+          "source_declared_type": "text",
+          "draft_representation": "자유 텍스트",
+          "bronze_type": "string",
+          "silver_type": "string",
+          "transform": "preserve",
+          "meaning_ko": "위반 코드·설명·메모가 결합된 원문"
+        },
+        {
+          "source_column": "Latitude",
+          "standard_column": "latitude",
+          "source_declared_type": "number",
+          "draft_representation": "소수 형태",
+          "bronze_type": "string",
+          "silver_type": "float64",
+          "transform": "number",
+          "meaning_ko": "점검 위치의 위도"
+        },
+        {
+          "source_column": "Longitude",
+          "standard_column": "longitude",
+          "source_declared_type": "number",
+          "draft_representation": "소수 형태",
+          "bronze_type": "string",
+          "silver_type": "float64",
+          "transform": "number",
+          "meaning_ko": "점검 위치의 경도"
+        },
+        {
+          "source_column": "Location",
+          "standard_column": "location_text",
+          "source_declared_type": "point",
+          "draft_representation": "(위도, 경도) 문자열",
+          "bronze_type": "string",
+          "silver_type": "string",
+          "transform": "text",
+          "meaning_ko": "CSV의 위치 원문"
+        }
+      ]
+    },
+    "community_areas": {
+      "file": "community_areas.geojson",
+      "local_file": "export.csv",
+      "team_sha256": "c4b9c42adc19baca0a9c6ee3e84b302d40073d3ad99ee3d8b101d5d8217b0d16",
+      "source_id": "igwz-8jzy",
+      "url": "https://data.cityofchicago.org/Facilities-Geographic-Boundaries/Boundaries-Community-Areas/igwz-8jzy/about_data",
+      "grain": "Community Area 지역 1곳",
+      "primary_key": "community_area_num",
+      "expected_code_columns": [],
+      "map_reference_id": "cauq-8yn6",
+      "identification_status": "boundary_dataset_candidate",
+      "columns": [
+        {
+          "source_column": "the_geom",
+          "standard_column": "geometry",
+          "source_declared_type": "multipolygon",
+          "draft_representation": "MULTIPOLYGON WKT",
+          "bronze_type": "string",
+          "silver_type": "string",
+          "transform": "preserve",
+          "meaning_ko": "커뮤니티 지역 경계, 좌표축은 경도·위도로 잠정 적용"
+        },
+        {
+          "source_column": "AREA_NUMBE",
+          "standard_column": "community_area_num",
+          "source_declared_type": "number",
+          "draft_representation": "문자열, 정수 형태",
+          "bronze_type": "string",
+          "silver_type": "int64",
+          "transform": "integer",
+          "meaning_ko": "커뮤니티 지역 번호"
+        },
+        {
+          "source_column": "COMMUNITY",
+          "standard_column": "community_area_name",
+          "source_declared_type": "text",
+          "draft_representation": "문자열, 지역명",
+          "bronze_type": "string",
+          "silver_type": "string",
+          "transform": "text",
+          "meaning_ko": "커뮤니티 지역 이름"
+        },
+        {
+          "source_column": "AREA_NUM_1",
+          "standard_column": "community_area_code_raw",
+          "source_declared_type": "text",
+          "draft_representation": "문자열, 정수 형태",
+          "bronze_type": "string",
+          "silver_type": "string",
+          "transform": "text",
+          "meaning_ko": "원천의 보조 지역 코드"
+        },
+        {
+          "source_column": "SHAPE_AREA",
+          "standard_column": "shape_area_num",
+          "source_declared_type": "number",
+          "draft_representation": "문자열, 소수 형태",
+          "bronze_type": "string",
+          "silver_type": "float64",
+          "transform": "number",
+          "meaning_ko": "원천의 경계 면적 값"
+        },
+        {
+          "source_column": "SHAPE_LEN",
+          "standard_column": "shape_length_num",
+          "source_declared_type": "number",
+          "draft_representation": "문자열, 소수 형태",
+          "bronze_type": "string",
+          "silver_type": "float64",
+          "transform": "number",
+          "meaning_ko": "원천의 경계 길이 값"
+        }
+      ]
+    }
+  },
+  "scope": "Food inspections and community-area boundary snapshot"
+}
