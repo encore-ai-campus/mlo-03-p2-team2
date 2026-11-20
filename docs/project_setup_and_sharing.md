@@ -40,14 +40,17 @@ with pq.ParquetFile("data/02_silver/04_license/food_inspections.parquet") as par
 | 로컬 위치 | 내용 |
 | --- | --- |
 | `data/00_origin/` | 원천 CSV 2개, GeoJSON 1개, 컬럼 설명 JSON 3개 |
-| `data/01_bronze/04_license/` · `data/02_silver/04_license/` | 04번 원천 보존본과 표준화본 |
-| `data/03_gold/facts/04_license/` · `data/03_gold/dimensions/04_license/` | 04번 사실·차원 Parquet |
+| `data/01_bronze/04_license/` · `data/02_silver/04_license/` | 공용본으로 실행한 04번 원천 보존본과 표준화본 |
+| `data/03_gold/facts/04_license/` · `data/03_gold/dimensions/04_license/` | 공용본으로 생성한 04번 사실·차원 Parquet |
 | `src/domains/04_license/` · `src/ingestion/` | 04번 변환·검증 코드와 원천 프로파일링 코드 |
 | `metadata/lineage/04_license/` | 팀 공유 스냅샷의 적재 매니페스트와 컬럼 변환 목록 |
 | `reports/04_license/` | 팀 공유 스냅샷의 품질 검사와 단계별 검증 보고서 |
-| `reports/runs/04_license/` | 로컬 실행에서 생성하는 보고서 |
+| `reports/runs/04_license/` | 공용본 실행에서 생성한 로컬 보고서 |
+| 저장소 옆 `04_share/` | 공용 원천과 단계별 Parquet, 체크섬, 검증 보고서를 한 폴더에 모은 공유 파일 |
 
 `.env`나 환경 변수에서 원천 경로를 지정한 경우 `CHICAGO_RAW_DIR=data/00_origin`으로 맞춥니다.
+
+공용 점검 CSV는 03번의 `Food_Inspections_20261119.zip`에서 가져온 **318,627행** 버전입니다. 나머지 원천 5개는 기존 파일을 체크섬으로 대조했습니다. 기본 단계 폴더와 공유 보고서는 이 공용본의 결과입니다. [현재 공용 원천 체크섬](../metadata/source_catalog/verification/download_manifest.csv) · [기존·공용본 매칭 비교](../reports/04_license/match_comparison.md)
 
 ## GitHub 공유
 
@@ -65,4 +68,4 @@ with pq.ParquetFile("data/02_silver/04_license/food_inspections.parquet") as par
 | `origin.zip` | 224.2 MiB |
 | `data/01_bronze/04_license/business_licenses.parquet` | 103.5 MiB |
 
-GitHub의 일반 Git 저장소는 파일 하나가 **100 MiB**를 초과하면 차단하며, 웹에서 파일을 추가하는 경우 한도는 **25 MiB**입니다. 우리 팀의 큰 원천과 Bronze 산출물은 전체 파일 공유 위치와 재현 방법을 MD에 기록하는 방식이 적합합니다. [GitHub 파일 크기 한도](https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-large-files-on-github)
+GitHub의 일반 Git 저장소는 파일 하나가 **100 MiB**를 초과하면 차단하며, 웹에서 저장소에 파일을 추가하는 경우 한도는 **25 MiB**입니다. 04번 공유 파일은 각 파일을 100 MB 이하로 준비했습니다. `04_share/`의 파일과 `04_manifest.json`, `04_sha256sums.txt`를 함께 공유하면 팀원이 분할 파일을 복원하고 검사할 수 있습니다. [04번 원천과 산출물 공유](domains/04_license.md#원천과-단계별-산출물-공유) · [GitHub 파일 크기 한도](https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-large-files-on-github)

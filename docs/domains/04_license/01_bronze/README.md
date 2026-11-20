@@ -3,7 +3,7 @@
 | 입력 | 출력 | 논리 레코드 수 | 원천 → Bronze 컬럼 수 |
 | --- | --- | ---: | ---: |
 | `data/00_origin/business_licenses.csv` | `data/01_bronze/04_license/business_licenses.parquet` | 1,212,132 | 37 → 38 |
-| `data/00_origin/food_inspections.csv` | `data/01_bronze/04_license/food_inspections.parquet` | 318,552 | 17 → 18 |
+| `data/00_origin/food_inspections.csv` | `data/01_bronze/04_license/food_inspections.parquet` | 318,627 | 17 → 18 |
 
 | 작업 | 적용 내용 |
 | --- | --- |
@@ -18,4 +18,4 @@
 
 두 Parquet 옆의 `ingestion_manifest.json`에는 테이블별로 원천 파일명·형식·인코딩·선택 컬럼·시트·SHA-256, Bronze 파일명·SHA-256·행 수를 기록합니다. 읽기 시작 시각과 적재 기록 시각은 UTC로 기록합니다. 새 산출물은 `created`와 생성 시각을, 기존 산출물 검증은 `verified_existing`과 생성 시각 `null`을 기록합니다. 검증된 동일 입력을 다시 실행하면 기존 적재 기록을 사용합니다. [팀 공유용 매니페스트](../../../../metadata/lineage/04_license/bronze_manifest.json)는 이 스냅샷의 실행 기록을 복사한 파일입니다.
 
-공유 스냅샷에서 원천 값·순서·스키마·행 수와 적재 기록을 대조하는 **7개 검사**가 통과했습니다. [Bronze 변환](../../../../src/domains/04_license/01_bronze.py) · [Bronze 검증](../../../../src/domains/04_license/validate_bronze.py) · [적재 기록 코드](../../../../src/domains/04_license/bronze_manifest.py) · [다음 단계 Silver](../02_silver/README.md)
+공용본 실행에서 두 Parquet를 생성했고, 원천 값·순서·스키마·행 수와 적재 기록을 대조하는 **7개 검사**가 통과했습니다. [Bronze 변환](../../../../src/domains/04_license/01_bronze.py) · [Bronze 검증](../../../../src/domains/04_license/validate_bronze.py) · [적재 기록 코드](../../../../src/domains/04_license/bronze_manifest.py) · [다음 단계 Silver](../02_silver/README.md)

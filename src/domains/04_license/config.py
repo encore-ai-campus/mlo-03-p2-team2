@@ -94,11 +94,15 @@ def settings(args):
     return Config(sources, args.dictionary.resolve(), data, reports)
 
 
-def load_config(description):
-    parser = argparse.ArgumentParser(description=description)
+def add_config_arguments(parser):
     parser.add_argument("--raw-dir", type=Path, help="Directory containing the immutable input files")
     parser.add_argument("--sources-config", type=Path, help="YAML source mapping")
     parser.add_argument("--dictionary", type=Path, default=Path(__file__).with_name("데이터 사전.csv"))
     parser.add_argument("--data-dir", type=Path, default=PROJECT / "data")
     parser.add_argument("--report-dir", type=Path, default=PROJECT / "reports" / "runs" / DOMAIN)
+
+
+def load_config(description):
+    parser = argparse.ArgumentParser(description=description)
+    add_config_arguments(parser)
     return settings(parser.parse_args())

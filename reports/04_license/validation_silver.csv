@@ -2,6 +2,6 @@ table,name,violations,detail
 business_licenses,row count,0,"Bronze: 1212132, Silver: 1212132"
 business_licenses,dictionary schema,0,
 business_licenses,dictionary values and source row lineage,0,
-food_inspections,row count,0,"Bronze: 318552, Silver: 318552"
+food_inspections,row count,0,"Bronze: 318627, Silver: 318627"
 food_inspections,dictionary schema,0,
 food_inspections,dictionary values and source row lineage,0,

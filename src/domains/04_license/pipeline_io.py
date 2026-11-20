@@ -2,6 +2,7 @@
 
 import csv
 import hashlib
+import json
 import os
 import shutil
 import sys
@@ -113,6 +114,10 @@ def write_parquet(path, schema, batches):
 def sha256(path):
     with path.open("rb") as stream:
         return hashlib.file_digest(stream, "sha256").hexdigest()
+
+
+def json_bytes(value):
+    return (json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n").encode("utf-8")
 
 
 @contextmanager

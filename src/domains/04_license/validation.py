@@ -1,6 +1,7 @@
 """One validation row per check, with a failing process status."""
 
 import csv
+from collections import deque
 from dataclasses import asdict, dataclass
 from io import StringIO
 
@@ -9,9 +10,10 @@ import pyarrow.parquet as pq
 
 from bronze_manifest import MANIFEST, artifact_identity, check_entry, read_manifest
 from config import TABLES
-from modeling import EVENT, MATCH, SCHEMAS, UNKNOWN, gold_path
+from modeling import (EVENT, MATCH, SCHEMAS, UNKNOWN, Indexes, gold_path,
+                      inspection_license_numbers, inspection_matches, license_events)
 from normalization import load_dictionary, normalize_batch, silver_schema
-from pipeline_io import ROW, bronze_batches, parquet_batches, sha256, staging
+from pipeline_io import ROW, bronze_batches, sha256, staging
 from quality import compare, render_reports
 
 
@@ -132,6 +134,18 @@ def gold_checks(config, root=None):
         with pq.ParquetFile(config.table("silver", source)) as artifact:
             unchanged = artifact.read(columns=cols).equals(tables[fact].select(cols))
         checks.append(Check(fact, "source key, row order and count", int(not unchanged)))
+
+    licenses = config.table("silver", "business_licenses")
+    inspections = config.table("silver", "food_inspections")
+    indexes = Indexes()
+    expected_events = license_events(licenses, indexes, inspection_license_numbers(inspections))
+    events_match = equal_batches(expected_events, iter(tables[EVENT].to_batches()))
+    if not events_match:
+        # A comparison can stop early. Index the remaining Silver events before checking matches.
+        deque(expected_events, maxlen=0)
+    checks.append(Check(EVENT, "fact values recomputed from Silver", int(not events_match)))
+    matches_match = equal_batches(inspection_matches(inspections, indexes), iter(tables[MATCH].to_batches()))
+    checks.append(Check(MATCH, "fact values and period candidates recomputed from Silver", int(not matches_match)))
 
     match = tables[MATCH]
     event = tables[EVENT]

@@ -215,3 +215,125 @@ def test_bronze_uses_configured_workbook_sheet_and_columns(tmp_path):
     assert result.to_pydict() == {
         "description": ["line 1\nline 2", ""], "row_id": ["0001", "0002"], "source_row_num": [1, 2],
     }
+
+
+def test_gold_rejects_plausible_but_incorrect_fact_values(project):
+    _, data, _ = project
+    for stage in STAGES:
+        execute(stage, project)
+    facts = data / "03_gold" / "facts" / "04_license"
+    match = facts / "fact_inspection_license_match.parquet"
+    events = facts / "fact_license_event.parquet"
+    mutations = (
+        (match, 1, {"candidate_count_num": 9}),
+        (match, 3, {"match_status_cd": "NO_LICENSE_NUMBER_MATCH"}),
+        (match, 0, {"match_status_cd": "NO_VALID_PERIOD", "candidate_count_num": 0,
+                    "matched_license_event_id": None, "establishment_key": "__unknown__"}),
+        (match, 1, {"result_cd": "PASS", "date_key": "2024-01-01"}),
+        (events, 3, {"recorded_status_cd": "OTHER"}),
+    )
+    accepted = []
+    for path, index, changes in mutations:
+        original = path.read_bytes()
+        fact = pq.read_table(path)
+        rows = fact.to_pylist()
+        rows[index].update(changes)
+        try:
+            pq.write_table(pa.Table.from_pylist(rows, schema=fact.schema), path)
+            result = execute("validate_gold", project, ok=False)
+            if result.returncode != 1 or "recomputed from Silver" not in result.stdout:
+                accepted.append((changes, result.stdout, result.stderr))
+        finally:
+            path.write_bytes(original)
+    assert not accepted
+
+
+def package_command(*args, ok=True):
+    result = subprocess.run([sys.executable, str(SCRIPTS / "package_outputs.py"), *map(str, args)],
+                            capture_output=True, encoding="utf-8", errors="replace")
+    assert result.returncode == (0 if ok else 1), result.stdout + result.stderr
+    return result
+
+
+def test_package_restores_split_parquet_and_rejects_tampering(project, tmp_path):
+    raw, data, reports = project
+    (raw / "food_columns.json").write_bytes(b"{}")
+    (raw / "license_columns.json").write_bytes(b"{}")
+    (raw / "area_columns.json").write_bytes(b"{}")
+    (raw / "community_areas.geojson").write_bytes(b'{"type":"FeatureCollection","features":[]}')
+    with (raw / "food_inspections.csv").open("ab") as stream:
+        for key in range(108, 500):
+            stream.write(f"{key},111,01/10/2024,Pass\r\n".encode())
+    execute("run_pipeline", project)
+    bronze = Path("01_bronze/04_license/business_licenses.parquet")
+    size = (data / bronze).stat().st_size
+    package = tmp_path / "package"
+    build = ("build", "--raw-dir", raw, "--data-dir", data, "--report-dir", reports, "--output-dir", package,
+             "--limit-bytes", size - 1)
+    package_command(*build)
+    initial = snapshot(package)
+    package_command(*build)
+    assert snapshot(package) == initial
+
+    assert all(path.is_file() and path.name.startswith("04_") for path in package.iterdir())
+    artifacts = json.loads((package / "04_manifest.json").read_bytes())["artifacts"]
+    record = next(entry for entry in artifacts if entry["path"] == (Path("data") / bronze).as_posix())
+    assert [part["bytes"] for part in record["parts"]] == [(size + 1) // 2, size // 2]
+    assert record["rows"] == 4
+    source = next(entry for entry in artifacts if entry["path"] == "data/00_origin/food_inspections.csv")
+    assert len(source["parts"]) == 2
+    assert all(part["path"].startswith("04_origin_food_inspections.csv.gz.part-") for part in source["parts"])
+    restore = tmp_path / "restored"
+    package_command("verify", "--package-dir", package, "--restore-dir", restore)
+    assert snapshot(restore / "data")[bronze.as_posix()] == snapshot(data)[bronze.as_posix()]
+    assert snapshot(restore / "data" / "00_origin") == snapshot(raw)
+    assert snapshot(restore / "reports") == snapshot(reports)
+
+    part = package / record["parts"][0]["path"]
+    contents = part.read_bytes()
+    part.write_bytes(bytes([contents[0] ^ 1]) + contents[1:])
+    result = package_command("verify", "--package-dir", package, "--restore-dir", tmp_path / "rejected", ok=False)
+    assert "SHA-256 differs" in result.stderr
+    assert not list((tmp_path / "rejected").rglob("*.parquet"))
+
+
+def test_incoming_rows_flow_to_gold_and_preserve_original_snapshots(project, tmp_path):
+    raw, _, _ = project
+    incoming = tmp_path / "incoming"
+    incoming.mkdir()
+    inspections = incoming / "food_inspections.csv"
+    columns = ["Results", "Inspection Date", "License #", "Inspection ID"]
+    rows = [["Fail", "01/10/2024", "333", "105"], ["Fail", "01/10/2024", "111", "108"]]
+    write_csv(inspections, columns, rows)
+    with (raw / "business_licenses.csv").open(encoding="utf-8", newline="") as stream:
+        data_rows = csv.reader(stream)
+        next(data_rows)
+        event = next(data_rows)
+    event[:3] = ["source-5", "5", "333"]
+    write_csv(incoming / "business_licenses.csv", LICENSE_COLUMNS, [event])
+    before = snapshot(raw), snapshot(incoming)
+    combined = tmp_path / "combined"
+    options = ("--delta-dir", str(incoming), "--combined-raw-dir", str(combined))
+    execute("run_pipeline", project, extra=options)
+    assert (snapshot(raw), snapshot(incoming)) == before
+
+    manifest = json.loads((combined / "merge_manifest.json").read_bytes())
+    for entry in manifest["entries"]:
+        assert entry["inserted_rows"] == 1
+        assert entry["result_sha256"] == snapshot(combined)[entry["file"]]
+    assert next(entry for entry in manifest["entries"] if entry["table"] == "food_inspections")["updated_rows"] == 1
+    updated_project = combined, *project[1:]
+    execute("run_pipeline", updated_project, extra=("--start-at", "silver"))
+    execute("run_pipeline", updated_project, extra=("--validate-only",))
+    _, data, _ = project
+    fact = pq.read_table(data / "03_gold/facts/04_license/fact_inspection_license_match.parquet")
+    matches = {row["inspection_key"]: row for row in fact.to_pylist()}
+    assert matches["105"]["matched_license_event_id"] == "5"
+    assert matches["105"]["result_cd"] == "FAIL"
+    assert matches["108"]["candidate_count_num"] == 2
+
+    compared = snapshot(combined)
+    write_csv(inspections, columns, rows + [["Pass", "01/10/2024", "333", "105"]])
+    failed = execute("run_pipeline", project, ok=False, extra=options)
+    assert failed.returncode == 1 and "conflicting incoming rows" in failed.stderr
+    assert snapshot(combined) == compared

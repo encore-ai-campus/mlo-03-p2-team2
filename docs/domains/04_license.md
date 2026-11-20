@@ -4,7 +4,7 @@
 
 ## AS-IS 원천 데이터 프로파일링
 
-공유 스냅샷의 점검 **318,552행 × 17열**과 인허가 **1,212,132행 × 37열**을 조사했습니다. 결측과 키 분포는 원천 값을 보존한 Bronze에서 확인했습니다. 면허번호만으로 비교한 결과는 점검의 **94.80%**, 점검일을 유효기간에 대조한 결과는 **73.37%**에서 후보가 한 건 이상이었습니다. [원천 파일과 조사 기준](04_license/00_origin/README.md)
+현재 공용 점검 **318,627행 × 17열**과 인허가 **1,212,132행 × 37열**을 기준으로 조사했습니다. 면허번호만으로 비교하면 점검의 **94.80%**, 점검일을 유효기간에 대조하면 **73.37%**에서 후보가 한 건 이상이었습니다. [원천 파일과 조사 기준](04_license/00_origin/README.md) · [현재 공용 원천 체크섬](../../metadata/source_catalog/verification/download_manifest.csv)
 
 | 항목 | 관측 결과 | 분석에 미치는 영향 |
 | --- | --- | --- |
@@ -18,11 +18,11 @@
 
 | 점검 한 건의 후보 수 | 면허번호만 비교 | 면허번호와 점검일 유효기간을 함께 비교 |
 | --- | ---: | ---: |
-| 0건 | 16,577 | 84,828 |
-| 1건 | 35,887 | 232,323 |
-| 2건 이상 | 266,088 | 1,401 |
+| 0건 | 16,584 | 84,843 |
+| 1건 | 35,899 | 232,383 |
+| 2건 이상 | 266,144 | 1,401 |
 
-빈 면허번호와 `0`, `9999999`는 두 비교에서 후보 0건으로 잡았습니다. 기간 비교는 시작일과 만료일 양쪽을 포함하며, 시작일·만료일이 비어 있거나 역전된 기록은 제외했습니다. 상태별 상세와 취소·철회일 검토 항목은 [Gold](04_license/03_gold/README.md)와 [품질 검사](04_license/quality/README.md)에 있습니다.
+빈 면허번호와 `0`, `9999999`는 두 비교에서 후보 0건으로 잡았습니다. 기간 비교는 시작일과 만료일 양쪽을 포함하며, 시작일·만료일이 비어 있거나 역전된 기록은 제외했습니다. [Gold 상태별 상세](04_license/03_gold/README.md) · [품질 규칙 검토](04_license/quality/README.md) · [기존 318,552행과 매칭 결과 비교](../../reports/04_license/match_comparison.md)
 
 ## 단계별 변환 기록
 
@@ -44,7 +44,8 @@
 
 ```powershell
 $domain = 'src/domains/04_license'
-$options = @('--data-dir', 'data/pro_2', '--report-dir', 'reports/runs/pro_2/04_license')
+$options = @('--raw-dir', 'data/00_origin', '--data-dir', 'data',
+             '--report-dir', 'reports/runs/04_license')
 
 python "$domain/01_bronze.py" @options
 python "$domain/validate_bronze.py" @options
@@ -58,4 +59,50 @@ python "$domain/validate_gold.py" @options
 
 [공용 원천 설정 예시](../../config/sources.example.yaml)의 `food_inspections`와 `business_licenses`를 사용합니다. `--sources-config`로 다른 YAML를 지정할 수 있습니다. 각 소스에 `file`, `format`, 선택 사항 `columns`를 지정합니다. `format: xlsx`는 `sheet`로 읽을 시트를 선택하며, 워크북에 저장된 셀 값을 읽습니다. 다른 헤더로 Silver를 만들 때는 `--dictionary`로 대응하는 컬럼 사전을 지정합니다.
 
-기본 원천 폴더는 `data/00_origin/`입니다. 원천 경로를 따로 지정하면 `--raw-dir`, `CHICAGO_RAW_DIR` 환경 변수, `.env` 순서로 적용됩니다. 위 예시는 Python 3.14에서 처음 생성하는 결과를 `data/pro_2/`와 `reports/runs/pro_2/04_license/`에 저장합니다. 출력 옵션을 생략하면 `data/01_bronze/`, `data/02_silver/`, `data/03_gold/`와 `reports/runs/04_license/`를 사용합니다. 동일한 입력과 라이브러리 버전으로 다시 돌리면 Parquet 내용이 같은지 확인합니다. 기존 Parquet와 다른 결과는 새 출력 위치에 저장합니다.
+기본 원천 폴더는 `data/00_origin/`입니다. 원천 경로를 따로 지정하면 `--raw-dir`, `CHICAGO_RAW_DIR` 환경 변수, `.env` 순서로 적용됩니다. `data/01_bronze/`, `data/02_silver/`, `data/03_gold/`에는 이번 **318,627행** 공용본으로 만든 결과를 둡니다. 같은 입력과 라이브러리 버전으로 다시 돌리면 기존 Parquet와 체크섬을 대조합니다. 새 스냅샷을 검증할 때는 출력 위치를 따로 지정할 수 있습니다.
+
+## 전체 실행, 검증, 추가 데이터 반영
+
+위와 같은 `$domain`, `$options`로 아래 명령을 실행할 수 있습니다. 실행 중 검증에 실패하면 다음 단계로 넘어가기 전에 종료합니다.
+
+```powershell
+python "$domain/run_pipeline.py" @options                         # 전체 변환과 검증
+python "$domain/run_pipeline.py" @options --start-at silver       # Bronze 검증 후 Silver부터 실행
+python "$domain/run_pipeline.py" @options --validate-only         # 생성된 산출물을 단계별로 검증
+```
+
+새 파일이 **전체 스냅샷**이면 `--raw-dir`에 새 원천 폴더를 지정하고, `--data-dir`과 `--report-dir`에 새 버전의 경로를 지정해 실행합니다. **추가·수정 행만** 받은 경우에는 다음 순서로 실행합니다. `data/incoming/next`에 `food_inspections.csv`, `business_licenses.csv` 중 받은 파일을 둡니다. 각 행은 기존 CSV의 모든 컬럼을 포함해야 하며, 열 순서는 바뀌어도 됩니다.
+
+```powershell
+python "$domain/run_pipeline.py" --raw-dir data/00_origin `
+  --delta-dir data/incoming/next --combined-raw-dir data/combined_04/next `
+  --data-dir data/team_next --report-dir reports/runs/team_next/04_license
+```
+
+`Inspection ID` 또는 `LICENSE ID`가 이미 있으면 해당 위치의 행을 교체하고, 새 키는 파일 끝에 추가합니다. 같은 키에 서로 다른 추가 행이 오면 실행을 중단합니다. 원천과 추가분은 읽기 전용이며, 합친 파일은 `--combined-raw-dir`에 둡니다. 함께 생성되는 `merge_manifest.json`에 원천·추가분·합친 파일의 SHA-256과 추가·수정 건수를 기록합니다. 인허가 변경이 기존 점검에도 영향을 줄 수 있으므로 합친 스냅샷 전체에서 Gold 매칭을 다시 계산합니다.
+
+## 원천과 단계별 산출물 공유
+
+업로드 파일은 작업 저장소 옆 `04_share/`에 하위 폴더 없이 둡니다. 데이터셋 공유 이름은 `04_<단계>_<데이터셋>.<확장자>`입니다. `04_manifest.json`에는 원래 복원 경로, 크기, SHA-256, Parquet 행 수와 조각 순서가 들어 있습니다. `04_sha256sums.txt`에는 업로드 파일과 매니페스트의 SHA-256이 들어 있습니다. [공용본 공유 체크섬](../../reports/04_license/delivery_sha256sums.txt)
+
+| 단계 | 원래 파일 수 | 공유 파일 구성 |
+| --- | ---: | --- |
+| Origin | 6 | 점검 CSV와 인허가 CSV를 각각 gzip 2조각으로 분할, GeoJSON 1개, 설명 JSON 3개 |
+| Bronze | 2 | 점검 Parquet 1개, 인허가 Parquet 2조각 |
+| Silver | 2 | 점검·인허가 Parquet 각 1개 |
+| Gold | 5 | 사실 2개, 차원 3개 |
+
+Origin CSV 두 개는 원래 크기가 200 MB를 넘으므로 먼저 gzip으로 압축한 뒤 각각 두 조각으로 나눴습니다. Bronze 인허가 Parquet는 54,279,766바이트씩 두 조각으로 나눴습니다. 모든 공유 파일은 개당 100,000,000바이트 이하입니다. 복원은 조각을 순서대로 결합하고, gzip을 해제한 CSV와 Parquet를 원래 이름으로 저장합니다.
+
+```powershell
+$package = '../04_share'
+python "$domain/package_outputs.py" build --raw-dir data/00_origin --data-dir data `
+  --report-dir reports/runs/04_license --output-dir $package
+python "$domain/package_outputs.py" verify --package-dir $package
+$restored = '../04_restored'
+python "$domain/package_outputs.py" verify --package-dir $package --restore-dir $restored
+python "$domain/run_pipeline.py" --validate-only --raw-dir "$restored/data/00_origin" `
+  --data-dir "$restored/data" --report-dir "$restored/reports"
+```
+
+공용본은 Python 3.14.10과 PyArrow 26.0.1로 검증했습니다. 같은 원천과 기록기 버전에서 재생성한 Parquet는 전체 파일 SHA-256으로 비교할 수 있습니다. 새 경로에서 처음 적재할 때 `ingestion_manifest.json`의 실제 적재 시각은 새로 기록됩니다. 동일한 적재 매니페스트와 산출물로 패키징하면 매니페스트와 조각까지 동일합니다.

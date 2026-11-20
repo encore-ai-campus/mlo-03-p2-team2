@@ -84,6 +84,11 @@ def source_columns(batch, fields):
     return zip(*(batch[name].to_pylist() for name in fields))
 
 
+def inspection_license_numbers(path):
+    return {number for batch in parquet_batches(path, columns=["license_number_key"])
+            for number in batch["license_number_key"].to_pylist() if number is not None}
+
+
 def license_events(path, indexes, inspection_numbers):
     seen = set()
     for batch in parquet_batches(path, columns=LICENSE_FIELDS):
@@ -173,8 +178,7 @@ def dimensions(root, indexes):
 def build_gold(config, root):
     licenses = config.table("silver", "business_licenses")
     inspections = config.table("silver", "food_inspections")
-    numbers = {number for batch in parquet_batches(inspections, columns=["license_number_key"])
-               for number in batch["license_number_key"].to_pylist() if number is not None}
+    numbers = inspection_license_numbers(inspections)
     indexes = Indexes()
     write_parquet(gold_path(root, EVENT), SCHEMAS[EVENT], license_events(licenses, indexes, numbers))
     write_parquet(gold_path(root, MATCH), SCHEMAS[MATCH], inspection_matches(inspections, indexes))
