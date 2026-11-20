@@ -1,0 +1,33 @@
+{
+  "dataset": "food_inspections",
+  "source_file": "data/00_origin/food_inspections.csv",
+  "snapshot_date": "2026-11-19",
+  "bronze_file": "data/01_bronze/03_repeat_inspection/03_food_inspections.parquet",
+  "byte_size": 356934166,
+  "sha256": "b43beb7fae834a8698ca162004caf2929cb2eca7ff75c27b4db6bf07aa103c98",
+  "logical_row_count": 318627,
+  "header": [
+    "Inspection ID",
+    "DBA Name",
+    "AKA Name",
+    "License #",
+    "Facility Type",
+    "Risk",
+    "Address",
+    "City",
+    "State",
+    "Zip",
+    "Inspection Date",
+    "Inspection Type",
+    "Results",
+    "Violations",
+    "Latitude",
+    "Longitude",
+    "Location"
+  ],
+  "source_row_num": {
+    "first": 1,
+    "last": 318627,
+    "basis": "1-based CSV logical record order, excluding the header and completely empty records"
+  }
+}

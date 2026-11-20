@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>시카고 식품 위생 점검 분석</title>
+<style>
+  :root { color-scheme: light dark; --accent: light-dark(#146b67, #63d3c4); }
+  * { box-sizing: border-box; }
+  body { margin: auto; max-width: 900px; padding: 2rem 1.25rem; font: 16px/1.55 system-ui,sans-serif; }
+  h1 { font-size: clamp(1.6rem, 5vw, 2.5rem); line-height: 1.2; margin-bottom: .5rem; }
+  h2 { margin: 0 0 .5rem; }
+  h3 { margin: 1.6rem 0 .5rem; }
+  section { border-top: 1px solid color-mix(in srgb, currentColor 23%, transparent); margin-top: 2rem; padding-top: 1.5rem; }
+  .chart { list-style: none; padding: 0; display: grid; gap: .5rem; }
+  .chart li { display: grid; grid-template-columns: minmax(9rem, 1fr) minmax(4rem, 2fr) minmax(9rem, auto); gap: .75rem; align-items: center; }
+  .track { display: block; height: .6rem; background: color-mix(in srgb, currentColor 14%, transparent); }
+  .bar { display: block; height: 100%; background: var(--accent); }
+  strong, td { font-variant-numeric: tabular-nums; }
+  table { border-collapse: collapse; width: 100%; max-width: 45rem; }
+  th, td { padding: .3rem .6rem; border-bottom: 1px solid color-mix(in srgb, currentColor 20%, transparent); text-align: start; }
+  td { text-align: end; }
+  @media (max-width: 520px) {
+    .chart li { grid-template-columns: 1fr auto; gap: .2rem .5rem; }
+    .chart strong { grid-column: 2; grid-row: 1; }
+    .track { grid-column: 1 / -1; }
+  }
+</style>
+<main>
+<h1>시카고 식품 위생 점검 분석</h1>
+<p>01번 점검 Silver · 관측 종료일 2026-11-18</p>
+<section aria-labelledby="reinspection">
+<h2 id="reinspection">불합격 후 30일 이내 첫 재검사</h2>
+<p>불합격 61,344건 중 54,106건을 연결했습니다. 연결 건 중 <strong>FAIL → PASS 77.7%</strong> (42,060건)이며, 첫 재검사까지 걸린 기간의 중앙값은 <strong>7일</strong>입니다.</p>
+<p>같은 면허번호의 가장 최근 불합격일로부터 1–30일 사이에 관측된 첫 재검사를 연결했습니다. 같은 날 순서가 모호한 건은 미확정으로 집계했습니다.</p>
+<h3>첫 재검사 결과</h3>
+<ul class="chart"><li><span>FAIL → PASS</span><span class="track" aria-hidden="true"><span class="bar" style="width:77.736%"></span></span><strong>77.7% (42,060건)</strong></li><li><span>FAIL → PASS W/ CONDITIONS</span><span class="track" aria-hidden="true"><span class="bar" style="width:11.622%"></span></span><strong>11.6% (6,288건)</strong></li><li><span>FAIL → FAIL</span><span class="track" aria-hidden="true"><span class="bar" style="width:9.709%"></span></span><strong>9.7% (5,253건)</strong></li><li><span>FAIL → NO ENTRY</span><span class="track" aria-hidden="true"><span class="bar" style="width:0.725%"></span></span><strong>0.7% (392건)</strong></li><li><span>FAIL → OUT OF BUSINESS</span><span class="track" aria-hidden="true"><span class="bar" style="width:0.163%"></span></span><strong>0.2% (88건)</strong></li><li><span>FAIL → NOT READY</span><span class="track" aria-hidden="true"><span class="bar" style="width:0.046%"></span></span><strong>0.0% (25건)</strong></li></ul>
+<h3>재검사까지 걸린 일수</h3>
+<ul class="chart"><li><span>1–7일</span><span class="track" aria-hidden="true"><span class="bar" style="width:59.210%"></span></span><strong>32,036건</strong></li><li><span>8–14일</span><span class="track" aria-hidden="true"><span class="bar" style="width:33.682%"></span></span><strong>18,224건</strong></li><li><span>15–21일</span><span class="track" aria-hidden="true"><span class="bar" style="width:4.715%"></span></span><strong>2,551건</strong></li><li><span>22–30일</span><span class="track" aria-hidden="true"><span class="bar" style="width:2.393%"></span></span><strong>1,295건</strong></li></ul>
+<h3>불합격 점검의 연결 상태</h3>
+<table><thead><tr><th scope="col">상태</th><th scope="col">건수</th></tr></thead><tbody><tr><th scope='row'>1–30일 이내 연결</th><td>54,106</td></tr><tr><th scope='row'>30일 이내 연결 미관측</th><td>6,617</td></tr><tr><th scope='row'>같은 날 후보가 있어 미확정</th><td>339</td></tr><tr><th scope='row'>면허번호 없음</th><td>232</td></tr><tr><th scope='row'>관측 기간 30일 미만·미관측</th><td>50</td></tr></tbody></table>
+<p>30일 이내 재검사 미연결 7,238건</p>
+<ul>
+  <li><strong>30일 이내 연결 미관측</strong> · 30일을 모두 관측했으나 연결할 재검사 기록 없음</li>
+  <li><strong>같은 날 후보가 있어 미확정</strong> · 날짜만으로 여러 후보의 순서를 판단하기 어려운 경우</li>
+  <li><strong>면허번호 또는 점검일 없음</strong> · 후속 방문이나 날짜 순서를 확인할 정보 부족</li>
+  <li><strong>관측 기간 30일 미만·미관측</strong> · 관측 종료일까지 30일 미만이며 그 사이 연결할 재검사 기록 없음</li>
+</ul>
+<p>같은 면허번호에서 1월 10일과 20일에 각각 불합격하고 25일에 재검사를 받았다면, 25일 재검사는 가장 최근 불합격인 20일 건에 연결합니다. 10일 건은 미관측으로 남을 수 있습니다.</p>
+</section>
+<section aria-labelledby="repeat">
+<h2 id="repeat">같은 위반 코드의 재관측</h2>
+<p>기준 점검의 위반 코드 <strong>333,856건</strong>은 모두 다음 점검 기록과 비교할 수 있었습니다. 그중 <strong>130,574건 (39.1%)</strong>에서 같은 위반 코드가 다시 나왔고, 나머지 <strong>203,282건</strong>에서는 같은 코드가 나오지 않았습니다.</p>
+<p>2018-07-01 이후 같은 면허번호의 비교 대상 점검을 날짜순으로 비교했습니다. 기준 점검과 다음 점검의 위반 원문이 모두 파싱된 경우를 재관측률의 분모에 포함했습니다.</p>
+<h3 id="rule-comparison">위반 처리 기준 적용 전후</h3>
+<table aria-labelledby="rule-comparison">
+  <thead><tr><th scope="col">지표</th><th scope="col">기존 03번 파서</th><th scope="col">02번 산출물 적용</th></tr></thead>
+  <tbody><tr><th scope="row">비교 가능 코드 행</th><td>340,368</td><td>333,856</td></tr><tr><th scope="row">재관측 코드 행</th><td>132,792</td><td>130,574</td></tr><tr><th scope="row">재관측률</th><td>39.0%</td><td>39.1%</td></tr></tbody>
+</table>
+<p>같은 점검 Silver에 두 위반 처리 방식을 적용했습니다. 02번에서 격리된 위반 조각이 있는 점검은 재관측 여부를 확정할 수 없는 점검으로 처리했습니다.</p>
+<h3>비교 건수가 많은 위반 코드 10개</h3>
+<p>정렬 기준은 비교 가능 건수 내림차순이며, 동률이면 위반 코드 번호 오름차순입니다. 막대는 비교 가능 건수 중 같은 위반 코드가 다음 점검에서도 관측된 비율입니다.</p>
+<ul class="chart"><li><span>위반 55번</span><span class="track" aria-hidden="true"><span class="bar" style="width:69.206%"></span></span><strong>69.2% (29,411/42,498)</strong></li><li><span>위반 47번</span><span class="track" aria-hidden="true"><span class="bar" style="width:52.102%"></span></span><strong>52.1% (12,082/23,189)</strong></li><li><span>위반 49번</span><span class="track" aria-hidden="true"><span class="bar" style="width:54.229%"></span></span><strong>54.2% (11,855/21,861)</strong></li><li><span>위반 51번</span><span class="track" aria-hidden="true"><span class="bar" style="width:44.340%"></span></span><strong>44.3% (8,699/19,619)</strong></li><li><span>위반 10번</span><span class="track" aria-hidden="true"><span class="bar" style="width:31.282%"></span></span><strong>31.3% (5,281/16,882)</strong></li><li><span>위반 56번</span><span class="track" aria-hidden="true"><span class="bar" style="width:43.615%"></span></span><strong>43.6% (7,193/16,492)</strong></li><li><span>위반 58번</span><span class="track" aria-hidden="true"><span class="bar" style="width:39.378%"></span></span><strong>39.4% (6,215/15,783)</strong></li><li><span>위반 38번</span><span class="track" aria-hidden="true"><span class="bar" style="width:29.488%"></span></span><strong>29.5% (4,335/14,701)</strong></li><li><span>위반 5번</span><span class="track" aria-hidden="true"><span class="bar" style="width:40.189%"></span></span><strong>40.2% (5,823/14,489)</strong></li><li><span>위반 3번</span><span class="track" aria-hidden="true"><span class="bar" style="width:36.100%"></span></span><strong>36.1% (5,180/14,349)</strong></li></ul>
+<h3 id="comparison-exclusions">위반 코드 비교 불가 사유</h3>
+<table aria-labelledby="comparison-exclusions">
+  <thead><tr><th scope="col">사유</th><th scope="col">위반 코드 행 수</th></tr></thead>
+  <tbody><tr><th scope='row'>다음 비교 대상 점검 기록 없음</th><td>59,919</td></tr><tr><th scope='row'>다음 점검의 위반 원문 공란 또는 파싱 미확정</th><td>45,634</td></tr><tr><th scope='row'>기준 점검의 위반 원문 파싱 미확정</th><td>4,153</td></tr><tr><th scope='row'>같은 날짜에 복수 점검이 있어 비교 대상 미확정</th><td>1,206</td></tr></tbody>
+  <tfoot><tr><th scope="row">합계</th><td>110,912</td></tr></tfoot>
+</table>
+<ul>
+  <li><strong>다음 비교 대상 점검 기록 없음</strong> · 같은 면허번호에서 기준 점검보다 늦은 비교 대상 점검이 기록되지 않은 경우</li>
+  <li><strong>다음 점검의 위반 원문 공란 또는 파싱 미확정</strong> · 다음 점검은 연결됐으나 위반 내용이 비어 있거나 코드를 모두 읽을 수 없어 재관측 여부를 확인하지 못한 경우</li>
+  <li><strong>기준 점검의 위반 원문 파싱 미확정</strong> · 기준 점검의 위반 코드 일부는 읽었으나 원문 전체를 해석하지 못해 비교에서 제외한 경우</li>
+  <li><strong>같은 날짜에 복수 점검이 있어 비교 대상 미확정</strong> · 기준일 또는 다음 비교 대상 날짜에 같은 면허번호의 점검이 여러 건 있어 날짜만으로 비교할 쌍을 정할 수 없는 경우</li>
+</ul>
+<p>기준 점검에 위반 코드가 3개 있고 다음 점검의 위반 원문이 공란이면, 비교 불가는 위반 코드 3행으로 집계합니다.</p>
+</section>
+</main>
+</html>

@@ -1,0 +1,14 @@
+decision_id,table,dimension,rule,rows,bronze_violations,bronze_percent,bronze_examples,silver_violations,silver_percent,silver_examples
+D04-DQ-01,business_licenses,completeness,Missing license number,1212132,1,0.0001,993501,1,0.0001,993501
+D04-DQ-02,business_licenses,validity,Invalid license number,1212132,0,0.0000,,0,0.0000,
+D04-DQ-03,business_licenses,completeness,Missing term start,1212132,2719,0.2243,"14042, 37298, 45804",2719,0.2243,"14042, 37298, 45804"
+D04-DQ-04,business_licenses,completeness,Missing term expiration,1212132,170,0.0140,"1120, 2412, 4281",170,0.0140,"1120, 2412, 4281"
+D04-DQ-05,business_licenses,validity,Invalid term start date,1212132,0,0.0000,,0,0.0000,
+D04-DQ-06,business_licenses,validity,Invalid term expiration date,1212132,0,0.0000,,0,0.0000,
+D04-DQ-07,business_licenses,consistency,Expiration before term start,1212132,2963,0.2444,"1343, 1930, 2142",2963,0.2444,"1343, 1930, 2142"
+D04-DQ-08,business_licenses,standardization,Outer whitespace in application type,1212132,0,0.0000,,0,0.0000,
+D04-DQ-09,business_licenses,validity,Status code requiring review,1212132,1,0.0001,255595,1,0.0001,255595
+D04-DQ-10,food_inspections,completeness,Missing inspection license number,318627,19,0.0060,"15155, 54029, 84076",860,0.2699,"1079, 1087, 1274"
+D04-DQ-11,food_inspections,validity,Invalid or excluded inspection license number,318627,841,0.2639,"1079, 1087, 1274",0,0.0000,
+D04-DQ-12,food_inspections,completeness,Missing inspection date,318627,0,0.0000,,0,0.0000,
+D04-DQ-13,food_inspections,validity,Invalid inspection date,318627,0,0.0000,,0,0.0000,
