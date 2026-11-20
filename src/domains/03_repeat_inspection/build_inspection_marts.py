@@ -19,7 +19,7 @@ SILVER_DIR = PROJECT / "data" / "silver" / DOMAIN
 GOLD_DIR = PROJECT / "data" / "gold" / "marts" / DOMAIN
 REPORT_DIR = PROJECT / "reports" / "runs" / DOMAIN
 VIOLATION_START = date(2018, 7, 1)
-EARLY_REINSPECTION_DAYS = 30
+REINSPECTION_MAX_DAYS = 30
 COMPARABLE_RESULTS = {"FAIL", "PASS", "PASS W/ CONDITIONS"}
 REINSPECTION_TYPE = re.compile(r"\bre[\s-]*inspection\b", re.IGNORECASE)
 VIOLATION_PREFIX = re.compile(r"^\s*([1-9][0-9]*)\.\s+\S")
@@ -184,10 +184,12 @@ def reinspection_rows(rows, histories, observation_end):
     matches = {}
     for history in histories:
         previous_failures = []
-        for _, same_day in history:
+        for day, same_day in history:
             failures = [row for row in same_day if row.result_cd == "FAIL"]
             candidates = [row for row in same_day if REINSPECTION_TYPE.search(row.inspection_type or "")]
-            if candidates and previous_failures:
+            if candidates and previous_failures and (
+                1 <= (day - previous_failures[0].inspection_dtm).days <= REINSPECTION_MAX_DAYS
+            ):
                 other_failure = any(failure not in candidates for failure in failures)
                 ambiguous = len(previous_failures) > 1 or len(candidates) > 1 or other_failure
                 match = (None, "ambiguous_same_day") if ambiguous else (candidates[0], "matched")
@@ -210,19 +212,16 @@ def reinspection_rows(rows, histories, observation_end):
             status = "missing_date"
         elif base.inspection_key in matches:
             followup, status = matches[base.inspection_key]
-        elif (observation_end - base.inspection_dtm).days < EARLY_REINSPECTION_DAYS:
+        elif (observation_end - base.inspection_dtm).days < REINSPECTION_MAX_DAYS:
             status = "insufficient_observation"
         else:
             status = "not_observed"
         record = pair_record(base, followup)
-        window = None
-        if followup:
-            window = "within_30_days" if record["days_to_followup_num"] <= EARLY_REINSPECTION_DAYS else "after_30_days"
         yield {
             **record,
             "followup_inspection_type": followup.inspection_type if followup else None,
             "reinspection_match_status_cd": status,
-            "reinspection_window_cd": window,
+            "reinspection_window_cd": "within_30_days" if followup else None,
         }
 
 
@@ -245,7 +244,7 @@ def build(fact_path, silver_dir, gold_dir, report_dir=None):
     }
     metadata.update({
         b"violation_start": VIOLATION_START.isoformat().encode(),
-        b"reinspection_early_cutoff_days": str(EARLY_REINSPECTION_DAYS).encode(),
+        b"reinspection_early_cutoff_days": str(REINSPECTION_MAX_DAYS).encode(),
         b"observation_end": observation_end.isoformat().encode(),
     })
     silver_dir.mkdir(parents=True, exist_ok=True)

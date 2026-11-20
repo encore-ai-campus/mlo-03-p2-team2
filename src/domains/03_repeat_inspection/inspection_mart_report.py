@@ -6,14 +6,13 @@ import pyarrow.parquet as pq
 
 
 STATUS_LABELS = {
-    "matched": "관측 종료일까지 연결",
-    "not_observed": "관측 종료일까지 미관측",
+    "matched": "1–30일 이내 연결",
+    "not_observed": "30일 이내 연결 미관측",
     "ambiguous_same_day": "같은 날 후보가 있어 미확정",
     "missing_license": "면허번호 없음",
     "missing_date": "점검일 없음",
     "insufficient_observation": "관측 기간 30일 미만·미관측",
 }
-WINDOW_LABELS = {"within_30_days": "1–30일", "after_30_days": "31일 이후"}
 
 
 def bar_chart(rows):
@@ -52,7 +51,7 @@ def build_report(repeat_path, reinspection_path, parse_counts, observation_end):
     repeat_rate = f"{repeated / eligible:.1%}" if eligible else "—"
 
     reinspections = pq.read_table(reinspection_path, columns=[
-        "reinspection_match_status_cd", "reinspection_window_cd", "followup_result_cd", "days_to_followup_num",
+        "reinspection_match_status_cd", "followup_result_cd", "days_to_followup_num",
     ]).to_pylist()
     statuses = Counter(row["reinspection_match_status_cd"] for row in reinspections)
     matched = [row for row in reinspections if row["reinspection_match_status_cd"] == "matched"]
@@ -65,27 +64,13 @@ def build_report(repeat_path, reinspection_path, parse_counts, observation_end):
         (f"FAIL → {label}", count, len(matched), f"{count / len(matched):.1%} ({count:,}건)")
         for label, count in outcomes.most_common()
     )
-    window_rows = []
-    for window, label in WINDOW_LABELS.items():
-        window_results = Counter(
-            row["followup_result_cd"] for row in matched if row["reinspection_window_cd"] == window
-        )
-        total = window_results.total()
-        pass_cells = []
-        for result in ("PASS", "PASS W/ CONDITIONS"):
-            count = window_results[result]
-            pass_cells.append(f"<td>{count:,}건 ({count / total:.1%})</td>" if total else "<td>—</td>")
-        window_rows.append(f"<tr><th scope='row'>{label}</th><td>{total:,}</td>{''.join(pass_cells)}</tr>")
-    window_table = "".join(window_rows)
     delay_buckets = (
-        ("1–7일", 1, 7), ("8–14일", 8, 14), ("15–21일", 15, 21),
-        ("22–30일", 22, 30), ("31–60일", 31, 60), ("61–90일", 61, 90),
-        ("91일 이상", 91, None),
+        ("1–7일", 1, 7), ("8–14일", 8, 14), ("15–21일", 15, 21), ("22–30일", 22, 30),
     )
     delay_chart = bar_chart(
         (label, count, len(matched), f"{count:,}건")
         for label, start, end in delay_buckets
-        for count in [sum(days >= start and (end is None or days <= end) for days in delays)]
+        for count in [sum(start <= days <= end for days in delays)]
     )
     status_rows = "".join(
         f"<tr><th scope='row'>{escape(STATUS_LABELS[status])}</th><td>{count:,}</td></tr>"
@@ -122,21 +107,18 @@ def build_report(repeat_path, reinspection_path, parse_counts, observation_end):
 <h1>시카고 식품 위생 점검 분석</h1>
 <p>로컬 점검 데이터 · 관측 종료일 {observation_end.isoformat()}</p>
 <section aria-labelledby="reinspection">
-<h2 id="reinspection">불합격 후 첫 재검사</h2>
+<h2 id="reinspection">불합격 후 30일 이내 첫 재검사</h2>
 <p>FAIL {len(reinspections):,}건 중 {len(matched):,}건을 연결했어요. 연결된 점검 중 <strong>FAIL → PASS {pass_rate}</strong> ({passed:,}건), 첫 재검사까지 중앙값은 <strong>{delay_median}</strong>이에요.</p>
-<p>같은 면허번호의 직전 FAIL에 점검 유형상 재검사인 건을 연결했어요. 관측 종료일까지 첫 재검사를 찾고, 같은 날 순서가 모호한 경우는 미확정으로 집계했어요.</p>
-<h3>첫 재검사 시점별 통과 결과</h3>
-<table><thead><tr><th scope="col">시점</th><th scope="col">연결 건수</th><th scope="col">일반 통과</th><th scope="col">조건부 통과</th></tr></thead><tbody>{window_table}</tbody></table>
-<p>비율의 분모는 각 시점 구간에 연결된 첫 재검사 건수예요.</p>
+<p>같은 면허번호의 가장 최근 불합격일로부터 1–30일 사이에 관측된 첫 재검사를 연결했어요. 같은 날 순서가 모호한 경우는 미확정으로 집계했어요.</p>
 <h3>첫 재검사 결과</h3>
 {outcome_chart}
 <h3>재검사까지 걸린 일수</h3>
 {delay_chart}
 <h3>불합격 점검의 연결 상태</h3>
 <table><thead><tr><th scope="col">상태</th><th scope="col">건수</th></tr></thead><tbody>{status_rows}</tbody></table>
-<p>연결 상태는 최초 불합격 점검마다 같은 면허번호의 첫 재검사 방문을 찾았는지, 찾지 못했다면 이유가 무엇인지 보여줘요. 전체 불합격 {len(reinspections):,}건 중 {len(matched):,}건을 연결했고, {len(reinspections) - len(matched):,}건은 연결되지 않았어요.</p>
+<p>연결 상태는 각 불합격 점검에 30일 이내 첫 재검사를 연결했는지 보여줘요. 전체 불합격 {len(reinspections):,}건 중 {len(matched):,}건을 연결했고, {len(reinspections) - len(matched):,}건은 연결되지 않았어요.</p>
 <ul>
-  <li><strong>미관측</strong>은 데이터의 관측 종료일까지 해당 불합격 건에 연결할 재검사가 없었던 경우예요.</li>
+  <li><strong>30일 이내 연결 미관측</strong>은 불합격 이후 30일을 관측했지만 해당 건에 연결할 재검사가 없었던 경우예요.</li>
   <li><strong>같은 날 후보가 있어 미확정</strong>은 기록에 날짜만 있어서 여러 후보 중 순서를 정할 수 없었던 경우예요.</li>
   <li><strong>면허번호 또는 점검일 없음</strong>은 같은 영업면허의 후속 방문을 찾거나 날짜 순서를 확인할 정보가 부족했던 경우예요.</li>
   <li><strong>관측 기간 30일 미만·미관측</strong>은 불합격부터 관측 종료일까지 30일도 지나지 않았고, 그 사이 재검사가 기록되지 않은 경우예요.</li>
