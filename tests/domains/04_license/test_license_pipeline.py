@@ -33,7 +33,7 @@ def write_csv(path, columns, rows):
 @pytest.fixture
 def project(tmp_path):
     data, reports = (tmp_path / name for name in ("data", "reports"))
-    raw = data / "00_origin"
+    raw = data / "origin"
     raw.mkdir(parents=True)
 
     def license_row(key, number, start, end):
@@ -152,10 +152,10 @@ def test_all_stages_preserve_inputs_and_produce_reproducible_results(project):
 
     for table, expected in [("business_licenses", 4), ("food_inspections", 7)]:
         for layer in ("01_bronze", "02_silver"):
-            path = data / layer / "04_license" / (table + ".parquet")
+            path = data / layer / "04_license" / f"04_{table}.parquet"
             assert pq.ParquetFile(path).metadata.num_rows == expected
 
-    path = data / "03_gold" / "facts" / "04_license" / "fact_inspection_license_match.parquet"
+    path = data / "03_gold" / "04_license" / "04_fact_inspection_license_match.parquet"
     rows = pq.ParquetFile(path).read().to_pylist()
     assert [row["candidate_count_num"] for row in rows] == [1, 2, 1, 0, 0, 0, 0]
     assert [row["match_status_cd"] for row in rows] == [
@@ -210,7 +210,7 @@ def test_bronze_uses_configured_workbook_sheet_and_columns(tmp_path):
     execute("01_bronze", project, extra=extra)
     execute("validate_bronze", project, extra=extra)
     assert snapshot(raw) == original
-    result = pq.ParquetFile(data / "01_bronze" / "04_license" / "business_licenses.parquet").read()
+    result = pq.ParquetFile(data / "01_bronze" / "04_license" / "04_business_licenses.parquet").read()
     assert result.column_names == ["description", "row_id", "source_row_num"]
     assert result.to_pydict() == {
         "description": ["line 1\nline 2", ""], "row_id": ["0001", "0002"], "source_row_num": [1, 2],
@@ -221,9 +221,9 @@ def test_gold_rejects_plausible_but_incorrect_fact_values(project):
     _, data, _ = project
     for stage in STAGES:
         execute(stage, project)
-    facts = data / "03_gold" / "facts" / "04_license"
-    match = facts / "fact_inspection_license_match.parquet"
-    events = facts / "fact_license_event.parquet"
+    facts = data / "03_gold" / "04_license"
+    match = facts / "04_fact_inspection_license_match.parquet"
+    events = facts / "04_fact_license_event.parquet"
     mutations = (
         (match, 1, {"candidate_count_num": 9}),
         (match, 3, {"match_status_cd": "NO_LICENSE_NUMBER_MATCH"}),
@@ -246,55 +246,6 @@ def test_gold_rejects_plausible_but_incorrect_fact_values(project):
         finally:
             path.write_bytes(original)
     assert not accepted
-
-
-def package_command(*args, ok=True):
-    result = subprocess.run([sys.executable, str(SCRIPTS / "package_outputs.py"), *map(str, args)],
-                            capture_output=True, encoding="utf-8", errors="replace")
-    assert result.returncode == (0 if ok else 1), result.stdout + result.stderr
-    return result
-
-
-def test_package_restores_split_parquet_and_rejects_tampering(project, tmp_path):
-    raw, data, reports = project
-    (raw / "food_columns.json").write_bytes(b"{}")
-    (raw / "license_columns.json").write_bytes(b"{}")
-    (raw / "area_columns.json").write_bytes(b"{}")
-    (raw / "community_areas.geojson").write_bytes(b'{"type":"FeatureCollection","features":[]}')
-    with (raw / "food_inspections.csv").open("ab") as stream:
-        for key in range(108, 500):
-            stream.write(f"{key},111,01/10/2024,Pass\r\n".encode())
-    execute("run_pipeline", project)
-    bronze = Path("01_bronze/04_license/business_licenses.parquet")
-    size = (data / bronze).stat().st_size
-    package = tmp_path / "package"
-    build = ("build", "--raw-dir", raw, "--data-dir", data, "--report-dir", reports, "--output-dir", package,
-             "--limit-bytes", size - 1)
-    package_command(*build)
-    initial = snapshot(package)
-    package_command(*build)
-    assert snapshot(package) == initial
-
-    assert all(path.is_file() and path.name.startswith("04_") for path in package.iterdir())
-    artifacts = json.loads((package / "04_manifest.json").read_bytes())["artifacts"]
-    record = next(entry for entry in artifacts if entry["path"] == (Path("data") / bronze).as_posix())
-    assert [part["bytes"] for part in record["parts"]] == [(size + 1) // 2, size // 2]
-    assert record["rows"] == 4
-    source = next(entry for entry in artifacts if entry["path"] == "data/00_origin/food_inspections.csv")
-    assert len(source["parts"]) == 2
-    assert all(part["path"].startswith("04_origin_food_inspections.csv.gz.part-") for part in source["parts"])
-    restore = tmp_path / "restored"
-    package_command("verify", "--package-dir", package, "--restore-dir", restore)
-    assert snapshot(restore / "data")[bronze.as_posix()] == snapshot(data)[bronze.as_posix()]
-    assert snapshot(restore / "data" / "00_origin") == snapshot(raw)
-    assert snapshot(restore / "reports") == snapshot(reports)
-
-    part = package / record["parts"][0]["path"]
-    contents = part.read_bytes()
-    part.write_bytes(bytes([contents[0] ^ 1]) + contents[1:])
-    result = package_command("verify", "--package-dir", package, "--restore-dir", tmp_path / "rejected", ok=False)
-    assert "SHA-256 differs" in result.stderr
-    assert not list((tmp_path / "rejected").rglob("*.parquet"))
 
 
 def test_incoming_rows_flow_to_gold_and_preserve_original_snapshots(project, tmp_path):
@@ -326,7 +277,7 @@ def test_incoming_rows_flow_to_gold_and_preserve_original_snapshots(project, tmp
     execute("run_pipeline", updated_project, extra=("--start-at", "silver"))
     execute("run_pipeline", updated_project, extra=("--validate-only",))
     _, data, _ = project
-    fact = pq.read_table(data / "03_gold/facts/04_license/fact_inspection_license_match.parquet")
+    fact = pq.read_table(data / "03_gold/04_license/04_fact_inspection_license_match.parquet")
     matches = {row["inspection_key"]: row for row in fact.to_pylist()}
     assert matches["105"]["matched_license_event_id"] == "5"
     assert matches["105"]["result_cd"] == "FAIL"

@@ -14,7 +14,7 @@
 | `business_licenses.csv` | 1,212,132행 | 인허가 발급·갱신·상태와 유효기간. [시카고시 Business Licenses](https://catalog.data.gov/dataset/business-licenses) |
 | `community_areas.geojson` | 77개 지역 | 점검 위치의 커뮤니티 지역을 파악하는 경계. [시카고시 Boundaries – Community Areas](https://catalog.data.gov/dataset/boundaries-community-areas) |
 
-세 데이터 파일과 대응하는 컬럼 설명 JSON은 각자 로컬 `data/00_origin/`에 둡니다. 팀은 같은 스냅샷을 사용하며 검증 정보는 `metadata/source_catalog/verification/`에 둡니다. [원천 설정 예시](../config/sources.example.yaml)
+팀은 Git의 `data/origin/`에서 원천 파일과 컬럼 설명 JSON을 받아 같은 스냅샷을 사용합니다. 용량이 큰 CSV 두 개는 분할 파일을 복원한 뒤 읽습니다. [원천 복원과 검증](project_setup_and_sharing.md#팀-공용-원천)
 
 ## 다섯 가지 분석 관점
 

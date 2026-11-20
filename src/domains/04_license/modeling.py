@@ -6,7 +6,7 @@ from itertools import islice
 
 import pyarrow as pa
 
-from config import DOMAIN
+from config import DOMAIN, parquet_name
 from pipeline_io import BATCH_SIZE, ROW, parquet_batches, write_parquet
 
 
@@ -53,8 +53,7 @@ class Indexes:
 
 
 def gold_path(root, table):
-    group = "facts" if table in {EVENT, MATCH} else "dimensions"
-    return root / group / DOMAIN / f"{table}.parquet"
+    return root / DOMAIN / parquet_name(table)
 
 
 def record_batch(rows, table):

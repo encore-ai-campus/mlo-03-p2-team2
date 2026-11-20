@@ -2,8 +2,8 @@
 
 | 입력 | 출력 | 논리 레코드 수 | 원천 → Bronze 컬럼 수 |
 | --- | --- | ---: | ---: |
-| `data/00_origin/business_licenses.csv` | `data/01_bronze/04_license/business_licenses.parquet` | 1,212,132 | 37 → 38 |
-| `data/00_origin/food_inspections.csv` | `data/01_bronze/04_license/food_inspections.parquet` | 318,627 | 17 → 18 |
+| `data/origin/business_licenses.csv` | `data/01_bronze/04_license/04_business_licenses.parquet` | 1,212,132 | 37 → 38 |
+| `data/origin/food_inspections.csv` | `data/01_bronze/04_license/04_food_inspections.parquet` | 318,627 | 17 → 18 |
 
 | 작업 | 적용 내용 |
 | --- | --- |

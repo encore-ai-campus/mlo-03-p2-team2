@@ -102,7 +102,7 @@
 
 ## 조사 코드 실행
 
-프로젝트 루트에서 [원천 조사 코드](../src/ingestion/profile_sources.py)를 실행하면 결과가 JSON으로 출력됩니다. Python에 `pyarrow`와 `PyYAML`이 필요합니다. 기본 설정은 `config/sources.example.yaml`이며, 원천 폴더는 `--raw-dir`, `CHICAGO_RAW_DIR` 환경 변수, 기본 `data/00_origin/` 순으로 찾습니다. 다른 설정은 `--sources-config`로 지정할 수 있습니다.
+프로젝트 루트에서 [원천 조사 코드](../src/ingestion/profile_sources.py)를 실행하면 결과가 JSON으로 출력됩니다. Python에 `pyarrow`와 `PyYAML`이 필요합니다. 기본 설정은 `config/sources.example.yaml`이며, 원천 폴더는 `--raw-dir`, `CHICAGO_RAW_DIR` 환경 변수, 기본 `data/origin/` 순으로 찾습니다. 다른 설정은 `--sources-config`로 지정할 수 있습니다.
 
 ```powershell
 python src/ingestion/profile_sources.py

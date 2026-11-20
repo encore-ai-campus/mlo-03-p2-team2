@@ -45,8 +45,6 @@ download_manifest.csv
 !/data/**/
 !/data/README.md
 !/data/**/.gitkeep
-/data/00_origin/*
-!/data/00_origin/.gitkeep
 /reports/runs/
 
 # Temporary and editor files
@@ -60,3 +58,12 @@ download_manifest.csv
 .idea/
 .DS_Store
 Thumbs.db
+
+# The team tracks one shared Origin snapshot. Restored CSV files remain local.
+!/data/origin/SHA256SUMS
+!/data/origin/food_inspections.csv.gz.part-00[12]
+!/data/origin/business_licenses.csv.gz.part-00[12]
+!/data/origin/community_areas.geojson
+!/data/origin/area_columns.json
+!/data/origin/food_columns.json
+!/data/origin/license_columns.json

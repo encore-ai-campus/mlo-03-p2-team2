@@ -1,0 +1,4 @@
+/data/origin/*.json -text
+/data/origin/*.geojson -text
+/data/origin/*.part-* -text
+/data/origin/SHA256SUMS text eol=lf

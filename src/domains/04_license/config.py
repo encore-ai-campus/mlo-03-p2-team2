@@ -14,6 +14,10 @@ TABLES = ("business_licenses", "food_inspections")
 STAGE_DIRS = {"bronze": "01_bronze", "silver": "02_silver", "gold": "03_gold"}
 
 
+def parquet_name(name):
+    return f"{DOMAIN.split('_', 1)[0]}_{name}.parquet"
+
+
 @dataclass(frozen=True)
 class Source:
     path: Path
@@ -34,10 +38,7 @@ class Config:
         return self.data / STAGE_DIRS[stage]
 
     def table(self, stage, name):
-        return self.stage_dir(stage) / DOMAIN / f"{name}.parquet"
-
-    def gold(self, group, name):
-        return self.stage_dir("gold") / group / DOMAIN / f"{name}.parquet"
+        return self.stage_dir(stage) / DOMAIN / parquet_name(name)
 
 
 def dotenv_value(name):
@@ -67,7 +68,7 @@ def settings(args):
     if args.raw_dir:
         raw = args.raw_dir.resolve()
     else:
-        raw = project_path(os.environ.get(env_key) or dotenv_value(env_key) or "data/00_origin")
+        raw = project_path(os.environ.get(env_key) or dotenv_value(env_key) or "data/origin")
     data, reports = args.data_dir.resolve(), args.report_dir.resolve()
     stages = [(data / dirname).resolve() for dirname in STAGE_DIRS.values()]
     if (directories_overlap(data, reports)

@@ -231,7 +231,7 @@ def main():
     args.add_argument("--sources-config", type=Path, default=PROJECT / "config" / "sources.example.yaml")
     options = args.parse_args()
     config = yaml.safe_load(options.sources_config.read_text(encoding="utf-8-sig"))
-    root = (PROJECT / (options.raw_dir or os.getenv(config["raw_root_env"]) or "data/00_origin")).resolve()
+    root = (PROJECT / (options.raw_dir or os.getenv(config["raw_root_env"]) or "data/origin")).resolve()
     integrity = config["integrity"]
     verification = PROJECT / integrity["root"]
     outputs = {}

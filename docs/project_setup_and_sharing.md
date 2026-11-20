@@ -1,4 +1,4 @@
-# 팀 실행 환경과 GitHub 공유 기준
+# 팀 실행 환경과 저장소 구조
 
 ## Conda 환경
 
@@ -26,7 +26,7 @@ VS Code에서 이 프로젝트 폴더를 열고, 명령 팔레트에서 **Python
 ```python
 import pyarrow.parquet as pq
 
-with pq.ParquetFile("data/02_silver/04_license/food_inspections.parquet") as parquet:
+with pq.ParquetFile("data/02_silver/04_license/04_food_inspections.parquet") as parquet:
     print(parquet.schema_arrow)
     for batch in parquet.iter_batches(
         batch_size=5, columns=["inspection_key", "inspection_dtm", "result_cd"]
@@ -39,33 +39,26 @@ with pq.ParquetFile("data/02_silver/04_license/food_inspections.parquet") as par
 
 | 로컬 위치 | 내용 |
 | --- | --- |
-| `data/00_origin/` | 원천 CSV 2개, GeoJSON 1개, 컬럼 설명 JSON 3개 |
+| `data/origin/` | 팀 공용 원천 분할 파일, GeoJSON, 컬럼 설명 JSON, 체크섬과 복원된 CSV |
 | `data/01_bronze/04_license/` · `data/02_silver/04_license/` | 공용본으로 실행한 04번 원천 보존본과 표준화본 |
-| `data/03_gold/facts/04_license/` · `data/03_gold/dimensions/04_license/` | 공용본으로 생성한 04번 사실·차원 Parquet |
+| `data/03_gold/04_license/` | 공용본으로 생성한 04번 사실·차원 Parquet |
 | `src/domains/04_license/` · `src/ingestion/` | 04번 변환·검증 코드와 원천 프로파일링 코드 |
 | `metadata/lineage/04_license/` | 팀 공유 스냅샷의 적재 매니페스트와 컬럼 변환 목록 |
 | `reports/04_license/` | 팀 공유 스냅샷의 품질 검사와 단계별 검증 보고서 |
 | `reports/runs/04_license/` | 공용본 실행에서 생성한 로컬 보고서 |
-| 저장소 옆 `04_share/` | 공용 원천과 단계별 Parquet, 체크섬, 검증 보고서를 한 폴더에 모은 공유 파일 |
 
-`.env`나 환경 변수에서 원천 경로를 지정한 경우 `CHICAGO_RAW_DIR=data/00_origin`으로 맞춥니다.
+`.env`나 환경 변수에서 원천 경로를 지정한 경우 `CHICAGO_RAW_DIR=data/origin`으로 맞춥니다.
 
 공용 점검 CSV는 03번의 `Food_Inspections_20261119.zip`에서 가져온 **318,627행** 버전입니다. 나머지 원천 5개는 기존 파일을 체크섬으로 대조했습니다. 기본 단계 폴더와 공유 보고서는 이 공용본의 결과입니다. [현재 공용 원천 체크섬](../metadata/source_catalog/verification/download_manifest.csv) · [기존·공용본 매칭 비교](../reports/04_license/match_comparison.md)
 
-## GitHub 공유
+Bronze·Silver·Gold는 각각 동일한 01~05 관점 폴더를 사용합니다. 예를 들어 04번 Silver 점검 파일은 `data/02_silver/04_license/04_food_inspections.parquet`입니다. [01~05 폴더 구조 Wiki](https://github.com/encore-ai-campus/mlo-03-p2-team2/wiki/Repository-Structure)
 
-| 내용 | 공유 위치와 형태 |
-| --- | --- |
-| 단계별 변환과 검증 코드 | 관점별 `src/`, `tests/` 경로에 둡니다. |
-| 실행 환경·스키마·변경 기준 | `environment.yml`, 데이터 사전·코드표, 실행·설계 MD로 공유합니다. |
-| 실제로 무엇이 달라졌는지 | 04번 통합 문서에서 AS-IS와 단계별 산출물을 확인하고, 컬럼 변환 목록으로 입력부터 출력까지 추적합니다. [04번 통합 문서](domains/04_license.md) · [컬럼 변환 목록](../metadata/lineage/04_license/column_lineage.csv) · [공유 보고서](../reports/04_license/README.md) |
-| 원천과 전체 산출물 | 팀이 공유한 동일한 원천 스냅샷으로 재현합니다. `data/00_origin/`, `origin.zip`, 전체 생성 Parquet와 실행 보고서의 로컬 경로는 Git 제외 규칙을 적용합니다. [공유 원천 체크섬 목록](../metadata/source_catalog/verification/download_manifest.csv) |
+## 팀 공용 원천
 
-| 현재 큰 파일 | 실제 크기 |
-| --- | ---: |
-| `data/00_origin/business_licenses.csv` | 498.1 MiB |
-| `data/00_origin/food_inspections.csv` | 340.3 MiB |
-| `origin.zip` | 224.2 MiB |
-| `data/01_bronze/04_license/business_licenses.parquet` | 103.5 MiB |
+Git의 `data/origin/`에는 점검·인허가 CSV의 gzip 조각 각 2개, GeoJSON, 설명 JSON 3개와 `SHA256SUMS`가 있습니다. 팀원은 저장소를 받은 뒤 아래 명령으로 같은 폴더에 CSV를 복원합니다. 이미 복원된 파일은 SHA-256을 대조하며, 검증만 할 때는 `--restore`를 빼면 됩니다.
 
-GitHub의 일반 Git 저장소는 파일 하나가 **100 MiB**를 초과하면 차단하며, 웹에서 저장소에 파일을 추가하는 경우 한도는 **25 MiB**입니다. 04번 공유 파일은 각 파일을 100 MB 이하로 준비했습니다. `04_share/`의 파일과 `04_manifest.json`, `04_sha256sums.txt`를 함께 공유하면 팀원이 분할 파일을 복원하고 검사할 수 있습니다. [04번 원천과 산출물 공유](domains/04_license.md#원천과-단계별-산출물-공유) · [GitHub 파일 크기 한도](https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-large-files-on-github)
+```powershell
+python src/ingestion/restore_origin.py --restore
+```
+
+분할 조각은 각각 100 MB 이하입니다. 복원한 CSV와 각 파트의 생성 Parquet는 로컬에서 사용하고, Git에는 원천 분할 파일과 변환·검증 코드를 유지합니다. [업로드 파일 SHA-256](../data/origin/SHA256SUMS) · [원천 6개 SHA-256](../metadata/source_catalog/verification/download_manifest.csv)

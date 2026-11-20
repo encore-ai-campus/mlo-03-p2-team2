@@ -1,4 +1,4 @@
-from config import DOMAIN, TABLES
+from config import DOMAIN, TABLES, parquet_name
 from normalization import load_dictionary, normalize_batch, silver_schema
 from pipeline_io import cli, parquet_batches, staging, write_parquet
 
@@ -11,7 +11,7 @@ def run(config):
             fields = mapping[table]
             schema = silver_schema(fields)
             batches = (normalize_batch(batch, fields, schema) for batch in parquet_batches(source))
-            write_parquet(target / f"{table}.parquet", schema, batches)
+            write_parquet(target / parquet_name(table), schema, batches)
     print("Silver: 2 tables standardized with row lineage preserved.")
 
 

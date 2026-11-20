@@ -2,8 +2,8 @@
 
 | 입력 Bronze | 출력 Silver | 업무 컬럼 | 검증한 행 수 |
 | --- | --- | ---: | ---: |
-| `data/01_bronze/04_license/business_licenses.parquet` | `data/02_silver/04_license/business_licenses.parquet` | 19 | 1,212,132 |
-| `data/01_bronze/04_license/food_inspections.parquet` | `data/02_silver/04_license/food_inspections.parquet` | 4 | 318,627 |
+| `data/01_bronze/04_license/04_business_licenses.parquet` | `data/02_silver/04_license/04_business_licenses.parquet` | 19 | 1,212,132 |
+| `data/01_bronze/04_license/04_food_inspections.parquet` | `data/02_silver/04_license/04_food_inspections.parquet` | 4 | 318,627 |
 
 두 테이블 모두 업무 컬럼과 함께 `source_row_num`을 보존합니다. 04번에서 선택한 컬럼은 [컬럼 변환 목록](../../../../metadata/lineage/04_license/column_lineage.csv)의 `02_silver` 행에 있습니다. 실행 시에는 [04번 데이터 사전](../../../../src/domains/04_license/%EB%8D%B0%EC%9D%B4%ED%84%B0%20%EC%82%AC%EC%A0%84.csv)을 사용합니다.
 

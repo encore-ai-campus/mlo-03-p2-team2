@@ -1,14 +1,14 @@
 # 03 Gold · 기간 매칭과 사실·차원
 
-Silver의 `data/02_silver/04_license/business_licenses.parquet`와 `food_inspections.parquet`를 입력으로 사용합니다. 각 출력 컬럼이 어디에서 왔는지는 [컬럼 변환 목록](../../../../metadata/lineage/04_license/column_lineage.csv)의 `03_gold` 행에 기록합니다.
+Silver의 `data/02_silver/04_license/04_business_licenses.parquet`와 `04_food_inspections.parquet`를 입력으로 사용합니다. 각 출력 컬럼이 어디에서 왔는지는 [컬럼 변환 목록](../../../../metadata/lineage/04_license/column_lineage.csv)의 `03_gold` 행에 기록합니다.
 
 | 출력 파일 (`data/03_gold/` 기준) | 한 행의 의미 | PK | 행 수 |
 | --- | --- | --- | ---: |
-| `facts/04_license/fact_license_event.parquet` | 인허가 기록 1건 | `license_event_key` | 1,212,132 |
-| `facts/04_license/fact_inspection_license_match.parquet` | 점검 1건 | `inspection_key` | 318,627 |
-| `dimensions/04_license/dim_license.parquet` | 면허번호 1개 | `license_number_key` | 350,804 |
-| `dimensions/04_license/dim_establishment.parquet` | 계정·사업장 번호 조합 1개 | `establishment_key` | 283,880 |
-| `dimensions/04_license/dim_date.parquet` | 점검일 또는 인허가 발급일 1일 | `date_key` | 6,540 |
+| `04_license/04_fact_license_event.parquet` | 인허가 기록 1건 | `license_event_key` | 1,212,132 |
+| `04_license/04_fact_inspection_license_match.parquet` | 점검 1건 | `inspection_key` | 318,627 |
+| `04_license/04_dim_license.parquet` | 면허번호 1개 | `license_number_key` | 350,804 |
+| `04_license/04_dim_establishment.parquet` | 계정·사업장 번호 조합 1개 | `establishment_key` | 283,880 |
+| `04_license/04_dim_date.parquet` | 점검일 또는 인허가 발급일 1일 | `date_key` | 6,540 |
 
 차원 행 수에는 `__unknown__` 항목이 포함됩니다. 사실 테이블의 면허·사업장·날짜 키는 차원에 연결되며, 키 정보가 부족하거나 사업장 연결을 확정할 수 없으면 해당 차원의 `__unknown__`를 사용합니다. 점검 사실의 `source_license_number`에는 Silver에서 표준화한 면허번호를 남깁니다. 원천 문자열은 Bronze에서 확인합니다.
 
