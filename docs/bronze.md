@@ -8,7 +8,7 @@
 | --- | --- | --- |
 | food_inspections | `data/00_origin/food_inspections/food_inspections.csv` | `data/01_bronze/food_inspections/food_inspections.parquet` |
 | business_licenses | `data/00_origin/business_licenses/business_licenses.csv` | `data/01_bronze/business_licenses/business_licenses.parquet` |
-| community_areas | `data/00_origin/community_areas/community_areas.geojson` | `data/01_bronze/community_areas/community_areas.parquet` |
+| community_areas | `data/00_origin/community_areas/community_areas.csv` | `data/01_bronze/community_areas/community_areas.parquet` |
 
 각 데이터와 컬럼 JSON은 같은 데이터셋 폴더에 `.sha256` 파일과 함께 있다. 컬럼 JSON, 체크섬, manifest는 Bronze 행으로 적재하지 않는다. 적재 전 각 데이터 파일을 대응하는 `.sha256`과 대조하고, 적재 후 다시 해시를 계산한다.
 
@@ -32,4 +32,4 @@ python -m src.bronze.load_bronze
 python -m pytest tests/bronze --basetemp=data/pytest_tmp
 ```
 
-고정 행 수는 이 원천 스냅샷의 기준값인 점검 318,552건, 인허가 1,212,132건, 지역 77건이다. 다른 스냅샷을 사용하려면 행 수 계약을 검토해야 한다.
+현재 팀 공통 스냅샷의 고정 행 수는 점검 318,627건, 인허가 1,212,282건, 지역 77건이다. 다른 스냅샷을 사용하려면 행 수 계약을 검토해야 한다.

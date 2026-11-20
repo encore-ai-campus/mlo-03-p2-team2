@@ -125,7 +125,8 @@ def verify_output(source: Source, output: Path, columns: list[str], count: int, 
             elif source.name == "business_licenses":
                 license_ids.add(bronze["LICENSE ID"])
             else:
-                area_numbers.add(bronze["area_numbe"])
+                area_key = "area_numbe" if "area_numbe" in bronze else "AREA_NUMBE"
+                area_numbers.add(bronze[area_key])
             observed += 1
     if observed != count or next(original, None) is not None:
         raise ValueError(f"Row stream mismatch for {source.name}")

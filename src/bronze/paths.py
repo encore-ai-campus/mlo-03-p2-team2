@@ -29,7 +29,7 @@ class Source:
 
 
 SOURCES = (
-    Source("food_inspections", "food_inspections/food_inspections.csv", 318_552, "csv"),
-    Source("business_licenses", "business_licenses/business_licenses.csv", 1_212_132, "csv"),
-    Source("community_areas", "community_areas/community_areas.geojson", 77, "geojson"),
+    Source("food_inspections", "food_inspections/food_inspections.csv", 318_627, "csv"),
+    Source("business_licenses", "business_licenses/business_licenses.csv", 1_212_282, "csv"),
+    Source("community_areas", "community_areas/community_areas.csv", 77, "csv"),
 )

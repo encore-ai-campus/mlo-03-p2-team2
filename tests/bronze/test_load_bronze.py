@@ -15,6 +15,14 @@ def test_output_names_follow_dataset_names():
     }
 
 
+def test_team_snapshot_contracts_are_current():
+    contracts = {source.name: source for source in paths.SOURCES}
+    assert contracts["food_inspections"].expected_rows == 318_627
+    assert contracts["business_licenses"].expected_rows == 1_212_282
+    assert contracts["community_areas"].relative_path == "community_areas/community_areas.csv"
+    assert contracts["community_areas"].format == "csv"
+
+
 def test_csv_full_refresh_preserves_values(tmp_path, monkeypatch):
     monkeypatch.setattr(paths, "ORIGIN_ROOT", tmp_path / "origin")
     monkeypatch.setattr(paths, "BRONZE_ROOT", tmp_path / "bronze")
