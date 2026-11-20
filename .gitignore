@@ -45,6 +45,7 @@ download_manifest.csv
 !/data/**/
 !/data/README.md
 !/data/**/.gitkeep
+/data/00_origin/
 /reports/runs/
 
 # Temporary and editor files

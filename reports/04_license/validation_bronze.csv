@@ -1,0 +1,8 @@
+table,name,violations,detail
+bronze,ingestion manifest structure,0,
+business_licenses,schema,0,
+business_licenses,"source values, order and row count",0,Bronze rows: 1212132
+business_licenses,"ingestion manifest file hashes, row count and UTC timestamps",0,
+food_inspections,schema,0,
+food_inspections,"source values, order and row count",0,Bronze rows: 318552
+food_inspections,"ingestion manifest file hashes, row count and UTC timestamps",0,

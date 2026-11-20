@@ -4,7 +4,7 @@ from validation import gold_checks
 
 
 def run(config):
-    with staging(config.data / "gold") as target:
+    with staging(config.stage_dir("gold")) as target:
         build_gold(config, target)
         checks = gold_checks(config, target)
         failed = [check for check in checks if check.violations]

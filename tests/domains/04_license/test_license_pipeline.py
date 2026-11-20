@@ -1,7 +1,9 @@
 import csv
 import hashlib
+import json
 import subprocess
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 import pyarrow as pa
@@ -30,8 +32,9 @@ def write_csv(path, columns, rows):
 
 @pytest.fixture
 def project(tmp_path):
-    raw, data, reports = (tmp_path / name for name in ("raw", "data", "reports"))
-    raw.mkdir()
+    data, reports = (tmp_path / name for name in ("data", "reports"))
+    raw = data / "00_origin"
+    raw.mkdir(parents=True)
 
     def license_row(key, number, start, end):
         return [
@@ -78,6 +81,64 @@ def snapshot(folder):
             for p in folder.rglob("*") if p.is_file()}
 
 
+@pytest.mark.parametrize("stage", ("01_bronze", "02_silver", "03_gold"))
+def test_raw_directory_cannot_be_inside_an_output_stage(project, stage):
+    _, data, _ = project
+    result = execute("01_bronze", project, ok=False,
+                     extra=("--raw-dir", str(data / stage / "raw")))
+    assert result.returncode == 1
+    assert "must not overlap" in result.stderr
+
+
+def test_bronze_records_utc_provenance_and_verifies_existing_outputs(project):
+    raw, data, _ = project
+    output = data / "01_bronze" / "04_license"
+    manifest = output / "ingestion_manifest.json"
+    execute("01_bronze", project)
+    original = manifest.read_bytes()
+    records = json.loads(original)["entries"]
+    assert {row["table"]: row["row_count"] for row in records} == {
+        "business_licenses": 4, "food_inspections": 7,
+    }
+    for row in records:
+        assert row["status"] == "created"
+        for field in ("source_read_started_at_utc", "bronze_created_at_utc", "recorded_at_utc"):
+            assert datetime.fromisoformat(row[field]).utcoffset() == timezone.utc.utcoffset(None)
+        assert row["source_sha256"] == hashlib.sha256((raw / row["source_file"]).read_bytes()).hexdigest()
+        assert row["bronze_sha256"] == hashlib.sha256((output / row["bronze_file"]).read_bytes()).hexdigest()
+    execute("01_bronze", project)
+    assert manifest.read_bytes() == original
+    execute("validate_bronze", project)
+
+    manifest.unlink()  # Simulate Parquet produced before provenance was implemented.
+    outputs = snapshot(output)
+    missing = execute("validate_bronze", project, ok=False)
+    assert missing.returncode == 1
+    assert "ingestion manifest" in missing.stdout
+    execute("01_bronze", project)
+    current = snapshot(output)
+    assert all(current[path] == digest for path, digest in outputs.items())
+    backfilled = json.loads(manifest.read_bytes())
+    assert all(row["status"] == "verified_existing" and row["bronze_created_at_utc"] is None
+               for row in backfilled["entries"])
+    execute("validate_bronze", project)
+
+    entry = backfilled["entries"][0]
+    original_hash = entry["source_sha256"]
+    entry["source_sha256"] = "0" * 64
+    manifest.write_text(json.dumps(backfilled), encoding="utf-8")
+    tampered = execute("validate_bronze", project, ok=False)
+    assert tampered.returncode == 1
+    assert "source_sha256" in tampered.stdout
+
+    entry["source_sha256"] = original_hash
+    entry["recorded_at_utc"] = "2026-11-20T10:00:00+09:00"
+    manifest.write_text(json.dumps(backfilled), encoding="utf-8")
+    wrong_zone = execute("validate_bronze", project, ok=False)
+    assert wrong_zone.returncode == 1
+    assert "Expected a UTC timestamp: recorded_at_utc" in wrong_zone.stdout
+
+
 def test_all_stages_preserve_inputs_and_produce_reproducible_results(project):
     raw, data, reports = project
     raw_hashes = snapshot(raw)
@@ -90,11 +151,11 @@ def test_all_stages_preserve_inputs_and_produce_reproducible_results(project):
     assert snapshot(raw) == raw_hashes
 
     for table, expected in [("business_licenses", 4), ("food_inspections", 7)]:
-        for layer in ("bronze", "silver"):
+        for layer in ("01_bronze", "02_silver"):
             path = data / layer / "04_license" / (table + ".parquet")
             assert pq.ParquetFile(path).metadata.num_rows == expected
 
-    path = data / "gold" / "facts" / "04_license" / "fact_inspection_license_match.parquet"
+    path = data / "03_gold" / "facts" / "04_license" / "fact_inspection_license_match.parquet"
     rows = pq.ParquetFile(path).read().to_pylist()
     assert [row["candidate_count_num"] for row in rows] == [1, 2, 1, 0, 0, 0, 0]
     assert [row["match_status_cd"] for row in rows] == [
@@ -149,7 +210,7 @@ def test_bronze_uses_configured_workbook_sheet_and_columns(tmp_path):
     execute("01_bronze", project, extra=extra)
     execute("validate_bronze", project, extra=extra)
     assert snapshot(raw) == original
-    result = pq.ParquetFile(data / "bronze" / "04_license" / "business_licenses.parquet").read()
+    result = pq.ParquetFile(data / "01_bronze" / "04_license" / "business_licenses.parquet").read()
     assert result.column_names == ["description", "row_id", "source_row_num"]
     assert result.to_pydict() == {
         "description": ["line 1\nline 2", ""], "row_id": ["0001", "0002"], "source_row_num": [1, 2],

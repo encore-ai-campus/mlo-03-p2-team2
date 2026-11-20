@@ -1,0 +1,68 @@
+# 팀 실행 환경과 GitHub 공유 기준
+
+## Conda 환경
+
+프로젝트 루트를 연 Anaconda Prompt에서 아래 명령을 실행합니다. 환경 이름은 `pro_2`이고 Python은 3.14입니다. [환경 정의](../environment.yml)
+
+```powershell
+conda env create --file environment.yml
+conda activate pro_2
+python --version
+python -m pytest -q tests/domains/04_license
+```
+
+프로젝트 코드의 실행에는 PyArrow, PyYAML, openpyxl이 필요합니다. pytest는 테스트에 사용합니다. Python 3.14 환경은 PyArrow 26.0.1을 사용하고, 기존 Python 3.13 환경에서는 PyArrow 21.0.0으로 만든 스냅샷을 같은 환경으로 재현할 수 있습니다. [04번 의존성](../src/domains/04_license/requirements.txt) · [PyArrow Python 3.14 배포 파일](https://pypi.org/project/pyarrow/26.0.1/)
+
+기존 팀 스냅샷의 Parquet는 새 환경에서 열거나 검증할 수 있습니다. **새 Python 3.14 환경으로 다시 생성할 때는 별도 출력 위치를 사용합니다.** Parquet 기록기 버전이 바뀌면 테이블 값이 같아도 파일 체크섬이 달라질 수 있습니다. 04번 단계 실행 방법은 [04번 문서](domains/04_license.md)에 있습니다.
+
+## VS Code에서 Parquet 보기
+
+VS Code에서 이 프로젝트 폴더를 열고, 명령 팔레트에서 **Python: Select Interpreter → pro_2**를 선택합니다. 이 설정은 VS Code에서 Python과 테스트를 실행할 환경을 지정합니다. [VS Code의 Python 환경 안내](https://code.visualstudio.com/docs/python/environments)
+
+04번 Parquet는 ZSTD 압축을 사용합니다. VS Code에서 파일 탭을 우클릭하고 **Reopen Editor With... → Parquet Grid Viewer**를 선택하면 표로 볼 수 있습니다. Database Client의 Parquet Viewer에서 `unsupported compression codec: ZSTD`가 나오면 ZSTD를 지원하는 뷰어로 다시 엽니다. [Parquet Grid Viewer 확장](https://marketplace.visualstudio.com/items?itemName=zovo.zovo-parquet-viewer)
+
+`EPERM: operation not permitted`가 나오면 Windows에서 현재 계정의 파일 읽기 권한을 확인합니다. 터미널에서는 아래 코드로 처음 5행을 읽을 수 있습니다.
+
+```python
+import pyarrow.parquet as pq
+
+with pq.ParquetFile("data/02_silver/04_license/food_inspections.parquet") as parquet:
+    print(parquet.schema_arrow)
+    for batch in parquet.iter_batches(
+        batch_size=5, columns=["inspection_key", "inspection_dtm", "result_cd"]
+    ):
+        print(batch.to_pydict())
+        break
+```
+
+## 로컬 폴더 구조
+
+| 로컬 위치 | 내용 |
+| --- | --- |
+| `data/00_origin/` | 원천 CSV 2개, GeoJSON 1개, 컬럼 설명 JSON 3개 |
+| `data/01_bronze/04_license/` · `data/02_silver/04_license/` | 04번 원천 보존본과 표준화본 |
+| `data/03_gold/facts/04_license/` · `data/03_gold/dimensions/04_license/` | 04번 사실·차원 Parquet |
+| `src/domains/04_license/` · `src/ingestion/` | 04번 변환·검증 코드와 원천 프로파일링 코드 |
+| `metadata/lineage/04_license/` | 팀 공유 스냅샷의 적재 매니페스트와 컬럼 변환 목록 |
+| `reports/04_license/` | 팀 공유 스냅샷의 품질 검사와 단계별 검증 보고서 |
+| `reports/runs/04_license/` | 로컬 실행에서 생성하는 보고서 |
+
+`.env`나 환경 변수에서 원천 경로를 지정한 경우 `CHICAGO_RAW_DIR=data/00_origin`으로 맞춥니다.
+
+## GitHub 공유
+
+| 내용 | 공유 위치와 형태 |
+| --- | --- |
+| 단계별 변환과 검증 코드 | 관점별 `src/`, `tests/` 경로에 둡니다. |
+| 실행 환경·스키마·변경 기준 | `environment.yml`, 데이터 사전·코드표, 실행·설계 MD로 공유합니다. |
+| 실제로 무엇이 달라졌는지 | 04번 통합 문서에서 AS-IS와 단계별 산출물을 확인하고, 컬럼 변환 목록으로 입력부터 출력까지 추적합니다. [04번 통합 문서](domains/04_license.md) · [컬럼 변환 목록](../metadata/lineage/04_license/column_lineage.csv) · [공유 보고서](../reports/04_license/README.md) |
+| 원천과 전체 산출물 | 팀이 공유한 동일한 원천 스냅샷으로 재현합니다. `data/00_origin/`, `origin.zip`, 전체 생성 Parquet와 실행 보고서의 로컬 경로는 Git 제외 규칙을 적용합니다. [공유 원천 체크섬 목록](../metadata/source_catalog/verification/download_manifest.csv) |
+
+| 현재 큰 파일 | 실제 크기 |
+| --- | ---: |
+| `data/00_origin/business_licenses.csv` | 498.1 MiB |
+| `data/00_origin/food_inspections.csv` | 340.3 MiB |
+| `origin.zip` | 224.2 MiB |
+| `data/01_bronze/04_license/business_licenses.parquet` | 103.5 MiB |
+
+GitHub의 일반 Git 저장소는 파일 하나가 **100 MiB**를 초과하면 차단하며, 웹에서 파일을 추가하는 경우 한도는 **25 MiB**입니다. 우리 팀의 큰 원천과 Bronze 산출물은 전체 파일 공유 위치와 재현 방법을 MD에 기록하는 방식이 적합합니다. [GitHub 파일 크기 한도](https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-large-files-on-github)

@@ -1,59 +1,61 @@
-# Domain 04 · 사업체 인허가 이력
+# 04 사업체 인허가 · AS-IS와 단계별 변환 기록
 
 인허가 발급·갱신 기록과 위생점검을 연결해, 점검 당시 기록된 인허가 기간에 어떤 면허가 후보였는지 확인합니다. 점검 1건마다 후보 수와 상태를 남겨 반복 점검이나 불합격률 집계에서 행이 늘어나는 일을 방지합니다. [초기 프로젝트 기획서](../00_project_plan.md)
 
+## AS-IS 원천 데이터 프로파일링
+
+공유 스냅샷의 점검 **318,552행 × 17열**과 인허가 **1,212,132행 × 37열**을 조사했습니다. 결측과 키 분포는 원천 값을 보존한 Bronze에서 확인했습니다. 면허번호만으로 비교한 결과는 점검의 **94.80%**, 점검일을 유효기간에 대조한 결과는 **73.37%**에서 후보가 한 건 이상이었습니다. [원천 파일과 조사 기준](04_license/00_origin/README.md)
+
+| 항목 | 관측 결과 | 분석에 미치는 영향 |
+| --- | --- | --- |
+| 점검 면허번호 결측·이상값 | 빈칸 19건, `0` 840건, `9999999` 1건. 총 **860건(0.27%)** | 해당 값으로는 인허가를 특정하기 어렵습니다. |
+| 인허가 면허번호 결측 | `LICENSE NUMBER` 빈칸 **1건** | 해당 인허가 기록은 면허번호로 연결할 수 없습니다. |
+| 인허가 유효기간 결측 | 시작일 **2,719건(0.2243%)**, 만료일 **170건(0.0140%)** | 날짜 한쪽이 없어 점검일이 유효기간에 포함되는지 판단하기 어렵습니다. |
+| 인허가 기간 역전 | 만료일이 시작일보다 빠른 기록 **2,963건(0.2444%)** | 날짜 형식 검사는 통과해도 기간 비교에 사용할 수 없습니다. |
+| 특이한 만료일 | `0206-08-17` 1건, `1901-01-01` 4건, `9999-01-01` 1건 | 앞의 5건은 기간 역전에도 포함됩니다. 6건 모두 실제 점검 후보에 들어가지 않았습니다. |
+| 인허가 상태와 변경일 | 변경일 결측 **1,131,478건**이 모두 발급 상태 `AAI`. 검토가 필요한 상태 `INQ` **1건** | 공란은 상태에 따라 의미가 달라집니다. 취소·철회 등의 기준일 효과는 합의가 필요합니다. |
+| 인허가 키 반복 | 비결측 면허번호 **350,803개** 중 **210,000개**가 반복됩니다. 원천 `ID`는 241개 값이 반복됐고, `LICENSE ID`는 전체 행에서 유일했습니다. | 한 점검에 인허가 기록이 여러 건 붙을 수 있어 후보 수를 별도로 기록해야 합니다. |
+
+| 점검 한 건의 후보 수 | 면허번호만 비교 | 면허번호와 점검일 유효기간을 함께 비교 |
+| --- | ---: | ---: |
+| 0건 | 16,577 | 84,828 |
+| 1건 | 35,887 | 232,323 |
+| 2건 이상 | 266,088 | 1,401 |
+
+빈 면허번호와 `0`, `9999999`는 두 비교에서 후보 0건으로 잡았습니다. 기간 비교는 시작일과 만료일 양쪽을 포함하며, 시작일·만료일이 비어 있거나 역전된 기록은 제외했습니다. 상태별 상세와 취소·철회일 검토 항목은 [Gold](04_license/03_gold/README.md)와 [품질 검사](04_license/quality/README.md)에 있습니다.
+
+## 단계별 변환 기록
+
+| 단계 | 입력 → 출력 | 변환 내용 | 상세 기록 |
+| --- | --- | --- | --- |
+| 00 Origin | `data/00_origin/`의 점검·인허가 CSV와 컬럼 설명 JSON | 원천 컬럼, 제공 타입, 결측·형식·키, 스냅샷 체크섬 확인 | [00 Origin](04_license/00_origin/README.md) |
+| 01 Bronze | 원천 CSV 2개 → `data/01_bronze/04_license/`의 Parquet 2개와 적재 기록 | 원천 컬럼·문자열 값 보존, `source_row_num` 추가 | [01 Bronze](04_license/01_bronze/README.md) |
+| 02 Silver | Bronze Parquet 2개 → `data/02_silver/04_license/`의 Parquet 2개 | 필요한 업무 컬럼 선택, 이름·타입·결측·코드 표준화 | [02 Silver](04_license/02_silver/README.md) |
+| 품질 검사 | Bronze·Silver Parquet → `reports/runs/04_license/`의 MD·CSV | 13개 결정 ID로 표준화 전후 위반 비교 | [품질 검사](04_license/quality/README.md) · [공유 보고서](../../reports/04_license/README.md) |
+| 03 Gold | Silver Parquet 2개 → `data/03_gold/`의 사실 2개·차원 3개 | 점검일의 기간 후보 집계와 키 연결 | [03 Gold](04_license/03_gold/README.md) |
+
+[컬럼 변환 목록 CSV](../../metadata/lineage/04_license/column_lineage.csv)에서 출력 컬럼 한 개당 한 행으로 입력 파일과 컬럼, 출력 파일과 컬럼, 타입, 처리 방식, 기존 결정 ID를 확인할 수 있습니다. 여러 입력은 `+`로 표시합니다. Bronze의 신규 순번처럼 원천 컬럼이 없는 경우 입력 컬럼은 비워 둡니다. 결정 ID는 기존 Silver 데이터 사전에 등록된 규칙에 표시합니다. [공유 스냅샷 Bronze 매니페스트](../../metadata/lineage/04_license/bronze_manifest.json)
+
+표준화 규칙이 바뀌면 실행용 데이터 사전과 영향받는 단계 문서, 컬럼 변환 목록을 함께 맞춥니다. 수치를 다시 측정할 때는 사용한 원천 스냅샷과 집계 기준을 남깁니다.
+
 ## 실행
 
-프로젝트 루트에서 아래 순서로 실행합니다. 단계별 검증 스크립트는 실패하면 종료 코드 1을 반환하고, 검사별 판정을 CSV로 기록합니다.
+프로젝트 루트에서 [실행 환경 설정](../project_setup_and_sharing.md)에 따라 `pro_2`를 활성화한 뒤 실행합니다. 단계별 검증 스크립트는 실패하면 종료 코드 1을 반환하고, 검사별 판정을 CSV로 기록합니다.
 
 ```powershell
 $domain = 'src/domains/04_license'
-python -m pip install -r "$domain/requirements.txt"
+$options = @('--data-dir', 'data/pro_2', '--report-dir', 'reports/runs/pro_2/04_license')
 
-python "$domain/01_bronze.py"
-python "$domain/validate_bronze.py"
-python "$domain/02_normalize.py"
-python "$domain/validate_silver.py"
-python "$domain/03_quality.py"
-python "$domain/validate_quality.py"
-python "$domain/04_modeling.py"
-python "$domain/validate_gold.py"
+python "$domain/01_bronze.py" @options
+python "$domain/validate_bronze.py" @options
+python "$domain/02_normalize.py" @options
+python "$domain/validate_silver.py" @options
+python "$domain/03_quality.py" @options
+python "$domain/validate_quality.py" @options
+python "$domain/04_modeling.py" @options
+python "$domain/validate_gold.py" @options
 ```
 
 [공용 원천 설정 예시](../../config/sources.example.yaml)의 `food_inspections`와 `business_licenses`를 사용합니다. `--sources-config`로 다른 YAML를 지정할 수 있습니다. 각 소스에 `file`, `format`, 선택 사항 `columns`를 지정합니다. `format: xlsx`는 `sheet`로 읽을 시트를 선택하며, 워크북에 저장된 셀 값을 읽습니다. 다른 헤더로 Silver를 만들 때는 `--dictionary`로 대응하는 컬럼 사전을 지정합니다.
 
-`--raw-dir`은 환경 변수와 로컬 설정보다 우선합니다. 다른 스냅샷을 처리할 때는 `--data-dir`과 `--report-dir`로 출력 위치를 지정할 수 있습니다. 동일한 입력과 라이브러리 버전으로 다시 돌리면 Parquet 내용이 같은지 확인합니다. 기존 Parquet와 다른 결과는 새 출력 위치에 저장합니다.
-
-## 단계별 산출물
-
-| 단계 | 하는 일 | 검증 |
-| --- | --- | --- |
-| Bronze | 두 입력을 읽어 기본 설정에서는 원천 컬럼 전체를 문자열로 보존합니다. `source_row_num`은 헤더를 뺀 논리 레코드의 1부터 시작하는 순번입니다. | 원천과 Bronze의 스키마, 값, 순서, 행 수 일치 |
-| Silver | [데이터 사전](../../src/domains/04_license/%EB%8D%B0%EC%9D%B4%ED%84%B0%20%EC%82%AC%EC%A0%84.csv)에 지정된 04번 컬럼을 표준화합니다. 모든 Bronze 행의 순번을 보존합니다. | 행 수 대사, 표준 이름·타입, 사전대로 변환한 값과 행 순번 확인 |
-| 데이터 품질 | `reports/runs/04_license/품질 관리.md`에 차원별·규칙별 비교표를, `quality_comparison.csv`에 규칙별 상세를 기록합니다. 예시는 원천 행 순번입니다. | 결정 ID 유일성, 같은 입력에서 보고서 재생성 결과 일치 |
-| Gold | `data/gold/facts/04_license/`와 `data/gold/dimensions/04_license/`에 각각 사실과 차원 Parquet를 저장합니다. | 모든 테이블의 PK 유일성, FK 존재, Silver 키·행 순서와 행 수, 확정 후보의 기간 정합성 |
-
-### 데이터 표준과 품질 결정
-
-| 결정 ID | 기준 |
-| --- | --- |
-| `D04-N01` | 바깥 공백을 제거하고 공란은 null로 표현합니다. ZIP과 식별 값의 텍스트 표현을 보존합니다. |
-| `D04-N02` · `D04-N05` | 양의 숫자 식별자를 문자열로 보존합니다. 점검 면허번호 `0`과 이번 스냅샷의 이상값 후보 `9999999`는 매칭 대상에서 제외합니다. |
-| `D04-N03` · `D04-N04` | 범주를 대문자로 통일하고 날짜를 달력 날짜로 저장합니다. 변환에 실패한 값은 Bronze 행 순번으로 추적합니다. |
-| `D04-DQ-01`~`D04-DQ-06` · `D04-DQ-10`~`D04-DQ-13` | 번호나 날짜의 결측과 형식 오류를 따로 집계합니다. Silver에서 형식 오류가 null로 바뀐 경우 결측 집계에 반영합니다. |
-| `D04-DQ-07` | 만료일이 시작일보다 빠른 기간은 정합성 오류입니다. 인허가 행은 보존하고 기간 매칭 후보에서 제외합니다. |
-| `D04-DQ-08` · `D04-DQ-09` | 인허가 신청 유형의 바깥 공백과 공식 설명에서 의미를 확인한 상태 코드의 범위를 검사합니다. 검토 대상 상태는 원천과 Silver에 보존합니다. [시카고시 인허가 설명](https://catalog.data.gov/dataset/business-licenses) |
-
-## Gold 행 단위와 키
-
-| 테이블 | 한 행의 의미 | PK |
-| --- | --- | --- |
-| `dim_license` | 면허번호 하나 | `license_number_key` |
-| `dim_establishment` | 계정번호·사업장 번호 조합 하나 | `establishment_key` |
-| `dim_date` | 점검일 또는 인허가 발급일 하나 | `date_key` |
-| `fact_license_event` | 출처가 있는 인허가 기록 한 건 | `license_event_key`, 원천 `LICENSE ID` |
-| `fact_inspection_license_match` | 점검 한 건 | `inspection_key`, 원천 `Inspection ID` |
-
-두 사실 테이블의 면허번호, 사업장, 날짜 키는 차원에 연결됩니다. 원천 정보가 부족한 키는 차원의 `__unknown__` 항목으로 연결합니다.
-
-면허번호가 같고 `시작일 ≤ 점검일 ≤ 만료일`이면 기간 후보로 계산합니다. 후보가 한 건이면 해당 인허가 기록 ID와 사업장 키를 기록합니다. 후보가 여러 건이면 후보 수만 남기고 연결 결정은 보류합니다. 이 규칙은 기록된 기간을 기준으로 합니다. 취소·철회 시점의 적용과 사업장 속성 변경 이력의 복원은 팀에서 정의할 항목입니다.
+기본 원천 폴더는 `data/00_origin/`입니다. 원천 경로를 따로 지정하면 `--raw-dir`, `CHICAGO_RAW_DIR` 환경 변수, `.env` 순서로 적용됩니다. 위 예시는 Python 3.14에서 처음 생성하는 결과를 `data/pro_2/`와 `reports/runs/pro_2/04_license/`에 저장합니다. 출력 옵션을 생략하면 `data/01_bronze/`, `data/02_silver/`, `data/03_gold/`와 `reports/runs/04_license/`를 사용합니다. 동일한 입력과 라이브러리 버전으로 다시 돌리면 Parquet 내용이 같은지 확인합니다. 기존 Parquet와 다른 결과는 새 출력 위치에 저장합니다.

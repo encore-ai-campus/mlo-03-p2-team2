@@ -3,9 +3,10 @@
 import csv
 import hashlib
 import os
+import shutil
 import sys
 from contextlib import contextmanager
-from tempfile import TemporaryDirectory
+from uuid import uuid4
 
 import pyarrow as pa
 import pyarrow.csv as pacsv
@@ -119,8 +120,10 @@ def staging(root, replace=False):
     if root.resolve() != root:
         raise ValueError(f"Output directory resolves outside its configured location: {root}")
     root.mkdir(parents=True, exist_ok=True)
-    with TemporaryDirectory(prefix=".04-license-", dir=root) as temp_name:
-        tmp = root / temp_name
+    tmp = root / f".04-license-{uuid4().hex}"
+    # On Windows a 0o700 directory has a private ACL that hard-linked outputs retain.
+    tmp.mkdir(mode=0o777 if os.name == "nt" else 0o700)
+    try:
         yield tmp
         files = []
         for path in sorted(tmp.rglob("*")):
@@ -141,6 +144,10 @@ def staging(root, replace=False):
             except FileExistsError:
                 if sha256(final) != sha256(source):
                     raise ValueError(f"Concurrent output differs: {final}")
+    finally:
+        if tmp.resolve() != tmp:
+            raise ValueError(f"Refusing to remove a staging directory outside its configured location: {tmp}")
+        shutil.rmtree(tmp)
 
 
 def cli(action, description):

@@ -1,0 +1,108 @@
+stage,input_files,input_columns,output_file,output_column,output_type,operation,decision_id
+01_bronze,data/00_origin/business_licenses.csv,ID,data/01_bronze/04_license/business_licenses.parquet,ID,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,LICENSE ID,data/01_bronze/04_license/business_licenses.parquet,LICENSE ID,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,ACCOUNT NUMBER,data/01_bronze/04_license/business_licenses.parquet,ACCOUNT NUMBER,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,SITE NUMBER,data/01_bronze/04_license/business_licenses.parquet,SITE NUMBER,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,LEGAL NAME,data/01_bronze/04_license/business_licenses.parquet,LEGAL NAME,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,DOING BUSINESS AS NAME,data/01_bronze/04_license/business_licenses.parquet,DOING BUSINESS AS NAME,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,ADDRESS,data/01_bronze/04_license/business_licenses.parquet,ADDRESS,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,CITY,data/01_bronze/04_license/business_licenses.parquet,CITY,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,STATE,data/01_bronze/04_license/business_licenses.parquet,STATE,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,ZIP CODE,data/01_bronze/04_license/business_licenses.parquet,ZIP CODE,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,WARD,data/01_bronze/04_license/business_licenses.parquet,WARD,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,PRECINCT,data/01_bronze/04_license/business_licenses.parquet,PRECINCT,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,WARD PRECINCT,data/01_bronze/04_license/business_licenses.parquet,WARD PRECINCT,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,POLICE DISTRICT,data/01_bronze/04_license/business_licenses.parquet,POLICE DISTRICT,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,COMMUNITY AREA,data/01_bronze/04_license/business_licenses.parquet,COMMUNITY AREA,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,COMMUNITY AREA NAME,data/01_bronze/04_license/business_licenses.parquet,COMMUNITY AREA NAME,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,NEIGHBORHOOD,data/01_bronze/04_license/business_licenses.parquet,NEIGHBORHOOD,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,LICENSE CODE,data/01_bronze/04_license/business_licenses.parquet,LICENSE CODE,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,LICENSE DESCRIPTION,data/01_bronze/04_license/business_licenses.parquet,LICENSE DESCRIPTION,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,BUSINESS ACTIVITY ID,data/01_bronze/04_license/business_licenses.parquet,BUSINESS ACTIVITY ID,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,BUSINESS ACTIVITY,data/01_bronze/04_license/business_licenses.parquet,BUSINESS ACTIVITY,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,LICENSE NUMBER,data/01_bronze/04_license/business_licenses.parquet,LICENSE NUMBER,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,APPLICATION TYPE,data/01_bronze/04_license/business_licenses.parquet,APPLICATION TYPE,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,APPLICATION CREATED DATE,data/01_bronze/04_license/business_licenses.parquet,APPLICATION CREATED DATE,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,APPLICATION REQUIREMENTS COMPLETE,data/01_bronze/04_license/business_licenses.parquet,APPLICATION REQUIREMENTS COMPLETE,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,PAYMENT DATE,data/01_bronze/04_license/business_licenses.parquet,PAYMENT DATE,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,CONDITIONAL APPROVAL,data/01_bronze/04_license/business_licenses.parquet,CONDITIONAL APPROVAL,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,LICENSE TERM START DATE,data/01_bronze/04_license/business_licenses.parquet,LICENSE TERM START DATE,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,LICENSE TERM EXPIRATION DATE,data/01_bronze/04_license/business_licenses.parquet,LICENSE TERM EXPIRATION DATE,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,LICENSE APPROVED FOR ISSUANCE,data/01_bronze/04_license/business_licenses.parquet,LICENSE APPROVED FOR ISSUANCE,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,DATE ISSUED,data/01_bronze/04_license/business_licenses.parquet,DATE ISSUED,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,LICENSE STATUS,data/01_bronze/04_license/business_licenses.parquet,LICENSE STATUS,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,LICENSE STATUS CHANGE DATE,data/01_bronze/04_license/business_licenses.parquet,LICENSE STATUS CHANGE DATE,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,SSA,data/01_bronze/04_license/business_licenses.parquet,SSA,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,LATITUDE,data/01_bronze/04_license/business_licenses.parquet,LATITUDE,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,LONGITUDE,data/01_bronze/04_license/business_licenses.parquet,LONGITUDE,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,LOCATION,data/01_bronze/04_license/business_licenses.parquet,LOCATION,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/business_licenses.csv,,data/01_bronze/04_license/business_licenses.parquet,source_row_num,int64,헤더를 제외한 CSV 논리 레코드에 1부터 순번 부여,
+01_bronze,data/00_origin/food_inspections.csv,Inspection ID,data/01_bronze/04_license/food_inspections.parquet,Inspection ID,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/food_inspections.csv,DBA Name,data/01_bronze/04_license/food_inspections.parquet,DBA Name,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/food_inspections.csv,AKA Name,data/01_bronze/04_license/food_inspections.parquet,AKA Name,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/food_inspections.csv,License #,data/01_bronze/04_license/food_inspections.parquet,License #,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/food_inspections.csv,Facility Type,data/01_bronze/04_license/food_inspections.parquet,Facility Type,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/food_inspections.csv,Risk,data/01_bronze/04_license/food_inspections.parquet,Risk,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/food_inspections.csv,Address,data/01_bronze/04_license/food_inspections.parquet,Address,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/food_inspections.csv,City,data/01_bronze/04_license/food_inspections.parquet,City,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/food_inspections.csv,State,data/01_bronze/04_license/food_inspections.parquet,State,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/food_inspections.csv,Zip,data/01_bronze/04_license/food_inspections.parquet,Zip,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/food_inspections.csv,Inspection Date,data/01_bronze/04_license/food_inspections.parquet,Inspection Date,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/food_inspections.csv,Inspection Type,data/01_bronze/04_license/food_inspections.parquet,Inspection Type,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/food_inspections.csv,Results,data/01_bronze/04_license/food_inspections.parquet,Results,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/food_inspections.csv,Violations,data/01_bronze/04_license/food_inspections.parquet,Violations,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/food_inspections.csv,Latitude,data/01_bronze/04_license/food_inspections.parquet,Latitude,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/food_inspections.csv,Longitude,data/01_bronze/04_license/food_inspections.parquet,Longitude,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/food_inspections.csv,Location,data/01_bronze/04_license/food_inspections.parquet,Location,string,CSV 값을 원천 컬럼명과 순서대로 문자열로 보존,
+01_bronze,data/00_origin/food_inspections.csv,,data/01_bronze/04_license/food_inspections.parquet,source_row_num,int64,헤더를 제외한 CSV 논리 레코드에 1부터 순번 부여,
+02_silver,data/01_bronze/04_license/business_licenses.parquet,ID,data/02_silver/04_license/business_licenses.parquet,source_record_id,string,양끝 공백 제거 후 빈 문자열을 null로 변환,D04-N01
+02_silver,data/01_bronze/04_license/business_licenses.parquet,LICENSE ID,data/02_silver/04_license/business_licenses.parquet,license_event_key,string,양끝 공백 제거 후 양의 정수 형태의 문자열을 보존하고 나머지는 null 처리,D04-N02
+02_silver,data/01_bronze/04_license/business_licenses.parquet,LICENSE NUMBER,data/02_silver/04_license/business_licenses.parquet,license_number_key,string,양끝 공백 제거 후 양의 정수 형태의 문자열을 보존하고 나머지는 null 처리,D04-N02
+02_silver,data/01_bronze/04_license/business_licenses.parquet,ACCOUNT NUMBER,data/02_silver/04_license/business_licenses.parquet,account_key,string,양끝 공백 제거 후 양의 정수 형태의 문자열을 보존하고 나머지는 null 처리,D04-N02
+02_silver,data/01_bronze/04_license/business_licenses.parquet,SITE NUMBER,data/02_silver/04_license/business_licenses.parquet,site_key,string,양끝 공백 제거 후 양의 정수 형태의 문자열을 보존하고 나머지는 null 처리,D04-N02
+02_silver,data/01_bronze/04_license/business_licenses.parquet,LEGAL NAME,data/02_silver/04_license/business_licenses.parquet,legal_name,string,양끝 공백 제거 후 빈 문자열을 null로 변환,D04-N01
+02_silver,data/01_bronze/04_license/business_licenses.parquet,DOING BUSINESS AS NAME,data/02_silver/04_license/business_licenses.parquet,dba_name,string,양끝 공백 제거 후 빈 문자열을 null로 변환,D04-N01
+02_silver,data/01_bronze/04_license/business_licenses.parquet,ADDRESS,data/02_silver/04_license/business_licenses.parquet,address,string,양끝 공백 제거 후 빈 문자열을 null로 변환,D04-N01
+02_silver,data/01_bronze/04_license/business_licenses.parquet,CITY,data/02_silver/04_license/business_licenses.parquet,city,string,양끝 공백 제거 및 빈 값 null 처리 후 대문자로 변환,D04-N03
+02_silver,data/01_bronze/04_license/business_licenses.parquet,STATE,data/02_silver/04_license/business_licenses.parquet,state_cd,string,양끝 공백 제거 및 빈 값 null 처리 후 대문자로 변환,D04-N03
+02_silver,data/01_bronze/04_license/business_licenses.parquet,ZIP CODE,data/02_silver/04_license/business_licenses.parquet,zip_code,string,양끝 공백 제거 후 빈 문자열을 null로 변환,D04-N01
+02_silver,data/01_bronze/04_license/business_licenses.parquet,LICENSE CODE,data/02_silver/04_license/business_licenses.parquet,license_type_key,string,양끝 공백 제거 후 양의 정수 형태의 문자열을 보존하고 나머지는 null 처리,D04-N02
+02_silver,data/01_bronze/04_license/business_licenses.parquet,APPLICATION TYPE,data/02_silver/04_license/business_licenses.parquet,application_cd,string,양끝 공백 제거 및 빈 값 null 처리 후 대문자로 변환,D04-N03
+02_silver,data/01_bronze/04_license/business_licenses.parquet,DATE ISSUED,data/02_silver/04_license/business_licenses.parquet,issued_dtm,date32,달력 날짜로 파싱하고 빈 값 또는 파싱 실패는 null 처리,D04-N04
+02_silver,data/01_bronze/04_license/business_licenses.parquet,LICENSE STATUS,data/02_silver/04_license/business_licenses.parquet,recorded_status_cd,string,양끝 공백 제거 및 빈 값 null 처리 후 대문자로 변환,D04-N03
+02_silver,data/01_bronze/04_license/business_licenses.parquet,LICENSE STATUS CHANGE DATE,data/02_silver/04_license/business_licenses.parquet,status_change_dtm,date32,달력 날짜로 파싱하고 빈 값 또는 파싱 실패는 null 처리,D04-N04
+02_silver,data/01_bronze/04_license/business_licenses.parquet,LICENSE TERM START DATE,data/02_silver/04_license/business_licenses.parquet,term_start_dtm,date32,달력 날짜로 파싱하고 빈 값 또는 파싱 실패는 null 처리,D04-N04
+02_silver,data/01_bronze/04_license/business_licenses.parquet,LICENSE TERM EXPIRATION DATE,data/02_silver/04_license/business_licenses.parquet,term_end_dtm,date32,달력 날짜로 파싱하고 빈 값 또는 파싱 실패는 null 처리,D04-N04
+02_silver,data/01_bronze/04_license/business_licenses.parquet,APPLICATION CREATED DATE,data/02_silver/04_license/business_licenses.parquet,application_created_dtm,date32,달력 날짜로 파싱하고 빈 값 또는 파싱 실패는 null 처리,D04-N04
+02_silver,data/01_bronze/04_license/business_licenses.parquet,source_row_num,data/02_silver/04_license/business_licenses.parquet,source_row_num,int64,Bronze의 원천 레코드 순번 유지,
+02_silver,data/01_bronze/04_license/food_inspections.parquet,Inspection ID,data/02_silver/04_license/food_inspections.parquet,inspection_key,string,양끝 공백 제거 후 양의 정수 형태의 문자열을 보존하고 나머지는 null 처리,D04-N02
+02_silver,data/01_bronze/04_license/food_inspections.parquet,License #,data/02_silver/04_license/food_inspections.parquet,license_number_key,string,형식이 잘못된 값과 빈칸 및 0과 9999999를 null 처리,D04-N05
+02_silver,data/01_bronze/04_license/food_inspections.parquet,Inspection Date,data/02_silver/04_license/food_inspections.parquet,inspection_dtm,date32,달력 날짜로 파싱하고 빈 값 또는 파싱 실패는 null 처리,D04-N04
+02_silver,data/01_bronze/04_license/food_inspections.parquet,Results,data/02_silver/04_license/food_inspections.parquet,result_cd,string,양끝 공백 제거 및 빈 값 null 처리 후 대문자로 변환,D04-N03
+02_silver,data/01_bronze/04_license/food_inspections.parquet,source_row_num,data/02_silver/04_license/food_inspections.parquet,source_row_num,int64,Bronze의 원천 레코드 순번 유지,
+03_gold,data/02_silver/04_license/business_licenses.parquet,license_event_key,data/03_gold/facts/04_license/fact_license_event.parquet,license_event_key,string,인허가 이력 단위에서 값 유지,
+03_gold,data/02_silver/04_license/business_licenses.parquet,license_number_key,data/03_gold/facts/04_license/fact_license_event.parquet,license_number_key,string,인허가 면허번호를 사용하고 결측은 __unknown__ 차원으로 연결,
+03_gold,data/02_silver/04_license/business_licenses.parquet,account_key + site_key,data/03_gold/facts/04_license/fact_license_event.parquet,establishment_key,string,계정번호:사업장 번호 키를 만들고 구성 값이 결측이면 __unknown__ 사용,
+03_gold,data/02_silver/04_license/business_licenses.parquet,issued_dtm,data/03_gold/facts/04_license/fact_license_event.parquet,date_key,string,발급일을 ISO 날짜 문자열 키로 바꾸고 결측은 __unknown__ 사용,
+03_gold,data/02_silver/04_license/business_licenses.parquet,application_cd,data/03_gold/facts/04_license/fact_license_event.parquet,application_cd,string,인허가 이력 단위에서 값 유지,
+03_gold,data/02_silver/04_license/business_licenses.parquet,recorded_status_cd,data/03_gold/facts/04_license/fact_license_event.parquet,recorded_status_cd,string,인허가 이력 단위에서 값 유지,
+03_gold,data/02_silver/04_license/business_licenses.parquet,term_start_dtm,data/03_gold/facts/04_license/fact_license_event.parquet,term_start_dtm,date32,인허가 이력 단위에서 값 유지,
+03_gold,data/02_silver/04_license/business_licenses.parquet,term_end_dtm,data/03_gold/facts/04_license/fact_license_event.parquet,term_end_dtm,date32,인허가 이력 단위에서 값 유지,
+03_gold,data/02_silver/04_license/business_licenses.parquet,status_change_dtm,data/03_gold/facts/04_license/fact_license_event.parquet,status_change_dtm,date32,인허가 이력 단위에서 값 유지,
+03_gold,data/02_silver/04_license/business_licenses.parquet,source_row_num,data/03_gold/facts/04_license/fact_license_event.parquet,source_row_num,int64,인허가 이력 단위에서 값 유지,
+03_gold,data/02_silver/04_license/food_inspections.parquet,inspection_key,data/03_gold/facts/04_license/fact_inspection_license_match.parquet,inspection_key,string,점검 단위에서 값 유지,
+03_gold,data/02_silver/04_license/food_inspections.parquet + data/02_silver/04_license/business_licenses.parquet,food_inspections.license_number_key + business_licenses.license_number_key,data/03_gold/facts/04_license/fact_inspection_license_match.parquet,license_number_key,string,인허가에 등록된 번호는 면허 차원 키로 연결하고 그 외에는 __unknown__ 사용,
+03_gold,data/02_silver/04_license/food_inspections.parquet + data/02_silver/04_license/business_licenses.parquet,food_inspections.license_number_key + food_inspections.inspection_dtm + business_licenses.license_number_key + business_licenses.term_start_dtm + business_licenses.term_end_dtm + business_licenses.account_key + business_licenses.site_key,data/03_gold/facts/04_license/fact_inspection_license_match.parquet,establishment_key,string,유효기간 후보가 한 건이고 계정·사업장 번호가 있으면 조합 키를 사용하고 그 외에는 __unknown__ 사용,
+03_gold,data/02_silver/04_license/food_inspections.parquet,inspection_dtm,data/03_gold/facts/04_license/fact_inspection_license_match.parquet,date_key,string,점검일을 ISO 날짜 문자열 키로 바꾸고 결측은 __unknown__ 사용,
+03_gold,data/02_silver/04_license/food_inspections.parquet,license_number_key,data/03_gold/facts/04_license/fact_inspection_license_match.parquet,source_license_number,string,Silver에서 표준화한 점검 면허번호를 결측과 함께 보존,
+03_gold,data/02_silver/04_license/food_inspections.parquet + data/02_silver/04_license/business_licenses.parquet,food_inspections.license_number_key + food_inspections.inspection_dtm + business_licenses.license_number_key + business_licenses.term_start_dtm + business_licenses.term_end_dtm + business_licenses.license_event_key,data/03_gold/facts/04_license/fact_inspection_license_match.parquet,matched_license_event_id,string,기간 후보가 한 건일 때 인허가 기록 ID를 연결하고 그 외에는 null,
+03_gold,data/02_silver/04_license/food_inspections.parquet + data/02_silver/04_license/business_licenses.parquet,food_inspections.license_number_key + food_inspections.inspection_dtm + business_licenses.license_number_key + business_licenses.term_start_dtm + business_licenses.term_end_dtm,data/03_gold/facts/04_license/fact_inspection_license_match.parquet,match_status_cd,string,면허번호·점검일 결측과 번호 미일치 및 기간 후보 수에 따라 상태 코드를 부여,
+03_gold,data/02_silver/04_license/food_inspections.parquet,result_cd,data/03_gold/facts/04_license/fact_inspection_license_match.parquet,result_cd,string,점검 단위에서 값 유지,
+03_gold,data/02_silver/04_license/food_inspections.parquet + data/02_silver/04_license/business_licenses.parquet,food_inspections.license_number_key + food_inspections.inspection_dtm + business_licenses.license_number_key + business_licenses.term_start_dtm + business_licenses.term_end_dtm,data/03_gold/facts/04_license/fact_inspection_license_match.parquet,candidate_count_num,int64,면허번호가 같고 기록의 시작일과 만료일 사이에 점검일이 있는 후보를 점검별로 집계,
+03_gold,data/02_silver/04_license/food_inspections.parquet,source_row_num,data/03_gold/facts/04_license/fact_inspection_license_match.parquet,source_row_num,int64,점검 단위에서 값 유지,
+03_gold,data/02_silver/04_license/business_licenses.parquet,license_number_key,data/03_gold/dimensions/04_license/dim_license.parquet,license_number_key,string,비결측 면허번호의 고유 값과 __unknown__ 항목 생성,
+03_gold,data/02_silver/04_license/business_licenses.parquet,account_key + site_key,data/03_gold/dimensions/04_license/dim_establishment.parquet,establishment_key,string,비결측 계정번호:사업장 번호 조합의 고유 키와 __unknown__ 항목 생성,
+03_gold,data/02_silver/04_license/business_licenses.parquet,account_key,data/03_gold/dimensions/04_license/dim_establishment.parquet,account_key,string,조합 키의 계정번호를 보존하고 __unknown__ 항목은 null,
+03_gold,data/02_silver/04_license/business_licenses.parquet,site_key,data/03_gold/dimensions/04_license/dim_establishment.parquet,site_key,string,조합 키의 사업장 번호를 보존하고 __unknown__ 항목은 null,
+03_gold,data/02_silver/04_license/food_inspections.parquet + data/02_silver/04_license/business_licenses.parquet,food_inspections.inspection_dtm + business_licenses.issued_dtm,data/03_gold/dimensions/04_license/dim_date.parquet,date_key,string,고유 점검일·발급일을 ISO 날짜 문자열 키로 만들고 __unknown__ 항목 추가,
+03_gold,data/02_silver/04_license/food_inspections.parquet + data/02_silver/04_license/business_licenses.parquet,food_inspections.inspection_dtm + business_licenses.issued_dtm,data/03_gold/dimensions/04_license/dim_date.parquet,calendar_dtm,date32,고유 점검일·발급일을 날짜 타입으로 보존하고 __unknown__ 항목은 null,

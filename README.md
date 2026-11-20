@@ -18,4 +18,4 @@
 
 ## 로컬 설정
 
-팀이 공유한 원천 데이터와 컬럼 JSON을 `origin/`에 두고, `.env.example`을 `.env`로 복사합니다. 원천과 공유용 압축본은 Git에서 제외됩니다. [원천 설정 예시](config/sources.example.yaml) · [공용 작업 규칙](AGENTS.md)
+팀이 공유한 원천 데이터와 컬럼 JSON을 `data/00_origin/`에 둡니다. 산출물은 `data/01_bronze/`, `data/02_silver/`, `data/03_gold/`에 저장합니다. 다른 위치의 원천을 사용할 때는 `.env.example`을 `.env`로 복사해 경로를 지정합니다. 원천과 공유용 압축본은 Git에서 제외됩니다. [원천 설정 예시](config/sources.example.yaml) · [공용 작업 규칙](AGENTS.md)

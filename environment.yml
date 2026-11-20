@@ -1,0 +1,10 @@
+name: pro_2
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python=3.14
+  - pip
+  - pip:
+      - -r src/domains/04_license/requirements.txt
+      - pytest==9.0.2

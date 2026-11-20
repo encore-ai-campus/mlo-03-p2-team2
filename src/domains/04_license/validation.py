@@ -7,10 +7,11 @@ from io import StringIO
 import pyarrow.compute as pc
 import pyarrow.parquet as pq
 
+from bronze_manifest import MANIFEST, artifact_identity, check_entry, read_manifest
 from config import TABLES
 from modeling import EVENT, MATCH, SCHEMAS, UNKNOWN, gold_path
 from normalization import load_dictionary, normalize_batch, silver_schema
-from pipeline_io import ROW, bronze_batches, parquet_batches, staging
+from pipeline_io import ROW, bronze_batches, parquet_batches, sha256, staging
 from quality import compare, render_reports
 
 
@@ -35,15 +36,32 @@ def equal_batches(expected, actual):
 
 def bronze_checks(config):
     checks = []
+    manifest = config.table("bronze", TABLES[0]).with_name(MANIFEST)
+    try:
+        _, entries = read_manifest(manifest, TABLES)
+        checks.append(Check("bronze", "ingestion manifest structure", 0))
+    except (OSError, ValueError) as error:
+        entries = {}
+        checks.append(Check("bronze", "ingestion manifest structure", 1, str(error)))
+
     for name in TABLES:
         target = config.table("bronze", name)
-        batches = bronze_batches(config.sources[name])
+        source = config.sources[name]
+        batches = bronze_batches(source)
         expected = next(batches)
         with pq.ParquetFile(target) as artifact:
             checks.append(Check(name, "schema", int(not artifact.schema_arrow.equals(expected))))
             matches = equal_batches(batches, artifact.iter_batches())
+            row_count = artifact.metadata.num_rows
             checks.append(Check(name, "source values, order and row count", int(not matches),
-                                f"Bronze rows: {artifact.metadata.num_rows}"))
+                                f"Bronze rows: {row_count}"))
+        if name in entries:
+            identity = artifact_identity(name, source, sha256(source.path), target, row_count)
+            try:
+                check_entry(entries[name], identity)
+                checks.append(Check(name, "ingestion manifest file hashes, row count and UTC timestamps", 0))
+            except ValueError as error:
+                checks.append(Check(name, "ingestion manifest file hashes, row count and UTC timestamps", 1, str(error)))
     return checks
 
 
@@ -93,7 +111,7 @@ def membership_violations(values, permitted):
 
 
 def gold_checks(config, root=None):
-    root = root or config.data / "gold"
+    root = root or config.stage_dir("gold")
     tables = {}
     checks = []
     for name, schema in SCHEMAS.items():

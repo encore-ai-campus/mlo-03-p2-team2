@@ -3,7 +3,6 @@
 import argparse
 import os
 from dataclasses import dataclass
-from itertools import combinations
 from pathlib import Path
 
 import yaml
@@ -12,6 +11,7 @@ import yaml
 PROJECT = Path(__file__).resolve().parents[3]
 DOMAIN = "04_license"
 TABLES = ("business_licenses", "food_inspections")
+STAGE_DIRS = {"bronze": "01_bronze", "silver": "02_silver", "gold": "03_gold"}
 
 
 @dataclass(frozen=True)
@@ -30,11 +30,14 @@ class Config:
     data: Path
     reports: Path
 
+    def stage_dir(self, stage):
+        return self.data / STAGE_DIRS[stage]
+
     def table(self, stage, name):
-        return self.data / stage / DOMAIN / f"{name}.parquet"
+        return self.stage_dir(stage) / DOMAIN / f"{name}.parquet"
 
     def gold(self, group, name):
-        return self.data / "gold" / group / DOMAIN / f"{name}.parquet"
+        return self.stage_dir("gold") / group / DOMAIN / f"{name}.parquet"
 
 
 def dotenv_value(name):
@@ -51,6 +54,10 @@ def project_path(value):
     return (PROJECT / value).resolve()
 
 
+def directories_overlap(first, second):
+    return first.is_relative_to(second) or second.is_relative_to(first)
+
+
 def settings(args):
     local_sources = PROJECT / "config" / "sources.local.yaml"
     default = local_sources if local_sources.is_file() else PROJECT / "config" / "sources.example.yaml"
@@ -60,11 +67,12 @@ def settings(args):
     if args.raw_dir:
         raw = args.raw_dir.resolve()
     else:
-        raw = project_path(os.environ.get(env_key) or dotenv_value(env_key) or "origin")
+        raw = project_path(os.environ.get(env_key) or dotenv_value(env_key) or "data/00_origin")
     data, reports = args.data_dir.resolve(), args.report_dir.resolve()
-    folders = raw, data, reports
-    if any(a.is_relative_to(b) or b.is_relative_to(a) for a, b in combinations(folders, 2)):
-        raise ValueError("Raw, data and report directories must be separate.")
+    stages = [(data / dirname).resolve() for dirname in STAGE_DIRS.values()]
+    if (directories_overlap(data, reports)
+            or any(directories_overlap(raw, output) for output in [*stages, reports])):
+        raise ValueError("Raw, stage output and report directories must not overlap.")
     sources = {}
     for name in TABLES:
         spec = doc["sources"][name]
