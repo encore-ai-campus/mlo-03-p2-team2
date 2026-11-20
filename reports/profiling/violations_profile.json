@@ -1,0 +1,154 @@
+{
+  "profiled_at_utc": "2026-11-20T06:21:08+00:00",
+  "dataset": "food_inspections",
+  "field": "Violations",
+  "source": {
+    "origin_file": "data/00_origin/food_inspections/food_inspections.csv",
+    "origin_file_bytes": 356934166,
+    "origin_sha256": "b43beb7fae834a8698ca162004caf2929cb2eca7ff75c27b4db6bf07aa103c98",
+    "bronze_file": "data/01_bronze/food_inspections/food_inspections.parquet",
+    "bronze_file_bytes": 65041899,
+    "bronze_sha256": "8bce236e42751111b74742fbe55081ee0d800e1da48fe7c12b8d3604c8f6d682",
+    "bronze_rows": 318627,
+    "bronze_columns": 19,
+    "bronze_field_type": "string"
+  },
+  "method": {
+    "batch_size": 10000,
+    "fragment_separator_regex": "\\s+\\|\\s+",
+    "code_header_regex": "^(?P<code>\\d+[A-Z]?)\\.\\s+(?P<body>.+)$",
+    "description_comments_regex": "^(?P<code>\\d+[A-Z]?)\\.\\s+(?P<description>.*?)(?:\\s+-\\s+Comments:|\\s+Comments:)(?P<comments>.*)$",
+    "fully_parseable_definition": "code header + nonempty description + Comments marker"
+  },
+  "counts": {
+    "candidate_fragments": 1031073,
+    "canonical_description_comments_pattern": 1029281,
+    "code_header_failures": 0,
+    "code_header_matches": 1031073,
+    "comments_marker_fragments": 1029281,
+    "empty_descriptions": 0,
+    "empty_string_rows": 90022,
+    "fully_parseable_fragments": 1029281,
+    "literal_pipe_characters": 802468,
+    "missing_comments_marker_fragments": 1792,
+    "nonempty_comments": 1029281,
+    "nonempty_descriptions": 1031073,
+    "nonempty_rows": 228605,
+    "null_rows": 0,
+    "recognized_pipe_separators": 802468,
+    "rows_with_all_fragments_parseable": 227423,
+    "rows_with_literal_pipe": 197317,
+    "rows_with_multiple_fragments": 197317,
+    "rows_with_no_fully_parseable_fragments": 184,
+    "rows_with_some_fragments_unparseable": 998,
+    "rows_with_unrecognized_pipe_separator": 0,
+    "standard_description_comments_pattern_matches": 1029281,
+    "total_rows": 318627,
+    "whitespace_only_rows": 0
+  },
+  "code_pattern": {
+    "distinct_codes": 65,
+    "top_20_codes_by_fragment_count": [
+      {
+        "code": "55",
+        "fragments": 86459
+      },
+      {
+        "code": "38",
+        "fragments": 78215
+      },
+      {
+        "code": "34",
+        "fragments": 71800
+      },
+      {
+        "code": "33",
+        "fragments": 67670
+      },
+      {
+        "code": "35",
+        "fragments": 65993
+      },
+      {
+        "code": "32",
+        "fragments": 55393
+      },
+      {
+        "code": "41",
+        "fragments": 40567
+      },
+      {
+        "code": "47",
+        "fragments": 39844
+      },
+      {
+        "code": "36",
+        "fragments": 35980
+      },
+      {
+        "code": "49",
+        "fragments": 31396
+      },
+      {
+        "code": "10",
+        "fragments": 29803
+      },
+      {
+        "code": "51",
+        "fragments": 28868
+      },
+      {
+        "code": "3",
+        "fragments": 27658
+      },
+      {
+        "code": "56",
+        "fragments": 25112
+      },
+      {
+        "code": "37",
+        "fragments": 20963
+      },
+      {
+        "code": "58",
+        "fragments": 20574
+      },
+      {
+        "code": "40",
+        "fragments": 20523
+      },
+      {
+        "code": "5",
+        "fragments": 19478
+      },
+      {
+        "code": "53",
+        "fragments": 17530
+      },
+      {
+        "code": "2",
+        "fragments": 17382
+      }
+    ]
+  },
+  "examples": {
+    "nonempty_original_values": [
+      "3. MANAGEMENT, FOOD EMPLOYEE AND CONDITIONAL EMPLOYEE; KNOWLEDGE, RESPONSIBILITIES AND REPORTING - Comments: OBSERVED NO EMPLOYEE HEALTH POLICY ON SITE. INSTRUCTED TO PROVIDE AN EMPLOYEE HEALTH POLICY THAT INCLUDES A SIGNED ACKNOWLEDGEMENT OF FROM EACH EMPLOYEE. PRIORITY FOUNDATION VIOLATION 7-38-010. NO CITATION ISSUED. | 38. INSECTS, RODENTS, & ANIMALS NOT PRESENT - Comments: OUTER OPENINGS NOT PROTECTED. OBSERVED 1/4\" GAP AT THE BOTTOM OF MIDDLE OF THE FRONT ENTRANCE DOOR. MUST MAKE DOOR TIGH…",
+      "49. NON-FOOD/FOOD CONTACT SURFACES CLEAN - Comments: OBSERVED DEBRIS INSIDE CABINETS IN KITCHEN, ON SHELVING UNITS IN STAFF WASHROOM AND DRY FOOD STORAGE AREA. INSTRUCTED MANAGER TO CLEAN AND MAINTAIN. | 55. PHYSICAL FACILITIES INSTALLED, MAINTAINED & CLEAN - Comments: OBSERVED EXCESSIVE CLUTTER IN STORAGE CLOSETS. INSTRUCTED MANAGER TO REMOVE ALL UNUSED ITEMS TO PREVENT PEST HARBORAGE. | 55. PHYSICAL FACILITIES INSTALLED, MAINTAINED & CLEAN - Comments: OBSERVED DEBRIS ON FLOOR ALONG WALLS AND C…",
+      "50. HOT & COLD WATER AVAILABLE; ADEQUATE PRESSURE - Comments: OBSERVED NO RUNNING HOT WATER THROUGHOUT PREMISES, WATER TEMPERATURE BETWEEN 73.6 F AND 83.6 F AT ALL SINKS THROUGHOUT. INSTRUCTED MANAGER MUST PROVIDE RUNNING HOT WATER AT A MINIMAL 110.0 F AT 3-COMPARTMENT SINK AND MINIMAL 100.0 F AT ALL OTHER SINKS. PRIORITY VIOLATION 7-38-030(C). | 55. PHYSICAL FACILITIES INSTALLED, MAINTAINED & CLEAN - Comments: OBSERVED FOOD DEBRIS/DUST BUILD UP ON WALLS AT DISHWASH AREA. MUST CLEAN WALLS AND MA…",
+      "38. INSECTS, RODENTS, & ANIMALS NOT PRESENT - Comments: OBSERVED OVER 30 MICE DROPPINGS SCATTERED ON FLOOR, SHELVES AND CUBBIES IN PREP, STORAGE, CLASSROOM AND OFFICE AREAS. INSTRUCTED MANAGER TO CALL AN EXTERMINATOR FOR SERVICE, CLEAN AND SANITIZE ALL AREAS. PRIORITY FOUNDATION 7-38-020(A) CITATION ISSUED | 44. UTENSILS, EQUIPMENT & LINENS: PROPERLY STORED, DRIED, & HANDLED - Comments: OBSERVED MULTI-USE UTENSILS NOT INVERTED IN KITCHEN. INSTRUCTED MANAGER TO INVERT ALL UTENSILS TO PROTECT FROM…",
+      "47. FOOD & NON-FOOD CONTACT SURFACES CLEANABLE, PROPERLY DESIGNED, CONSTRUCTED & USED - Comments: OBSERVED CARDBOARD ON SHELVING IN REAR STORAGE AREA. INSTRUCTED PERSON IN CHARGE TO REMOVE AND MAINTAIN ALL SHELVING SMOOTH AND EASILY CLEANABLE. | 56. ADEQUATE VENTILATION & LIGHTING; DESIGNATED AREAS USED - Comments: OBSERVED CEILING VENTS WITH DUST BUILD UP IN REAR STORAGE AREA CEILINGS. INSTRUCTED PERSON IN CHARGE TO CLEAN AND MAINTAIN."
+    ],
+    "exceptions": {
+      "missing_comments_marker": [
+        "1. PERSON IN CHARGE PRESENT, DEMONSTRATES KNOWLEDGE, AND PERFORMS DUTIES",
+        "1. PERSON IN CHARGE PRESENT, DEMONSTRATES KNOWLEDGE, AND PERFORMS DUTIES",
+        "47. FOOD & NON-FOOD CONTACT SURFACES CLEANABLE, PROPERLY DESIGNED, CONSTRUCTED & USED",
+        "54. GARBAGE & REFUSE PROPERLY DISPOSED; FACILITIES MAINTAINED",
+        "58. ALLERGEN TRAINING AS REQUIRED"
+      ],
+      "no_code_header": [],
+      "unrecognized_pipe_separator": []
+    }
+  }
+}

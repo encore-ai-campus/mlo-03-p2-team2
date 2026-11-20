@@ -1,0 +1,66 @@
+﻿source_dataset,source_column,team_standard_column,team_silver_type,current_silver_recommendation,mapping_status,review_note
+food_inspections,Inspection ID,inspection_key,string,string (키),검토 필요,팀 인벤토리 제안; Silver 미구현
+food_inspections,DBA Name,dba_name,string,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+food_inspections,AKA Name,aka_name,string,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+food_inspections,License #,license_number_key,string,string (키),검토 필요,팀 인벤토리 제안; Silver 미구현
+food_inspections,Facility Type,facility_type,string,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+food_inspections,Risk,risk_level_cd,string,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+food_inspections,Address,address,string,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+food_inspections,City,city,string,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+food_inspections,State,state_cd,string,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+food_inspections,Zip,zip_code,string,string,검토 필요,팀 인벤토리 제안; Silver 미구현
+food_inspections,Inspection Date,inspection_dtm,date32,date (예외 검증 후),검토 필요,팀 인벤토리 제안; Silver 미구현
+food_inspections,Inspection Type,inspection_type,string,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+food_inspections,Results,result_cd,string,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+food_inspections,Violations,violations_text,string,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+food_inspections,Latitude,latitude,float64,decimal (원본값 병행 보존),검토 필요,팀 인벤토리 제안; Silver 미구현
+food_inspections,Longitude,longitude,float64,decimal (원본값 병행 보존),검토 필요,팀 인벤토리 제안; Silver 미구현
+food_inspections,Location,location_text,string,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,ID,source_record_id,string,string (키),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,LICENSE ID,license_event_key,string,string (키),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,ACCOUNT NUMBER,account_key,string,string (키),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,SITE NUMBER,site_key,string,string (키),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,LEGAL NAME,legal_name,string,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,DOING BUSINESS AS NAME,dba_name,string,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,ADDRESS,address,string,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,CITY,city,string,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,STATE,state_cd,string,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,ZIP CODE,zip_code,string,string,검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,WARD,ward_num,int64,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,PRECINCT,precinct_num,int64,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,WARD PRECINCT,ward_precinct_key,string,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,POLICE DISTRICT,police_district_num,int64,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,COMMUNITY AREA,community_area_num,int64,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,COMMUNITY AREA NAME,community_area_name,string,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,NEIGHBORHOOD,neighborhood_name,string,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,LICENSE CODE,license_type_key,string,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,LICENSE DESCRIPTION,license_type_description,string,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,BUSINESS ACTIVITY ID,business_activity_ids_text,string,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,BUSINESS ACTIVITY,business_activity_text,string,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,LICENSE NUMBER,license_number_key,string,string (키),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,APPLICATION TYPE,application_cd,string,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,APPLICATION CREATED DATE,application_created_dtm,date32,date (예외 검증 후),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,APPLICATION REQUIREMENTS COMPLETE,application_requirements_complete_dtm,date32,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,PAYMENT DATE,payment_dtm,date32,date (예외 검증 후),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,CONDITIONAL APPROVAL,conditional_approval_cd,string,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,LICENSE TERM START DATE,term_start_dtm,date32,date (예외 검증 후),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,LICENSE TERM EXPIRATION DATE,term_end_dtm,date32,date (예외 검증 후),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,LICENSE APPROVED FOR ISSUANCE,approved_for_issuance_dtm,date32,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,DATE ISSUED,issued_dtm,date32,date (예외 검증 후),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,LICENSE STATUS,recorded_status_cd,string,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,LICENSE STATUS CHANGE DATE,status_change_dtm,date32,date (예외 검증 후),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,SSA,ssa_cd,string,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,LATITUDE,latitude,float64,decimal (원본값 병행 보존),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,LONGITUDE,longitude,float64,decimal (원본값 병행 보존),검토 필요,팀 인벤토리 제안; Silver 미구현
+business_licenses,LOCATION,location_text,string,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+community_areas,type,feature_type,string,string (검토 필요),검토 필요,인벤토리에 표준 컬럼명 없음; feature_type은 로컬 제안
+community_areas,geometry,geometry,GeoJSON object,geometry/GeoJSON (검토 필요),검토 필요,geometry 이름은 팀 제안; 저장 타입·GeoParquet 여부 미정
+community_areas,:id,source_feature_id,string,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+community_areas,:version,source_version_id,string,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+community_areas,:created_at,source_created_at,"timestamp[ms, UTC]",string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+community_areas,:updated_at,source_updated_at,"timestamp[ms, UTC]",date (예외 검증 후),검토 필요,팀 인벤토리 제안; Silver 미구현
+community_areas,area_numbe,community_area_num,int64,string (키),검토 필요,팀 인벤토리 제안; Silver 미구현
+community_areas,community,community_area_name,string,string (검토 필요),검토 필요,팀 인벤토리 제안; Silver 미구현
+community_areas,area_num_1,community_area_code_raw,string,string (키),검토 필요,팀 인벤토리 제안; Silver 미구현
+community_areas,shape_area,shape_area_num,float64,decimal (원본값 병행 보존),검토 필요,팀 인벤토리 제안; Silver 미구현
+community_areas,shape_len,shape_length_num,float64,decimal (원본값 병행 보존),검토 필요,팀 인벤토리 제안; Silver 미구현

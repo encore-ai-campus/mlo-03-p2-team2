@@ -1,0 +1,2404 @@
+{
+  "run_id": "79e8b4280ab443eb9d73f6774dfff5f5",
+  "executed_at_utc": "2026-11-19T11:11:15Z",
+  "null_policy": {
+    "empty": "CSV field exactly '' or JSON null",
+    "whitespace": "nonempty text for which str.strip() == ''",
+    "null_token": "trimmed, case-insensitive NULL/N/A/NA/NONE; counted separately, not automatically missing",
+    "missing_rate": "(empty + whitespace) / rows; NULL-like tokens excluded"
+  },
+  "sources": {
+    "food_inspections": {
+      "source_file": "food_inspections/food_inspections.csv",
+      "format": "CSV",
+      "encoding": "UTF-8 (optional BOM)",
+      "delimiter": ",",
+      "rows": 318552,
+      "columns": [
+        "Inspection ID",
+        "DBA Name",
+        "AKA Name",
+        "License #",
+        "Facility Type",
+        "Risk",
+        "Address",
+        "City",
+        "State",
+        "Zip",
+        "Inspection Date",
+        "Inspection Type",
+        "Results",
+        "Violations",
+        "Latitude",
+        "Longitude",
+        "Location"
+      ],
+      "column_stats": {
+        "Inspection ID": {
+          "empty": 0,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 318552,
+          "numeric_decimal": 0,
+          "other_text": 0,
+          "sample": "2646852",
+          "top_sample": [
+            [
+              "2646852",
+              1
+            ],
+            [
+              "2646818",
+              1
+            ],
+            [
+              "2646794",
+              1
+            ],
+            [
+              "2646826",
+              1
+            ],
+            [
+              "2646800",
+              1
+            ]
+          ],
+          "unique_values": 318552,
+          "missing_rate_percent": 0.0
+        },
+        "DBA Name": {
+          "empty": 0,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 23,
+          "numeric_decimal": 0,
+          "other_text": 318529,
+          "sample": "FLASH HERNANDEZ TACOS",
+          "top_sample": [
+            [
+              "SUBWAY",
+              507
+            ],
+            [
+              "DUNKIN DONUTS",
+              241
+            ],
+            [
+              "JIMMY JOHNS",
+              106
+            ],
+            [
+              "MCDONALD'S",
+              97
+            ],
+            [
+              "TACO BELL",
+              81
+            ]
+          ],
+          "unique_values": 35308,
+          "missing_rate_percent": 0.0
+        },
+        "AKA Name": {
+          "empty": 2425,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 45,
+          "numeric_decimal": 0,
+          "other_text": 316082,
+          "sample": "FLASH HERNANDEZ TACOS",
+          "top_sample": [
+            [
+              "SUBWAY",
+              609
+            ],
+            [
+              "DUNKIN DONUTS",
+              229
+            ],
+            [
+              "MCDONALD'S",
+              118
+            ],
+            [
+              "7-ELEVEN",
+              111
+            ],
+            [
+              "WENDY'S",
+              109
+            ]
+          ],
+          "unique_values": 33598,
+          "missing_rate_percent": 0.7613
+        },
+        "License #": {
+          "empty": 19,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 318533,
+          "numeric_decimal": 0,
+          "other_text": 0,
+          "sample": "2817892",
+          "top_sample": [
+            [
+              "0",
+              139
+            ],
+            [
+              "2840813",
+              23
+            ],
+            [
+              "2307748",
+              22
+            ],
+            [
+              "2511352",
+              20
+            ],
+            [
+              "2913098",
+              19
+            ]
+          ],
+          "unique_values": 49379,
+          "missing_rate_percent": 0.006
+        },
+        "Facility Type": {
+          "empty": 5358,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 15,
+          "numeric_decimal": 0,
+          "other_text": 313179,
+          "sample": "Mobile Food Preparer",
+          "top_sample": [
+            [
+              "Restaurant",
+              35657
+            ],
+            [
+              "Grocery Store",
+              4688
+            ],
+            [
+              "School",
+              2874
+            ],
+            [
+              "Children's Services Facility",
+              1799
+            ],
+            [
+              "Bakery",
+              716
+            ]
+          ],
+          "unique_values": 528,
+          "missing_rate_percent": 1.682
+        },
+        "Risk": {
+          "empty": 88,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 318464,
+          "sample": "Risk 2 (Medium)",
+          "top_sample": [
+            [
+              "Risk 1 (High)",
+              40131
+            ],
+            [
+              "Risk 2 (Medium)",
+              7212
+            ],
+            [
+              "Risk 3 (Low)",
+              2600
+            ],
+            [
+              "All",
+              44
+            ]
+          ],
+          "unique_values": 5,
+          "missing_rate_percent": 0.0276
+        },
+        "Address": {
+          "empty": 0,
+          "whitespace": 3,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 318549,
+          "sample": "2300 S THROOP ST",
+          "top_sample": [
+            [
+              "11601 W TOUHY AVE",
+              558
+            ],
+            [
+              "2300 S THROOP ST",
+              191
+            ],
+            [
+              "11601 W TOUHY AVE ",
+              164
+            ],
+            [
+              "5700 S CICERO AVE",
+              103
+            ],
+            [
+              "135 N KEDZIE AVE",
+              91
+            ]
+          ],
+          "unique_values": 33352,
+          "missing_rate_percent": 0.0009
+        },
+        "City": {
+          "empty": 184,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 318368,
+          "sample": "CHICAGO",
+          "top_sample": [
+            [
+              "CHICAGO",
+              49734
+            ],
+            [
+              "Chicago",
+              106
+            ],
+            [
+              "chicago",
+              31
+            ],
+            [
+              "EVANSTON",
+              10
+            ],
+            [
+              "CCHICAGO",
+              7
+            ]
+          ],
+          "unique_values": 97,
+          "missing_rate_percent": 0.0578
+        },
+        "State": {
+          "empty": 76,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 318476,
+          "sample": "IL",
+          "top_sample": [
+            [
+              "IL",
+              49959
+            ],
+            [
+              "IN",
+              6
+            ],
+            [
+              "CA",
+              4
+            ],
+            [
+              "WI",
+              2
+            ],
+            [
+              "DC",
+              1
+            ]
+          ],
+          "unique_values": 8,
+          "missing_rate_percent": 0.0239
+        },
+        "Zip": {
+          "empty": 42,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 318510,
+          "numeric_decimal": 0,
+          "other_text": 0,
+          "sample": "60608",
+          "top_sample": [
+            [
+              "60614",
+              1944
+            ],
+            [
+              "60647",
+              1878
+            ],
+            [
+              "60657",
+              1702
+            ],
+            [
+              "60622",
+              1627
+            ],
+            [
+              "60608",
+              1624
+            ]
+          ],
+          "unique_values": 142,
+          "missing_rate_percent": 0.0132
+        },
+        "Inspection Date": {
+          "empty": 0,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 318552,
+          "sample": "11/17/2026",
+          "top_sample": [
+            [
+              "10/08/2024",
+              125
+            ],
+            [
+              "10/01/2024",
+              123
+            ],
+            [
+              "04/29/2025",
+              121
+            ],
+            [
+              "11/05/2025",
+              118
+            ],
+            [
+              "03/12/2025",
+              118
+            ]
+          ],
+          "unique_values": 4250,
+          "missing_rate_percent": 0.0
+        },
+        "Inspection Type": {
+          "empty": 1,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 318551,
+          "sample": "License",
+          "top_sample": [
+            [
+              "Canvass",
+              24590
+            ],
+            [
+              "License",
+              6935
+            ],
+            [
+              "Canvass Re-Inspection",
+              5909
+            ],
+            [
+              "Complaint",
+              4858
+            ],
+            [
+              "Non-Inspection",
+              2975
+            ]
+          ],
+          "unique_values": 111,
+          "missing_rate_percent": 0.0003
+        },
+        "Results": {
+          "empty": 0,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 318552,
+          "sample": "Pass",
+          "top_sample": [
+            [
+              "Pass",
+              26679
+            ],
+            [
+              "Fail",
+              8843
+            ],
+            [
+              "Pass w/ Conditions",
+              6250
+            ],
+            [
+              "No Entry",
+              3600
+            ],
+            [
+              "Out of Business",
+              3362
+            ]
+          ],
+          "unique_values": 7,
+          "missing_rate_percent": 0.0
+        },
+        "Violations": {
+          "empty": 90000,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 228552,
+          "sample": "16. FOOD-CONTACT SURFACES: CLEANED & SANITIZED - Comments: OBSERVED BLACK AND ORANGE MOLDLIKE SUBSTANCE ON UPPER INTERIO",
+          "top_sample": [
+            [
+              "55. PHYSICAL FACILITIES INSTALLED, MAINTAINED & CLEAN",
+              2
+            ],
+            [
+              "56. ADEQUATE VENTILATION & LIGHTING; DESIGNATED AREAS USED",
+              1
+            ],
+            [
+              "50. HOT & COLD WATER AVAILABLE; ADEQUATE PRESSURE",
+              1
+            ],
+            [
+              "12. FOOD RECEIVED AT PROPER TEMPERATURE",
+              1
+            ],
+            [
+              "45. SINGLE-USE/SINGLE-SERVICE ARTICLES: PROPERLY STORED & USED",
+              1
+            ]
+          ],
+          "unique_values": 226798,
+          "missing_rate_percent": 28.2528
+        },
+        "Latitude": {
+          "empty": 1064,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 317488,
+          "other_text": 0,
+          "sample": "41.85045102427",
+          "top_sample": [
+            [
+              "42.008750766",
+              726
+            ],
+            [
+              "41.85045102427",
+              266
+            ],
+            [
+              "41.78932932327",
+              139
+            ],
+            [
+              "41.88390509705",
+              128
+            ],
+            [
+              "41.89209413686",
+              93
+            ]
+          ],
+          "unique_values": 18993,
+          "missing_rate_percent": 0.334
+        },
+        "Longitude": {
+          "empty": 1064,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 317488,
+          "other_text": 0,
+          "sample": "-87.65879785568",
+          "top_sample": [
+            [
+              "-87.906874134",
+              726
+            ],
+            [
+              "-87.65879785568",
+              266
+            ],
+            [
+              "-87.7416456442",
+              139
+            ],
+            [
+              "-87.70605925084",
+              128
+            ],
+            [
+              "-87.61156988395",
+              93
+            ]
+          ],
+          "unique_values": 18993,
+          "missing_rate_percent": 0.334
+        },
+        "Location": {
+          "empty": 1064,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 317488,
+          "sample": "(41.85045102427, -87.65879785567869)",
+          "top_sample": [
+            [
+              "(42.00875076599798, -87.90687413400109)",
+              726
+            ],
+            [
+              "(41.85045102427, -87.65879785567869)",
+              266
+            ],
+            [
+              "(41.789329323265385, -87.74164564419637)",
+              139
+            ],
+            [
+              "(41.88390509704504, -87.70605925083947)",
+              128
+            ],
+            [
+              "(41.892094136861786, -87.61156988394656)",
+              93
+            ]
+          ],
+          "unique_values": 18993,
+          "missing_rate_percent": 0.334
+        }
+      },
+      "key_duplicate_rows": {
+        "License #": 269173
+      },
+      "key_duplicate_rate_percent": {
+        "Inspection ID": 0.0,
+        "License #": 84.4989
+      },
+      "full_row_duplicates_hash16": 0,
+      "dates": {
+        "Inspection Date": {
+          "invalid_calendar": 0,
+          "outside_1900_2100": 0,
+          "min": "2010-01-04",
+          "max": "2026-11-17",
+          "examples": []
+        }
+      },
+      "zip_non_us_pattern_count": 0,
+      "zip_non_us_pattern_examples": [],
+      "violations": {
+        "empty": 90000,
+        "nonempty": 228552,
+        "candidate_items": 1030806,
+        "multi_item_rows": 197271,
+        "rows_without_comments_marker": 184,
+        "rows_with_unspaced_pipe": 0,
+        "nonstandard_header_examples": []
+      },
+      "business_name_case_variants": [
+        [
+          "TROPICAL SMOOTHIE CAFE",
+          "Tropical Smoothie Cafe"
+        ],
+        [
+          "ROTI",
+          "Roti"
+        ],
+        [
+          "SEE THRU CHINESE KITCHEN",
+          "See Thru Chinese Kitchen"
+        ],
+        [
+          "PAZZA PIZZA",
+          "Pazza Pizza"
+        ],
+        [
+          "SUBWAY",
+          "Subway"
+        ],
+        [
+          "EL PUEBLITO MEXICAN GRILL",
+          "El Pueblito Mexican Grill"
+        ],
+        [
+          "JIMMY JOHN'S",
+          "Jimmy John's"
+        ],
+        [
+          "CLEO'S SOUTHERN CUISINE",
+          "Cleo's Southern Cuisine"
+        ],
+        [
+          "WINGSTOP",
+          "WingStop",
+          "Wingstop"
+        ],
+        [
+          "WHOLE FOODS MARKET",
+          "Whole Foods Market"
+        ]
+      ],
+      "city_spelling_examples": {
+        "CHICAGO": 317229,
+        "Chicago": 544,
+        "chicago": 175,
+        "CCHICAGO": 62
+      }
+    },
+    "business_licenses": {
+      "source_file": "business_licenses/business_licenses.csv",
+      "format": "CSV",
+      "encoding": "UTF-8 (optional BOM)",
+      "delimiter": ",",
+      "rows": 1212132,
+      "columns": [
+        "ID",
+        "LICENSE ID",
+        "ACCOUNT NUMBER",
+        "SITE NUMBER",
+        "LEGAL NAME",
+        "DOING BUSINESS AS NAME",
+        "ADDRESS",
+        "CITY",
+        "STATE",
+        "ZIP CODE",
+        "WARD",
+        "PRECINCT",
+        "WARD PRECINCT",
+        "POLICE DISTRICT",
+        "COMMUNITY AREA",
+        "COMMUNITY AREA NAME",
+        "NEIGHBORHOOD",
+        "LICENSE CODE",
+        "LICENSE DESCRIPTION",
+        "BUSINESS ACTIVITY ID",
+        "BUSINESS ACTIVITY",
+        "LICENSE NUMBER",
+        "APPLICATION TYPE",
+        "APPLICATION CREATED DATE",
+        "APPLICATION REQUIREMENTS COMPLETE",
+        "PAYMENT DATE",
+        "CONDITIONAL APPROVAL",
+        "LICENSE TERM START DATE",
+        "LICENSE TERM EXPIRATION DATE",
+        "LICENSE APPROVED FOR ISSUANCE",
+        "DATE ISSUED",
+        "LICENSE STATUS",
+        "LICENSE STATUS CHANGE DATE",
+        "SSA",
+        "LATITUDE",
+        "LONGITUDE",
+        "LOCATION"
+      ],
+      "column_stats": {
+        "ID": {
+          "empty": 0,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 1,
+          "numeric_decimal": 0,
+          "other_text": 1212131,
+          "sample": "1697585-20270116",
+          "top_sample": [
+            [
+              "2835961-20260416",
+              2
+            ],
+            [
+              "3010918-20250616",
+              2
+            ],
+            [
+              "3025623-20250509",
+              2
+            ],
+            [
+              "1697585-20270116",
+              1
+            ],
+            [
+              "3006730-20270116",
+              1
+            ]
+          ],
+          "unique_values": 1211880,
+          "missing_rate_percent": 0.0
+        },
+        "LICENSE ID": {
+          "empty": 0,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 1212132,
+          "numeric_decimal": 0,
+          "other_text": 0,
+          "sample": "3111539",
+          "top_sample": [
+            [
+              "3111539",
+              1
+            ],
+            [
+              "3112954",
+              1
+            ],
+            [
+              "3112171",
+              1
+            ],
+            [
+              "3112269",
+              1
+            ],
+            [
+              "3105881",
+              1
+            ]
+          ],
+          "unique_values": 1212132,
+          "missing_rate_percent": 0.0
+        },
+        "ACCOUNT NUMBER": {
+          "empty": 0,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 1212132,
+          "numeric_decimal": 0,
+          "other_text": 0,
+          "sample": "304027",
+          "top_sample": [
+            [
+              "147",
+              223
+            ],
+            [
+              "7551",
+              177
+            ],
+            [
+              "68120",
+              114
+            ],
+            [
+              "324325",
+              109
+            ],
+            [
+              "8970",
+              106
+            ]
+          ],
+          "unique_values": 197767,
+          "missing_rate_percent": 0.0
+        },
+        "SITE NUMBER": {
+          "empty": 0,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 1212132,
+          "numeric_decimal": 0,
+          "other_text": 0,
+          "sample": "1",
+          "top_sample": [
+            [
+              "1",
+              31394
+            ],
+            [
+              "2",
+              6969
+            ],
+            [
+              "3",
+              2979
+            ],
+            [
+              "4",
+              1541
+            ],
+            [
+              "5",
+              883
+            ]
+          ],
+          "unique_values": 544,
+          "missing_rate_percent": 0.0
+        },
+        "LEGAL NAME": {
+          "empty": 0,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 22,
+          "numeric_decimal": 0,
+          "other_text": 1212110,
+          "sample": "VARGAS FINANCIAL INCORPORATED",
+          "top_sample": [
+            [
+              "WALGREEN CO.",
+              223
+            ],
+            [
+              "BOND DRUG COMPANY OF ILLINOIS, LLC",
+              177
+            ],
+            [
+              "LEVY PREMIUM FOODSERVICE LIMITED PARTNERSHIP",
+              114
+            ],
+            [
+              "LAZ PARKING CHICAGO, LLC",
+              109
+            ],
+            [
+              "COMPASS GROUP USA, INC.",
+              106
+            ]
+          ],
+          "unique_values": 194473,
+          "missing_rate_percent": 0.0
+        },
+        "DOING BUSINESS AS NAME": {
+          "empty": 0,
+          "whitespace": 0,
+          "null_token": 398,
+          "numeric_integer": 172,
+          "numeric_decimal": 3,
+          "other_text": 1211957,
+          "sample": "VARGAS FINANCIAL INCORPORATED",
+          "top_sample": [
+            [
+              "BP",
+              96
+            ],
+            [
+              "SHELL",
+              92
+            ],
+            [
+              "SUBWAY",
+              88
+            ],
+            [
+              "CITGO",
+              85
+            ],
+            [
+              "LAZ PARKING",
+              73
+            ]
+          ],
+          "unique_values": 224197,
+          "missing_rate_percent": 0.0
+        },
+        "ADDRESS": {
+          "empty": 0,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 1212132,
+          "sample": "4009 W ARMITAGE AVE 1",
+          "top_sample": [
+            [
+              "[REDACTED FOR PRIVACY]",
+              1405
+            ],
+            [
+              "4100 S ASHLAND AVE",
+              135
+            ],
+            [
+              "2300 S THROOP ST",
+              126
+            ],
+            [
+              "4100 S ASHLAND AVE  OUTDOORS",
+              82
+            ],
+            [
+              "135 N KEDZIE AVE",
+              74
+            ]
+          ],
+          "unique_values": 199590,
+          "missing_rate_percent": 0.0
+        },
+        "CITY": {
+          "empty": 0,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 7,
+          "numeric_decimal": 0,
+          "other_text": 1212125,
+          "sample": "CHICAGO",
+          "top_sample": [
+            [
+              "CHICAGO",
+              45970
+            ],
+            [
+              "CICERO",
+              81
+            ],
+            [
+              "NAPERVILLE",
+              64
+            ],
+            [
+              "EVANSTON",
+              55
+            ],
+            [
+              "MELROSE PARK",
+              54
+            ]
+          ],
+          "unique_values": 2457,
+          "missing_rate_percent": 0.0
+        },
+        "STATE": {
+          "empty": 12,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 1212120,
+          "sample": "IL",
+          "top_sample": [
+            [
+              "IL",
+              48805
+            ],
+            [
+              "IN",
+              159
+            ],
+            [
+              "TX",
+              99
+            ],
+            [
+              "CA",
+              92
+            ],
+            [
+              "NY",
+              90
+            ]
+          ],
+          "unique_values": 57,
+          "missing_rate_percent": 0.001
+        },
+        "ZIP CODE": {
+          "empty": 329,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 1211713,
+          "numeric_decimal": 0,
+          "other_text": 90,
+          "sample": "60639",
+          "top_sample": [
+            [
+              "60647",
+              1940
+            ],
+            [
+              "60609",
+              1798
+            ],
+            [
+              "60608",
+              1650
+            ],
+            [
+              "60607",
+              1612
+            ],
+            [
+              "60622",
+              1569
+            ]
+          ],
+          "unique_values": 3583,
+          "missing_rate_percent": 0.0271
+        },
+        "WARD": {
+          "empty": 91846,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 1120286,
+          "numeric_decimal": 0,
+          "other_text": 0,
+          "sample": "26",
+          "top_sample": [
+            [
+              "42",
+              4013
+            ],
+            [
+              "27",
+              2620
+            ],
+            [
+              "34",
+              2374
+            ],
+            [
+              "1",
+              1589
+            ],
+            [
+              "47",
+              1362
+            ]
+          ],
+          "unique_values": 51,
+          "missing_rate_percent": 7.5772
+        },
+        "PRECINCT": {
+          "empty": 93914,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 1118218,
+          "numeric_decimal": 0,
+          "other_text": 0,
+          "sample": "20",
+          "top_sample": [
+            [
+              "9",
+              2149
+            ],
+            [
+              "19",
+              1597
+            ],
+            [
+              "27",
+              1343
+            ],
+            [
+              "10",
+              1275
+            ],
+            [
+              "16",
+              1266
+            ]
+          ],
+          "unique_values": 79,
+          "missing_rate_percent": 7.7478
+        },
+        "WARD PRECINCT": {
+          "empty": 91226,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 620,
+          "numeric_decimal": 0,
+          "other_text": 1120286,
+          "sample": "26-20",
+          "top_sample": [
+            [
+              "42-9",
+              774
+            ],
+            [
+              "34-9",
+              725
+            ],
+            [
+              "12-19",
+              589
+            ],
+            [
+              "27-45",
+              363
+            ],
+            [
+              "41-27",
+              327
+            ]
+          ],
+          "unique_values": 2761,
+          "missing_rate_percent": 7.5261
+        },
+        "POLICE DISTRICT": {
+          "empty": 92200,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 1119932,
+          "numeric_decimal": 0,
+          "other_text": 0,
+          "sample": "25",
+          "top_sample": [
+            [
+              "1",
+              4698
+            ],
+            [
+              "18",
+              4651
+            ],
+            [
+              "12",
+              4576
+            ],
+            [
+              "19",
+              4033
+            ],
+            [
+              "9",
+              3167
+            ]
+          ],
+          "unique_values": 33,
+          "missing_rate_percent": 7.6064
+        },
+        "COMMUNITY AREA": {
+          "empty": 99589,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 1112543,
+          "numeric_decimal": 0,
+          "other_text": 0,
+          "sample": "20",
+          "top_sample": [
+            [
+              "8",
+              3839
+            ],
+            [
+              "32",
+              3427
+            ],
+            [
+              "28",
+              2883
+            ],
+            [
+              "24",
+              2438
+            ],
+            [
+              "6",
+              1893
+            ]
+          ],
+          "unique_values": 79,
+          "missing_rate_percent": 8.216
+        },
+        "COMMUNITY AREA NAME": {
+          "empty": 99655,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 1112477,
+          "sample": "HERMOSA",
+          "top_sample": [
+            [
+              "NEAR NORTH SIDE",
+              3839
+            ],
+            [
+              "LOOP",
+              3427
+            ],
+            [
+              "NEAR WEST SIDE",
+              2883
+            ],
+            [
+              "WEST TOWN",
+              2438
+            ],
+            [
+              "LAKE VIEW",
+              1893
+            ]
+          ],
+          "unique_values": 78,
+          "missing_rate_percent": 8.2215
+        },
+        "NEIGHBORHOOD": {
+          "empty": 100632,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 1111500,
+          "sample": "HERMOSA",
+          "top_sample": [
+            [
+              "LOOP",
+              3287
+            ],
+            [
+              "RIVER NORTH",
+              2059
+            ],
+            [
+              "WEST LOOP",
+              1942
+            ],
+            [
+              "LAKE VIEW",
+              1495
+            ],
+            [
+              "NEW CITY",
+              1308
+            ]
+          ],
+          "unique_values": 99,
+          "missing_rate_percent": 8.3021
+        },
+        "LICENSE CODE": {
+          "empty": 0,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 1212132,
+          "numeric_decimal": 0,
+          "other_text": 0,
+          "sample": "1010",
+          "top_sample": [
+            [
+              "1010",
+              13942
+            ],
+            [
+              "1006",
+              9255
+            ],
+            [
+              "4404",
+              6365
+            ],
+            [
+              "1781",
+              3094
+            ],
+            [
+              "1475",
+              2285
+            ]
+          ],
+          "unique_values": 152,
+          "missing_rate_percent": 0.0
+        },
+        "LICENSE DESCRIPTION": {
+          "empty": 0,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 1212132,
+          "sample": "Limited Business License",
+          "top_sample": [
+            [
+              "Limited Business License",
+              13942
+            ],
+            [
+              "Retail Food Establishment",
+              9255
+            ],
+            [
+              "Regulated Business License",
+              6365
+            ],
+            [
+              "Tobacco",
+              3094
+            ],
+            [
+              "Consumption on Premises - Incidental Activity",
+              2285
+            ]
+          ],
+          "unique_values": 152,
+          "missing_rate_percent": 0.0
+        },
+        "BUSINESS ACTIVITY ID": {
+          "empty": 549101,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 602449,
+          "numeric_decimal": 0,
+          "other_text": 60582,
+          "sample": "197",
+          "top_sample": [
+            [
+              "775",
+              3019
+            ],
+            [
+              "638",
+              2223
+            ],
+            [
+              "735",
+              1973
+            ],
+            [
+              "990",
+              1405
+            ],
+            [
+              "781",
+              1379
+            ]
+          ],
+          "unique_values": 4146,
+          "missing_rate_percent": 45.3004
+        },
+        "BUSINESS ACTIVITY": {
+          "empty": 549101,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 663031,
+          "sample": "Provide Tax Preparation Services",
+          "top_sample": [
+            [
+              "Retail Sales of Perishable Foods",
+              3019
+            ],
+            [
+              "Consumption of Liquor on Premises",
+              2223
+            ],
+            [
+              "Preparation of Food and Dining on Premises With Seating",
+              1973
+            ],
+            [
+              "Sale of Food Prepared Onsite With Dining Area",
+              1379
+            ],
+            [
+              "Retail Sale of Tobacco",
+              1296
+            ]
+          ],
+          "unique_values": 4146,
+          "missing_rate_percent": 45.3004
+        },
+        "LICENSE NUMBER": {
+          "empty": 1,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 1212131,
+          "numeric_decimal": 0,
+          "other_text": 0,
+          "sample": "1697585",
+          "top_sample": [
+            [
+              "2615903",
+              7
+            ],
+            [
+              "2615772",
+              7
+            ],
+            [
+              "80763",
+              7
+            ],
+            [
+              "2390590",
+              5
+            ],
+            [
+              "2608603",
+              4
+            ]
+          ],
+          "unique_values": 350804,
+          "missing_rate_percent": 0.0001
+        },
+        "APPLICATION TYPE": {
+          "empty": 0,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 1212132,
+          "sample": "RENEW",
+          "top_sample": [
+            [
+              "RENEW",
+              37647
+            ],
+            [
+              "ISSUE",
+              11505
+            ],
+            [
+              "C_LOC",
+              716
+            ],
+            [
+              "C_SBA",
+              66
+            ],
+            [
+              "C_EXPA",
+              58
+            ]
+          ],
+          "unique_values": 6,
+          "missing_rate_percent": 0.0
+        },
+        "APPLICATION CREATED DATE": {
+          "empty": 929252,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 282880,
+          "sample": "10/01/2026",
+          "top_sample": [
+            [
+              "06/22/2026",
+              66
+            ],
+            [
+              "10/20/2025",
+              62
+            ],
+            [
+              "07/08/2026",
+              59
+            ],
+            [
+              "08/20/2025",
+              54
+            ],
+            [
+              "06/17/2025",
+              54
+            ]
+          ],
+          "unique_values": 6615,
+          "missing_rate_percent": 76.6626
+        },
+        "APPLICATION REQUIREMENTS COMPLETE": {
+          "empty": 18415,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 1193717,
+          "sample": "11/15/2026",
+          "top_sample": [
+            [
+              "05/15/2025",
+              2318
+            ],
+            [
+              "09/15/2025",
+              2164
+            ],
+            [
+              "07/15/2025",
+              2133
+            ],
+            [
+              "08/15/2025",
+              2083
+            ],
+            [
+              "04/15/2025",
+              1977
+            ]
+          ],
+          "unique_values": 7037,
+          "missing_rate_percent": 1.5192
+        },
+        "PAYMENT DATE": {
+          "empty": 22685,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 1189447,
+          "sample": "11/16/2026",
+          "top_sample": [
+            [
+              "09/15/2025",
+              514
+            ],
+            [
+              "07/15/2025",
+              432
+            ],
+            [
+              "10/15/2025",
+              380
+            ],
+            [
+              "09/15/2026",
+              373
+            ],
+            [
+              "12/15/2025",
+              371
+            ]
+          ],
+          "unique_values": 9067,
+          "missing_rate_percent": 1.8715
+        },
+        "CONDITIONAL APPROVAL": {
+          "empty": 0,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 1212132,
+          "sample": "N",
+          "top_sample": [
+            [
+              "N",
+              49640
+            ],
+            [
+              "Y",
+              360
+            ]
+          ],
+          "unique_values": 2,
+          "missing_rate_percent": 0.0
+        },
+        "LICENSE TERM START DATE": {
+          "empty": 2719,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 1209413,
+          "sample": "01/16/2027",
+          "top_sample": [
+            [
+              "07/16/2025",
+              2326
+            ],
+            [
+              "11/16/2025",
+              2162
+            ],
+            [
+              "09/16/2025",
+              2146
+            ],
+            [
+              "10/16/2025",
+              2088
+            ],
+            [
+              "02/16/2026",
+              1886
+            ]
+          ],
+          "unique_values": 6448,
+          "missing_rate_percent": 0.2243
+        },
+        "LICENSE TERM EXPIRATION DATE": {
+          "empty": 170,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 1211962,
+          "sample": "01/15/2029",
+          "top_sample": [
+            [
+              "07/15/2027",
+              2879
+            ],
+            [
+              "09/15/2027",
+              2645
+            ],
+            [
+              "11/15/2027",
+              2638
+            ],
+            [
+              "10/15/2027",
+              2595
+            ],
+            [
+              "06/15/2027",
+              2374
+            ]
+          ],
+          "unique_values": 4042,
+          "missing_rate_percent": 0.014
+        },
+        "LICENSE APPROVED FOR ISSUANCE": {
+          "empty": 56233,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 1155899,
+          "sample": "11/16/2026",
+          "top_sample": [
+            [
+              "09/15/2025",
+              490
+            ],
+            [
+              "07/15/2025",
+              404
+            ],
+            [
+              "09/15/2026",
+              377
+            ],
+            [
+              "10/15/2025",
+              364
+            ],
+            [
+              "12/15/2025",
+              363
+            ]
+          ],
+          "unique_values": 8847,
+          "missing_rate_percent": 4.6392
+        },
+        "DATE ISSUED": {
+          "empty": 0,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 1212132,
+          "sample": "11/17/2026",
+          "top_sample": [
+            [
+              "05/13/2026",
+              390
+            ],
+            [
+              "07/21/2026",
+              387
+            ],
+            [
+              "04/16/2026",
+              347
+            ],
+            [
+              "06/17/2025",
+              340
+            ],
+            [
+              "09/17/2025",
+              298
+            ]
+          ],
+          "unique_values": 6463,
+          "missing_rate_percent": 0.0
+        },
+        "LICENSE STATUS": {
+          "empty": 0,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 1212132,
+          "sample": "AAI",
+          "top_sample": [
+            [
+              "AAI",
+              49106
+            ],
+            [
+              "AAC",
+              874
+            ],
+            [
+              "REV",
+              20
+            ]
+          ],
+          "unique_values": 5,
+          "missing_rate_percent": 0.0
+        },
+        "LICENSE STATUS CHANGE DATE": {
+          "empty": 1131478,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 80654,
+          "sample": "11/09/2026",
+          "top_sample": [
+            [
+              "09/01/2026",
+              12
+            ],
+            [
+              "10/01/2026",
+              11
+            ],
+            [
+              "01/21/2026",
+              10
+            ],
+            [
+              "10/13/2026",
+              9
+            ],
+            [
+              "09/23/2026",
+              9
+            ]
+          ],
+          "unique_values": 6152,
+          "missing_rate_percent": 93.3461
+        },
+        "SSA": {
+          "empty": 896360,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 315772,
+          "numeric_decimal": 0,
+          "other_text": 0,
+          "sample": "31",
+          "top_sample": [
+            [
+              "33",
+              1149
+            ],
+            [
+              "10",
+              805
+            ],
+            [
+              "17",
+              557
+            ],
+            [
+              "34",
+              553
+            ],
+            [
+              "31",
+              525
+            ]
+          ],
+          "unique_values": 54,
+          "missing_rate_percent": 73.949
+        },
+        "LATITUDE": {
+          "empty": 93498,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 1118634,
+          "other_text": 0,
+          "sample": "41.917050893",
+          "top_sample": [
+            [
+              "41.8194414263",
+              618
+            ],
+            [
+              "42.008750766",
+              302
+            ],
+            [
+              "41.8504510243",
+              132
+            ],
+            [
+              "41.8880742811",
+              95
+            ],
+            [
+              "41.8819215626",
+              88
+            ]
+          ],
+          "unique_values": 87113,
+          "missing_rate_percent": 7.7135
+        },
+        "LONGITUDE": {
+          "empty": 93498,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 1118634,
+          "other_text": 0,
+          "sample": "-87.7269843986",
+          "top_sample": [
+            [
+              "-87.6653755449",
+              618
+            ],
+            [
+              "-87.906874134",
+              302
+            ],
+            [
+              "-87.6587978557",
+              132
+            ],
+            [
+              "-87.6349552029",
+              95
+            ],
+            [
+              "-87.6260630598",
+              88
+            ]
+          ],
+          "unique_values": 87112,
+          "missing_rate_percent": 7.7135
+        },
+        "LOCATION": {
+          "empty": 93498,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 1118634,
+          "sample": "(41.91705089299086, -87.72698439860197)",
+          "top_sample": [
+            [
+              "(41.81944142629576, -87.6653755449091)",
+              618
+            ],
+            [
+              "(42.00875076599798, -87.90687413400109)",
+              302
+            ],
+            [
+              "(41.85045102427, -87.65879785567869)",
+              132
+            ],
+            [
+              "(41.8880742810662, -87.63495520292739)",
+              95
+            ],
+            [
+              "(41.88192156256051, -87.62606305984501)",
+              88
+            ]
+          ],
+          "unique_values": 87113,
+          "missing_rate_percent": 7.7135
+        }
+      },
+      "key_duplicate_rows": {
+        "LICENSE NUMBER": 861328,
+        "ID": 252
+      },
+      "key_duplicate_rate_percent": {
+        "ID": 0.0208,
+        "LICENSE ID": 0.0,
+        "LICENSE NUMBER": 71.0589
+      },
+      "full_row_duplicates_hash16": 0,
+      "dates": {
+        "APPLICATION CREATED DATE": {
+          "invalid_calendar": 0,
+          "outside_1900_2100": 0,
+          "min": "2000-06-19",
+          "max": "2026-11-17",
+          "examples": []
+        },
+        "APPLICATION REQUIREMENTS COMPLETE": {
+          "invalid_calendar": 0,
+          "outside_1900_2100": 0,
+          "min": "2000-06-16",
+          "max": "2026-11-17",
+          "examples": []
+        },
+        "PAYMENT DATE": {
+          "invalid_calendar": 0,
+          "outside_1900_2100": 0,
+          "min": "1997-04-15",
+          "max": "2026-11-17",
+          "examples": []
+        },
+        "LICENSE TERM START DATE": {
+          "invalid_calendar": 0,
+          "outside_1900_2100": 0,
+          "min": "1995-02-16",
+          "max": "2028-07-16",
+          "examples": []
+        },
+        "LICENSE TERM EXPIRATION DATE": {
+          "invalid_calendar": 0,
+          "outside_1900_2100": 2,
+          "min": "0206-08-17",
+          "max": "9999-01-01",
+          "examples": [
+            "08/17/0206",
+            "01/01/9999"
+          ]
+        },
+        "LICENSE APPROVED FOR ISSUANCE": {
+          "invalid_calendar": 0,
+          "outside_1900_2100": 0,
+          "min": "2000-06-16",
+          "max": "2026-11-17",
+          "examples": []
+        },
+        "DATE ISSUED": {
+          "invalid_calendar": 0,
+          "outside_1900_2100": 0,
+          "min": "2002-01-02",
+          "max": "2026-11-17",
+          "examples": []
+        },
+        "LICENSE STATUS CHANGE DATE": {
+          "invalid_calendar": 0,
+          "outside_1900_2100": 0,
+          "min": "2002-01-08",
+          "max": "2026-11-17",
+          "examples": []
+        }
+      },
+      "zip_non_us_pattern_count": 166,
+      "zip_non_us_pattern_examples": [
+        [
+          "H3P3C",
+          14
+        ],
+        [
+          "L3R2N",
+          12
+        ],
+        [
+          "J3Y",
+          10
+        ],
+        [
+          "60",
+          8
+        ],
+        [
+          "M3B1Z",
+          6
+        ],
+        [
+          "1605",
+          5
+        ],
+        [
+          "1101",
+          5
+        ],
+        [
+          "JMCJS",
+          4
+        ],
+        [
+          "1550",
+          4
+        ],
+        [
+          "1126",
+          4
+        ]
+      ],
+      "city_spelling_examples": {
+        "CHICAGO": 1120881
+      }
+    },
+    "community_areas": {
+      "source_file": "community_areas/community_areas.geojson",
+      "format": "GeoJSON FeatureCollection",
+      "encoding": "UTF-8",
+      "rows": 77,
+      "columns": [
+        "type",
+        "geometry",
+        ":id",
+        ":version",
+        ":created_at",
+        ":updated_at",
+        "area_numbe",
+        "community",
+        "area_num_1",
+        "shape_area",
+        "shape_len"
+      ],
+      "column_stats": {
+        "type": {
+          "empty": 0,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 77,
+          "sample": "Feature",
+          "top_sample": [
+            [
+              "Feature",
+              77
+            ]
+          ],
+          "unique_values": 1,
+          "missing_rate_percent": 0.0
+        },
+        "geometry": {
+          "empty": 0,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 77,
+          "sample": "{\"type\":\"MultiPolygon\",\"coordinates\":[[[[-87.65455590025104,41.99816614970252],[-87.65573692713699,41.99817520952651],[-",
+          "top_sample": [],
+          "unique_values": 77,
+          "missing_rate_percent": 0.0
+        },
+        ":id": {
+          "empty": 0,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 77,
+          "sample": "row-m77e_pkv8.vjvf",
+          "top_sample": [
+            [
+              "row-m77e_pkv8.vjvf",
+              1
+            ],
+            [
+              "row-u375_347e-y6q8",
+              1
+            ],
+            [
+              "row-kgqf-m29p-99kg",
+              1
+            ],
+            [
+              "row-2dpv_pk9x-zybp",
+              1
+            ],
+            [
+              "row-37zy.7r75.56p7",
+              1
+            ]
+          ],
+          "unique_values": 77,
+          "missing_rate_percent": 0.0
+        },
+        ":version": {
+          "empty": 0,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 77,
+          "sample": "rv-3hjp_vkhx~fqfx",
+          "top_sample": [
+            [
+              "rv-3hjp_vkhx~fqfx",
+              1
+            ],
+            [
+              "rv-tgcx_t7fr-nkkg",
+              1
+            ],
+            [
+              "rv-bag4-8zri.nvhu",
+              1
+            ],
+            [
+              "rv-82s2~rb54~emuc",
+              1
+            ],
+            [
+              "rv-hrse.ahu7-rz4d",
+              1
+            ]
+          ],
+          "unique_values": 77,
+          "missing_rate_percent": 0.0
+        },
+        ":created_at": {
+          "empty": 0,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 77,
+          "sample": "2025-04-22T23:06:36.944Z",
+          "top_sample": [
+            [
+              "2025-04-22T23:06:36.944Z",
+              77
+            ]
+          ],
+          "unique_values": 1,
+          "missing_rate_percent": 0.0
+        },
+        ":updated_at": {
+          "empty": 0,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 77,
+          "sample": "2025-04-22T23:06:36.944Z",
+          "top_sample": [
+            [
+              "2025-04-22T23:06:36.944Z",
+              77
+            ]
+          ],
+          "unique_values": 1,
+          "missing_rate_percent": 0.0
+        },
+        "area_numbe": {
+          "empty": 0,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 77,
+          "numeric_decimal": 0,
+          "other_text": 0,
+          "sample": "1",
+          "top_sample": [
+            [
+              "1",
+              1
+            ],
+            [
+              "2",
+              1
+            ],
+            [
+              "3",
+              1
+            ],
+            [
+              "4",
+              1
+            ],
+            [
+              "5",
+              1
+            ]
+          ],
+          "unique_values": 77,
+          "missing_rate_percent": 0.0
+        },
+        "community": {
+          "empty": 0,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 0,
+          "other_text": 77,
+          "sample": "ROGERS PARK",
+          "top_sample": [
+            [
+              "ROGERS PARK",
+              1
+            ],
+            [
+              "WEST RIDGE",
+              1
+            ],
+            [
+              "UPTOWN",
+              1
+            ],
+            [
+              "LINCOLN SQUARE",
+              1
+            ],
+            [
+              "NORTH CENTER",
+              1
+            ]
+          ],
+          "unique_values": 77,
+          "missing_rate_percent": 0.0
+        },
+        "area_num_1": {
+          "empty": 0,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 77,
+          "numeric_decimal": 0,
+          "other_text": 0,
+          "sample": "1",
+          "top_sample": [
+            [
+              "1",
+              1
+            ],
+            [
+              "2",
+              1
+            ],
+            [
+              "3",
+              1
+            ],
+            [
+              "4",
+              1
+            ],
+            [
+              "5",
+              1
+            ]
+          ],
+          "unique_values": 77,
+          "missing_rate_percent": 0.0
+        },
+        "shape_area": {
+          "empty": 0,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 77,
+          "other_text": 0,
+          "sample": "51259902.4506",
+          "top_sample": [
+            [
+              "51259902.4506",
+              1
+            ],
+            [
+              "98429094.8621",
+              1
+            ],
+            [
+              "65095642.7289",
+              1
+            ],
+            [
+              "71352328.2399",
+              1
+            ],
+            [
+              "57054167.85",
+              1
+            ]
+          ],
+          "unique_values": 77,
+          "missing_rate_percent": 0.0
+        },
+        "shape_len": {
+          "empty": 0,
+          "whitespace": 0,
+          "null_token": 0,
+          "numeric_integer": 0,
+          "numeric_decimal": 77,
+          "other_text": 0,
+          "sample": "34052.3975757",
+          "top_sample": [
+            [
+              "34052.3975757",
+              1
+            ],
+            [
+              "43020.6894583",
+              1
+            ],
+            [
+              "46972.7945549",
+              1
+            ],
+            [
+              "36624.6030848",
+              1
+            ],
+            [
+              "31391.6697542",
+              1
+            ]
+          ],
+          "unique_values": 77,
+          "missing_rate_percent": 0.0
+        }
+      },
+      "top_level_keys": [
+        "type",
+        "features"
+      ],
+      "feature_keys": [
+        "type",
+        "geometry",
+        "properties"
+      ],
+      "property_keys": [
+        ":id",
+        ":version",
+        ":created_at",
+        ":updated_at",
+        "area_numbe",
+        "community",
+        "area_num_1",
+        "shape_area",
+        "shape_len"
+      ],
+      "geometry_types": {
+        "MultiPolygon": 77
+      },
+      "structural_errors": {},
+      "key_duplicate_rows": {
+        "area_numbe": 0
+      },
+      "key_duplicate_rate_percent": {
+        "area_numbe": 0.0
+      },
+      "full_row_duplicates_hash16": 0
+    }
+  },
+  "joins": {
+    "inspection_license_number": {
+      "distinct_shared_nonblank": 46485,
+      "inspection_rows_blank": 19,
+      "inspection_rows_no_match_nonblank": 16558,
+      "inspection_rows_one_candidate": 35887,
+      "inspection_rows_multiple_candidates": 266088,
+      "max_license_history_candidates": 26
+    },
+    "license_area_number": {
+      "distinct_matching_areas": 77,
+      "blank_rows": 99589,
+      "nonblank_unmatched_rows": 38,
+      "unmatched_values": {
+        "0": 38
+      }
+    }
+  }
+}

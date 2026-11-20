@@ -1,0 +1,3 @@
+source_file,source_column,target_file,transformation,affected_rows,status
+data/01_bronze/02_violation/02_food_inspections.parquet,Violations,data/02_silver/02_violation/02_inspection_violations_accepted.parquet,Split fragments; accept complete PARSED records,1029281,APPLIED
+data/01_bronze/02_violation/02_food_inspections.parquet,Violations,data/02_silver/02_violation/02_inspection_violations_quarantine.parquet,Preserve incomplete or invalid fragments with reason,1792,APPLIED
