@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "entries": [
+    {
+      "table": "business_licenses",
+      "source_file": "business_licenses.csv",
+      "source_sha256": "783354424bebe4d367bd3a0f9cdc63a846fae28d50580b9ccf89590d10cc61bb",
+      "source_format": "csv",
+      "source_encoding": "utf-8",
+      "source_sheet": null,
+      "selected_columns": null,
+      "bronze_file": "04_business_licenses.parquet",
+      "bronze_sha256": "e0ab11e5113c137e6fd9fd8ef71b93b8aa21446a5f8819a00b5a81cd768a1a5e",
+      "row_count": 1212132,
+      "status": "created",
+      "source_read_started_at_utc": "2026-11-20T06:16:28.094Z",
+      "bronze_created_at_utc": "2026-11-20T06:16:35.712Z",
+      "recorded_at_utc": "2026-11-20T06:16:36.286Z"
+    },
+    {
+      "table": "food_inspections",
+      "source_file": "food_inspections.csv",
+      "source_sha256": "b43beb7fae834a8698ca162004caf2929cb2eca7ff75c27b4db6bf07aa103c98",
+      "source_format": "csv",
+      "source_encoding": "utf-8",
+      "source_sheet": null,
+      "selected_columns": null,
+      "bronze_file": "04_food_inspections.parquet",
+      "bronze_sha256": "c8d13846097a2c1218f2fb0d92aab4782c2721734ca003ff7415fbf442f634d4",
+      "row_count": 318627,
+      "status": "created",
+      "source_read_started_at_utc": "2026-11-20T06:16:36.286Z",
+      "bronze_created_at_utc": "2026-11-20T06:16:40.196Z",
+      "recorded_at_utc": "2026-11-20T06:16:40.590Z"
+    }
+  ]
+}

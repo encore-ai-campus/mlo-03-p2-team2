@@ -1,0 +1,4 @@
+table,name,violations,detail
+quality,unique decision IDs,0,
+quality,quality_comparison.csv matches recomputed comparisons,0,
+quality,품질 관리.md matches recomputed comparisons,0,
