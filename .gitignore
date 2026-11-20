@@ -68,6 +68,11 @@ Thumbs.db
 !/data/00_origin/food_columns.json
 !/data/00_origin/license_columns.json
 
+# Published Domain 03 Silver and Gold snapshot.
+!/data/02_silver/03_repeat_inspection/03_inspection_history.parquet
+!/data/03_gold/03_repeat_inspection/03_inspection_reinspection_mart.parquet
+!/data/03_gold/03_repeat_inspection/03_repeat_violation_mart.parquet
+
 # Published Domain 04 snapshot. The reassembled Bronze file stays local.
 !/data/01_bronze/04_license/04_food_inspections.parquet
 !/data/01_bronze/04_license/04_business_licenses.parquet.part-00[12]
