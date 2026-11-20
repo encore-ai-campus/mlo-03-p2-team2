@@ -1,0 +1,1871 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>시카고 원본 데이터 품질 검사</title>
+<style>
+  body { max-width: 75rem; margin: 2rem auto; padding: 0 1rem; font: 1rem/1.5 system-ui, sans-serif; }
+  nav ul { display: flex; flex-wrap: wrap; gap: .5rem 1.5rem; padding-left: 1.25rem; }
+  section { margin: 2rem 0 3rem; }
+  h2 { border-bottom: 1px solid #d9dee5; padding-bottom: .4rem; }
+  h3 { margin-top: 1.8rem; }
+  .table-container { overflow-x: auto; }
+  table { border-collapse: collapse; text-align: left; }
+  th, td { padding: .4rem .65rem; border-bottom: 1px solid #d9dee5; }
+  th { background: #eef2f6; }
+  tbody tr:nth-child(even) { background: #f8fafc; }
+</style>
+<main>
+<h1>시카고 원본 데이터 품질 검사</h1>
+
+<nav aria-label="데이터셋"><ul><li><a href="#food_inspections">Food Inspections</a></li><li><a href="#business_licenses">Business Licenses</a></li><li><a href="#community_areas">Community Areas</a></li></ul></nav>
+<section id="food_inspections"><h2>Food Inspections</h2>
+<p>Food_Inspections_20261119.csv</p>
+<p>행 수: 318,627 / 열 수: 17</p>
+<h3>결측값</h3>
+<p>NULL 표기와 빈 문자열·공백을 별도로 집계</p>
+<div class="table-container"><table class="dataframe">
+  <thead>
+    <tr style="text-align: left;">
+      <th>column</th>
+      <th>null_count</th>
+      <th>null_pct</th>
+      <th>blank_count</th>
+      <th>blank_pct</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Inspection ID</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>DBA Name</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>AKA Name</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>2425</td>
+      <td>0.76</td>
+    </tr>
+    <tr>
+      <td>License #</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>19</td>
+      <td>0.01</td>
+    </tr>
+    <tr>
+      <td>Facility Type</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>5358</td>
+      <td>1.68</td>
+    </tr>
+    <tr>
+      <td>Risk</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>88</td>
+      <td>0.03</td>
+    </tr>
+    <tr>
+      <td>Address</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>3</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>City</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>184</td>
+      <td>0.06</td>
+    </tr>
+    <tr>
+      <td>State</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>76</td>
+      <td>0.02</td>
+    </tr>
+    <tr>
+      <td>Zip</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>42</td>
+      <td>0.01</td>
+    </tr>
+    <tr>
+      <td>Inspection Date</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>Inspection Type</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>1</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>Results</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>Violations</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>90022</td>
+      <td>28.25</td>
+    </tr>
+    <tr>
+      <td>Latitude</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>1065</td>
+      <td>0.33</td>
+    </tr>
+    <tr>
+      <td>Longitude</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>1065</td>
+      <td>0.33</td>
+    </tr>
+    <tr>
+      <td>Location</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>1065</td>
+      <td>0.33</td>
+    </tr>
+  </tbody>
+</table></div>
+<h3>중복값</h3>
+<p>첫 행을 제외한 초과 중복 건수</p>
+<p>전체 행 중복: 0건</p>
+<p>Inspection ID: 초과 0건, 중복 ID 0개, 예시 –</p>
+<h3>범주형 고유값과 빈도</h3>
+<p>비율은 결측·빈값을 제외한 건수 기준</p>
+<p>
+Facility Type: 527종, 유효 값 313,269건</p>
+<div class="table-container"><table class="dataframe">
+  <thead>
+    <tr style="text-align: left;">
+      <th>value</th>
+      <th>count</th>
+      <th>pct</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Restaurant</td>
+      <td>216251</td>
+      <td>69.03</td>
+    </tr>
+    <tr>
+      <td>Grocery Store</td>
+      <td>38132</td>
+      <td>12.17</td>
+    </tr>
+    <tr>
+      <td>School</td>
+      <td>19879</td>
+      <td>6.35</td>
+    </tr>
+    <tr>
+      <td>Children's Services Facility</td>
+      <td>7927</td>
+      <td>2.53</td>
+    </tr>
+    <tr>
+      <td>Bakery</td>
+      <td>4580</td>
+      <td>1.46</td>
+    </tr>
+    <tr>
+      <td>Daycare Above and Under 2 Years</td>
+      <td>4196</td>
+      <td>1.34</td>
+    </tr>
+    <tr>
+      <td>Daycare (2 - 6 Years)</td>
+      <td>3279</td>
+      <td>1.05</td>
+    </tr>
+    <tr>
+      <td>Long Term Care</td>
+      <td>2452</td>
+      <td>0.78</td>
+    </tr>
+    <tr>
+      <td>Catering</td>
+      <td>1973</td>
+      <td>0.63</td>
+    </tr>
+    <tr>
+      <td>Liquor</td>
+      <td>1383</td>
+      <td>0.44</td>
+    </tr>
+    <tr>
+      <td>Mobile Food Preparer</td>
+      <td>1335</td>
+      <td>0.43</td>
+    </tr>
+    <tr>
+      <td>Hospital</td>
+      <td>1001</td>
+      <td>0.32</td>
+    </tr>
+    <tr>
+      <td>Mobile Food Dispenser</td>
+      <td>968</td>
+      <td>0.31</td>
+    </tr>
+    <tr>
+      <td>Golden Diner</td>
+      <td>896</td>
+      <td>0.29</td>
+    </tr>
+    <tr>
+      <td>Daycare Combo 1586</td>
+      <td>627</td>
+      <td>0.2</td>
+    </tr>
+  </tbody>
+</table></div>
+<p>나머지 512종, 8,390건</p>
+<p>
+Risk: 4종, 유효 값 318,539건</p>
+<div class="table-container"><table class="dataframe">
+  <thead>
+    <tr style="text-align: left;">
+      <th>value</th>
+      <th>count</th>
+      <th>pct</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Risk 1 (High)</td>
+      <td>237341</td>
+      <td>74.51</td>
+    </tr>
+    <tr>
+      <td>Risk 2 (Medium)</td>
+      <td>56428</td>
+      <td>17.71</td>
+    </tr>
+    <tr>
+      <td>Risk 3 (Low)</td>
+      <td>24680</td>
+      <td>7.75</td>
+    </tr>
+    <tr>
+      <td>All</td>
+      <td>90</td>
+      <td>0.03</td>
+    </tr>
+  </tbody>
+</table></div>
+<p>
+City: 96종, 유효 값 318,443건</p>
+<div class="table-container"><table class="dataframe">
+  <thead>
+    <tr style="text-align: left;">
+      <th>value</th>
+      <th>count</th>
+      <th>pct</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>CHICAGO</td>
+      <td>317304</td>
+      <td>99.64</td>
+    </tr>
+    <tr>
+      <td>Chicago</td>
+      <td>544</td>
+      <td>0.17</td>
+    </tr>
+    <tr>
+      <td>chicago</td>
+      <td>175</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <td>CCHICAGO</td>
+      <td>62</td>
+      <td>0.02</td>
+    </tr>
+    <tr>
+      <td>SCHAUMBURG</td>
+      <td>30</td>
+      <td>0.01</td>
+    </tr>
+    <tr>
+      <td>EVANSTON</td>
+      <td>28</td>
+      <td>0.01</td>
+    </tr>
+    <tr>
+      <td>CHicago</td>
+      <td>22</td>
+      <td>0.01</td>
+    </tr>
+    <tr>
+      <td>MAYWOOD</td>
+      <td>15</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <td>ELK GROVE VILLAGE</td>
+      <td>13</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <td>OAK PARK</td>
+      <td>12</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <td>CHICAGOCHICAGO</td>
+      <td>12</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <td>CHICAGOO</td>
+      <td>11</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <td>CHICAGO.</td>
+      <td>10</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <td>SKOKIE</td>
+      <td>10</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <td>BERWYN</td>
+      <td>9</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table></div>
+<p>나머지 81종, 186건</p>
+<p>
+State: 7종, 유효 값 318,551건</p>
+<div class="table-container"><table class="dataframe">
+  <thead>
+    <tr style="text-align: left;">
+      <th>value</th>
+      <th>count</th>
+      <th>pct</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>IL</td>
+      <td>318526</td>
+      <td>99.99</td>
+    </tr>
+    <tr>
+      <td>IN</td>
+      <td>13</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <td>CA</td>
+      <td>6</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <td>WI</td>
+      <td>3</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <td>DC</td>
+      <td>1</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <td>CO</td>
+      <td>1</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <td>NY</td>
+      <td>1</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table></div>
+<p>
+Inspection Type: 110종, 유효 값 318,626건</p>
+<div class="table-container"><table class="dataframe">
+  <thead>
+    <tr style="text-align: left;">
+      <th>value</th>
+      <th>count</th>
+      <th>pct</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Canvass</td>
+      <td>164228</td>
+      <td>51.54</td>
+    </tr>
+    <tr>
+      <td>License</td>
+      <td>42759</td>
+      <td>13.42</td>
+    </tr>
+    <tr>
+      <td>Canvass Re-Inspection</td>
+      <td>35507</td>
+      <td>11.14</td>
+    </tr>
+    <tr>
+      <td>Complaint</td>
+      <td>30331</td>
+      <td>9.52</td>
+    </tr>
+    <tr>
+      <td>License Re-Inspection</td>
+      <td>12904</td>
+      <td>4.05</td>
+    </tr>
+    <tr>
+      <td>Complaint Re-Inspection</td>
+      <td>12754</td>
+      <td>4.0</td>
+    </tr>
+    <tr>
+      <td>Short Form Complaint</td>
+      <td>9400</td>
+      <td>2.95</td>
+    </tr>
+    <tr>
+      <td>Non-Inspection</td>
+      <td>5832</td>
+      <td>1.83</td>
+    </tr>
+    <tr>
+      <td>Suspected Food Poisoning</td>
+      <td>1029</td>
+      <td>0.32</td>
+    </tr>
+    <tr>
+      <td>Consultation</td>
+      <td>679</td>
+      <td>0.21</td>
+    </tr>
+    <tr>
+      <td>License-Task Force</td>
+      <td>604</td>
+      <td>0.19</td>
+    </tr>
+    <tr>
+      <td>Tag Removal</td>
+      <td>603</td>
+      <td>0.19</td>
+    </tr>
+    <tr>
+      <td>Recent Inspection</td>
+      <td>544</td>
+      <td>0.17</td>
+    </tr>
+    <tr>
+      <td>Out of Business</td>
+      <td>284</td>
+      <td>0.09</td>
+    </tr>
+    <tr>
+      <td>Task Force Liquor 1475</td>
+      <td>252</td>
+      <td>0.08</td>
+    </tr>
+  </tbody>
+</table></div>
+<p>나머지 95종, 916건</p>
+<p>
+Results: 7종, 유효 값 318,627건</p>
+<div class="table-container"><table class="dataframe">
+  <thead>
+    <tr style="text-align: left;">
+      <th>value</th>
+      <th>count</th>
+      <th>pct</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Pass</td>
+      <td>164981</td>
+      <td>51.78</td>
+    </tr>
+    <tr>
+      <td>Fail</td>
+      <td>61344</td>
+      <td>19.25</td>
+    </tr>
+    <tr>
+      <td>Pass w/ Conditions</td>
+      <td>47163</td>
+      <td>14.8</td>
+    </tr>
+    <tr>
+      <td>Out of Business</td>
+      <td>26041</td>
+      <td>8.17</td>
+    </tr>
+    <tr>
+      <td>No Entry</td>
+      <td>14339</td>
+      <td>4.5</td>
+    </tr>
+    <tr>
+      <td>Not Ready</td>
+      <td>4663</td>
+      <td>1.46</td>
+    </tr>
+    <tr>
+      <td>Business Not Located</td>
+      <td>96</td>
+      <td>0.03</td>
+    </tr>
+  </tbody>
+</table></div>
+<h3>날짜 범위와 변환 유효성</h3>
+<p>MM/DD/YYYY 기준</p>
+<div class="table-container"><table class="dataframe">
+  <thead>
+    <tr style="text-align: left;">
+      <th>column</th>
+      <th>first</th>
+      <th>last</th>
+      <th>invalid_date</th>
+      <th>after_snapshot</th>
+      <th>invalid_examples</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Inspection Date</td>
+      <td>2010-01-04</td>
+      <td>2026-11-18</td>
+      <td>0</td>
+      <td>0</td>
+      <td>–</td>
+    </tr>
+  </tbody>
+</table></div>
+<p>기준일: 2026-11-19 (원본 파일명 날짜)</p>
+<h3>숫자 변환 유효성 및 이상값</h3>
+<div class="table-container"><table class="dataframe">
+  <thead>
+    <tr style="text-align: left;">
+      <th>column</th>
+      <th>expected</th>
+      <th>invalid_number</th>
+      <th>negative</th>
+      <th>outside_range</th>
+      <th>invalid_examples</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Inspection ID</td>
+      <td>정수</td>
+      <td>0</td>
+      <td>0</td>
+      <td>–</td>
+      <td>–</td>
+    </tr>
+    <tr>
+      <td>License #</td>
+      <td>정수</td>
+      <td>0</td>
+      <td>0</td>
+      <td>–</td>
+      <td>–</td>
+    </tr>
+    <tr>
+      <td>Latitude</td>
+      <td>좌표</td>
+      <td>0</td>
+      <td>–</td>
+      <td>0</td>
+      <td>–</td>
+    </tr>
+    <tr>
+      <td>Longitude</td>
+      <td>좌표</td>
+      <td>0</td>
+      <td>–</td>
+      <td>0</td>
+      <td>–</td>
+    </tr>
+  </tbody>
+</table></div>
+<p>허용 범위: 위도 -90~90, 경도 -180~180</p>
+</section>
+<section id="business_licenses"><h2>Business Licenses</h2>
+<p>Business_Licenses_20261120.csv</p>
+<p>행 수: 1,212,282 / 열 수: 37</p>
+<h3>결측값</h3>
+<p>NULL 표기와 빈 문자열·공백을 별도로 집계</p>
+<div class="table-container"><table class="dataframe">
+  <thead>
+    <tr style="text-align: left;">
+      <th>column</th>
+      <th>null_count</th>
+      <th>null_pct</th>
+      <th>blank_count</th>
+      <th>blank_pct</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ID</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>LICENSE ID</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>ACCOUNT NUMBER</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>SITE NUMBER</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>LEGAL NAME</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>DOING BUSINESS AS NAME</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>ADDRESS</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>CITY</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>STATE</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>12</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>ZIP CODE</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>329</td>
+      <td>0.03</td>
+    </tr>
+    <tr>
+      <td>WARD</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>91857</td>
+      <td>7.58</td>
+    </tr>
+    <tr>
+      <td>PRECINCT</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>93922</td>
+      <td>7.75</td>
+    </tr>
+    <tr>
+      <td>WARD PRECINCT</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>91231</td>
+      <td>7.53</td>
+    </tr>
+    <tr>
+      <td>POLICE DISTRICT</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>92205</td>
+      <td>7.61</td>
+    </tr>
+    <tr>
+      <td>COMMUNITY AREA</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>99594</td>
+      <td>8.22</td>
+    </tr>
+    <tr>
+      <td>COMMUNITY AREA NAME</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>99660</td>
+      <td>8.22</td>
+    </tr>
+    <tr>
+      <td>NEIGHBORHOOD</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>100637</td>
+      <td>8.30</td>
+    </tr>
+    <tr>
+      <td>LICENSE CODE</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>LICENSE DESCRIPTION</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>BUSINESS ACTIVITY ID</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>549109</td>
+      <td>45.30</td>
+    </tr>
+    <tr>
+      <td>BUSINESS ACTIVITY</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>549109</td>
+      <td>45.30</td>
+    </tr>
+    <tr>
+      <td>LICENSE NUMBER</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>1</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>APPLICATION TYPE</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>APPLICATION CREATED DATE</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>929371</td>
+      <td>76.66</td>
+    </tr>
+    <tr>
+      <td>APPLICATION REQUIREMENTS COMPLETE</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>18415</td>
+      <td>1.52</td>
+    </tr>
+    <tr>
+      <td>PAYMENT DATE</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>22684</td>
+      <td>1.87</td>
+    </tr>
+    <tr>
+      <td>CONDITIONAL APPROVAL</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>LICENSE TERM START DATE</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>2719</td>
+      <td>0.22</td>
+    </tr>
+    <tr>
+      <td>LICENSE TERM EXPIRATION DATE</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>170</td>
+      <td>0.01</td>
+    </tr>
+    <tr>
+      <td>LICENSE APPROVED FOR ISSUANCE</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>56236</td>
+      <td>4.64</td>
+    </tr>
+    <tr>
+      <td>DATE ISSUED</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>LICENSE STATUS</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0.00</td>
+    </tr>
+    <tr>
+      <td>LICENSE STATUS CHANGE DATE</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>1131616</td>
+      <td>93.35</td>
+    </tr>
+    <tr>
+      <td>SSA</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>896467</td>
+      <td>73.95</td>
+    </tr>
+    <tr>
+      <td>LATITUDE</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>93504</td>
+      <td>7.71</td>
+    </tr>
+    <tr>
+      <td>LONGITUDE</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>93504</td>
+      <td>7.71</td>
+    </tr>
+    <tr>
+      <td>LOCATION</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>93504</td>
+      <td>7.71</td>
+    </tr>
+  </tbody>
+</table></div>
+<h3>중복값</h3>
+<p>첫 행을 제외한 초과 중복 건수</p>
+<p>전체 행 중복: 0건</p>
+<p>ID: 초과 252건, 중복 ID 241개, 예시 &#x27;2835961-20260416&#x27;, &#x27;3010918-20250616&#x27;, &#x27;3025623-20250509&#x27;</p>
+<p>LICENSE ID: 초과 0건, 중복 ID 0개, 예시 –</p>
+<h3>범주형 고유값과 빈도</h3>
+<p>비율은 결측·빈값을 제외한 건수 기준</p>
+<p>
+STATE: 56종, 유효 값 1,212,270건</p>
+<div class="table-container"><table class="dataframe">
+  <thead>
+    <tr style="text-align: left;">
+      <th>value</th>
+      <th>count</th>
+      <th>pct</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>IL</td>
+      <td>1194971</td>
+      <td>98.57</td>
+    </tr>
+    <tr>
+      <td>IN</td>
+      <td>3684</td>
+      <td>0.3</td>
+    </tr>
+    <tr>
+      <td>WI</td>
+      <td>1311</td>
+      <td>0.11</td>
+    </tr>
+    <tr>
+      <td>CA</td>
+      <td>1298</td>
+      <td>0.11</td>
+    </tr>
+    <tr>
+      <td>TX</td>
+      <td>959</td>
+      <td>0.08</td>
+    </tr>
+    <tr>
+      <td>NY</td>
+      <td>957</td>
+      <td>0.08</td>
+    </tr>
+    <tr>
+      <td>MI</td>
+      <td>855</td>
+      <td>0.07</td>
+    </tr>
+    <tr>
+      <td>FL</td>
+      <td>705</td>
+      <td>0.06</td>
+    </tr>
+    <tr>
+      <td>OH</td>
+      <td>668</td>
+      <td>0.06</td>
+    </tr>
+    <tr>
+      <td>GA</td>
+      <td>655</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <td>MO</td>
+      <td>568</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <td>MN</td>
+      <td>557</td>
+      <td>0.05</td>
+    </tr>
+    <tr>
+      <td>PA</td>
+      <td>540</td>
+      <td>0.04</td>
+    </tr>
+    <tr>
+      <td>AZ</td>
+      <td>347</td>
+      <td>0.03</td>
+    </tr>
+    <tr>
+      <td>NJ</td>
+      <td>306</td>
+      <td>0.03</td>
+    </tr>
+  </tbody>
+</table></div>
+<p>나머지 41종, 3,889건</p>
+<p>
+WARD: 50종, 유효 값 1,120,425건</p>
+<div class="table-container"><table class="dataframe">
+  <thead>
+    <tr style="text-align: left;">
+      <th>value</th>
+      <th>count</th>
+      <th>pct</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>42</td>
+      <td>104703</td>
+      <td>9.34</td>
+    </tr>
+    <tr>
+      <td>34</td>
+      <td>61921</td>
+      <td>5.53</td>
+    </tr>
+    <tr>
+      <td>27</td>
+      <td>50238</td>
+      <td>4.48</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>34458</td>
+      <td>3.08</td>
+    </tr>
+    <tr>
+      <td>32</td>
+      <td>34011</td>
+      <td>3.04</td>
+    </tr>
+    <tr>
+      <td>1</td>
+      <td>30894</td>
+      <td>2.76</td>
+    </tr>
+    <tr>
+      <td>25</td>
+      <td>30677</td>
+      <td>2.74</td>
+    </tr>
+    <tr>
+      <td>47</td>
+      <td>30017</td>
+      <td>2.68</td>
+    </tr>
+    <tr>
+      <td>44</td>
+      <td>29947</td>
+      <td>2.67</td>
+    </tr>
+    <tr>
+      <td>11</td>
+      <td>25675</td>
+      <td>2.29</td>
+    </tr>
+    <tr>
+      <td>43</td>
+      <td>25054</td>
+      <td>2.24</td>
+    </tr>
+    <tr>
+      <td>45</td>
+      <td>23773</td>
+      <td>2.12</td>
+    </tr>
+    <tr>
+      <td>28</td>
+      <td>23467</td>
+      <td>2.09</td>
+    </tr>
+    <tr>
+      <td>33</td>
+      <td>23062</td>
+      <td>2.06</td>
+    </tr>
+    <tr>
+      <td>12</td>
+      <td>23057</td>
+      <td>2.06</td>
+    </tr>
+  </tbody>
+</table></div>
+<p>나머지 35종, 569,471건</p>
+<p>
+COMMUNITY AREA: 78종, 유효 값 1,112,688건</p>
+<div class="table-container"><table class="dataframe">
+  <thead>
+    <tr style="text-align: left;">
+      <th>value</th>
+      <th>count</th>
+      <th>pct</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>8</td>
+      <td>97843</td>
+      <td>8.79</td>
+    </tr>
+    <tr>
+      <td>32</td>
+      <td>92681</td>
+      <td>8.33</td>
+    </tr>
+    <tr>
+      <td>28</td>
+      <td>54818</td>
+      <td>4.93</td>
+    </tr>
+    <tr>
+      <td>24</td>
+      <td>50447</td>
+      <td>4.53</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>48359</td>
+      <td>4.35</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>35349</td>
+      <td>3.18</td>
+    </tr>
+    <tr>
+      <td>22</td>
+      <td>32483</td>
+      <td>2.92</td>
+    </tr>
+    <tr>
+      <td>25</td>
+      <td>27952</td>
+      <td>2.51</td>
+    </tr>
+    <tr>
+      <td>30</td>
+      <td>26982</td>
+      <td>2.42</td>
+    </tr>
+    <tr>
+      <td>19</td>
+      <td>26442</td>
+      <td>2.38</td>
+    </tr>
+    <tr>
+      <td>31</td>
+      <td>23496</td>
+      <td>2.11</td>
+    </tr>
+    <tr>
+      <td>61</td>
+      <td>22880</td>
+      <td>2.06</td>
+    </tr>
+    <tr>
+      <td>16</td>
+      <td>21913</td>
+      <td>1.97</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>21648</td>
+      <td>1.95</td>
+    </tr>
+    <tr>
+      <td>15</td>
+      <td>21077</td>
+      <td>1.89</td>
+    </tr>
+  </tbody>
+</table></div>
+<p>나머지 63종, 508,318건</p>
+<p>
+LICENSE CODE: 152종, 유효 값 1,212,282건</p>
+<div class="table-container"><table class="dataframe">
+  <thead>
+    <tr style="text-align: left;">
+      <th>value</th>
+      <th>count</th>
+      <th>pct</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1010</td>
+      <td>483865</td>
+      <td>39.91</td>
+    </tr>
+    <tr>
+      <td>1006</td>
+      <td>188636</td>
+      <td>15.56</td>
+    </tr>
+    <tr>
+      <td>4404</td>
+      <td>74231</td>
+      <td>6.12</td>
+    </tr>
+    <tr>
+      <td>1781</td>
+      <td>58507</td>
+      <td>4.83</td>
+    </tr>
+    <tr>
+      <td>1475</td>
+      <td>41326</td>
+      <td>3.41</td>
+    </tr>
+    <tr>
+      <td>1012</td>
+      <td>27149</td>
+      <td>2.24</td>
+    </tr>
+    <tr>
+      <td>1011</td>
+      <td>26142</td>
+      <td>2.16</td>
+    </tr>
+    <tr>
+      <td>1470</td>
+      <td>19912</td>
+      <td>1.64</td>
+    </tr>
+    <tr>
+      <td>1474</td>
+      <td>19124</td>
+      <td>1.58</td>
+    </tr>
+    <tr>
+      <td>1009</td>
+      <td>15156</td>
+      <td>1.25</td>
+    </tr>
+    <tr>
+      <td>1329</td>
+      <td>14746</td>
+      <td>1.22</td>
+    </tr>
+    <tr>
+      <td>8340</td>
+      <td>13738</td>
+      <td>1.13</td>
+    </tr>
+    <tr>
+      <td>4406</td>
+      <td>13444</td>
+      <td>1.11</td>
+    </tr>
+    <tr>
+      <td>1007</td>
+      <td>11022</td>
+      <td>0.91</td>
+    </tr>
+    <tr>
+      <td>1008</td>
+      <td>10959</td>
+      <td>0.9</td>
+    </tr>
+  </tbody>
+</table></div>
+<p>나머지 137종, 194,325건</p>
+<p>
+LICENSE DESCRIPTION: 152종, 유효 값 1,212,282건</p>
+<div class="table-container"><table class="dataframe">
+  <thead>
+    <tr style="text-align: left;">
+      <th>value</th>
+      <th>count</th>
+      <th>pct</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Limited Business License</td>
+      <td>483865</td>
+      <td>39.91</td>
+    </tr>
+    <tr>
+      <td>Retail Food Establishment</td>
+      <td>188636</td>
+      <td>15.56</td>
+    </tr>
+    <tr>
+      <td>Regulated Business License</td>
+      <td>74231</td>
+      <td>6.12</td>
+    </tr>
+    <tr>
+      <td>Tobacco</td>
+      <td>58507</td>
+      <td>4.83</td>
+    </tr>
+    <tr>
+      <td>Consumption on Premises - Incidental Activity</td>
+      <td>41326</td>
+      <td>3.41</td>
+    </tr>
+    <tr>
+      <td>Home Occupation</td>
+      <td>27149</td>
+      <td>2.24</td>
+    </tr>
+    <tr>
+      <td>Home Repair</td>
+      <td>26142</td>
+      <td>2.16</td>
+    </tr>
+    <tr>
+      <td>Tavern</td>
+      <td>19912</td>
+      <td>1.64</td>
+    </tr>
+    <tr>
+      <td>Package Goods</td>
+      <td>19124</td>
+      <td>1.58</td>
+    </tr>
+    <tr>
+      <td>Manufacturing Establishments</td>
+      <td>15156</td>
+      <td>1.25</td>
+    </tr>
+    <tr>
+      <td>Special Event Food</td>
+      <td>14746</td>
+      <td>1.22</td>
+    </tr>
+    <tr>
+      <td>Motor Vehicle Services License</td>
+      <td>13738</td>
+      <td>1.13</td>
+    </tr>
+    <tr>
+      <td>Peddler License</td>
+      <td>13444</td>
+      <td>1.11</td>
+    </tr>
+    <tr>
+      <td>Wholesale Food Establishment</td>
+      <td>11022</td>
+      <td>0.91</td>
+    </tr>
+    <tr>
+      <td>Hazardous Materials</td>
+      <td>10959</td>
+      <td>0.9</td>
+    </tr>
+  </tbody>
+</table></div>
+<p>나머지 137종, 194,325건</p>
+<p>
+APPLICATION TYPE: 6종, 유효 값 1,212,282건</p>
+<div class="table-container"><table class="dataframe">
+  <thead>
+    <tr style="text-align: left;">
+      <th>value</th>
+      <th>count</th>
+      <th>pct</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>RENEW</td>
+      <td>922330</td>
+      <td>76.08</td>
+    </tr>
+    <tr>
+      <td>ISSUE</td>
+      <td>271238</td>
+      <td>22.37</td>
+    </tr>
+    <tr>
+      <td>C_LOC</td>
+      <td>16450</td>
+      <td>1.36</td>
+    </tr>
+    <tr>
+      <td>C_EXPA</td>
+      <td>944</td>
+      <td>0.08</td>
+    </tr>
+    <tr>
+      <td>C_SBA</td>
+      <td>801</td>
+      <td>0.07</td>
+    </tr>
+    <tr>
+      <td>C_CAPA</td>
+      <td>519</td>
+      <td>0.04</td>
+    </tr>
+  </tbody>
+</table></div>
+<p>
+CONDITIONAL APPROVAL: 2종, 유효 값 1,212,282건</p>
+<div class="table-container"><table class="dataframe">
+  <thead>
+    <tr style="text-align: left;">
+      <th>value</th>
+      <th>count</th>
+      <th>pct</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>N</td>
+      <td>1207277</td>
+      <td>99.59</td>
+    </tr>
+    <tr>
+      <td>Y</td>
+      <td>5005</td>
+      <td>0.41</td>
+    </tr>
+  </tbody>
+</table></div>
+<p>
+LICENSE STATUS: 5종, 유효 값 1,212,282건</p>
+<div class="table-container"><table class="dataframe">
+  <thead>
+    <tr style="text-align: left;">
+      <th>value</th>
+      <th>count</th>
+      <th>pct</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>AAI</td>
+      <td>1131616</td>
+      <td>93.35</td>
+    </tr>
+    <tr>
+      <td>AAC</td>
+      <td>79181</td>
+      <td>6.53</td>
+    </tr>
+    <tr>
+      <td>REV</td>
+      <td>1471</td>
+      <td>0.12</td>
+    </tr>
+    <tr>
+      <td>REA</td>
+      <td>13</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <td>INQ</td>
+      <td>1</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table></div>
+<h3>날짜 범위와 변환 유효성</h3>
+<p>MM/DD/YYYY 기준</p>
+<div class="table-container"><table class="dataframe">
+  <thead>
+    <tr style="text-align: left;">
+      <th>column</th>
+      <th>first</th>
+      <th>last</th>
+      <th>invalid_date</th>
+      <th>after_snapshot</th>
+      <th>invalid_examples</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>APPLICATION CREATED DATE</td>
+      <td>2000-06-19</td>
+      <td>2026-11-18</td>
+      <td>0</td>
+      <td>0</td>
+      <td>–</td>
+    </tr>
+    <tr>
+      <td>APPLICATION REQUIREMENTS COMPLETE</td>
+      <td>2000-06-16</td>
+      <td>2026-11-18</td>
+      <td>0</td>
+      <td>0</td>
+      <td>–</td>
+    </tr>
+    <tr>
+      <td>PAYMENT DATE</td>
+      <td>1997-04-15</td>
+      <td>2026-11-18</td>
+      <td>0</td>
+      <td>0</td>
+      <td>–</td>
+    </tr>
+    <tr>
+      <td>LICENSE TERM START DATE</td>
+      <td>1995-02-16</td>
+      <td>2028-07-16</td>
+      <td>0</td>
+      <td>–</td>
+      <td>–</td>
+    </tr>
+    <tr>
+      <td>LICENSE TERM EXPIRATION DATE</td>
+      <td>0206-08-17</td>
+      <td>9999-01-01</td>
+      <td>0</td>
+      <td>–</td>
+      <td>–</td>
+    </tr>
+    <tr>
+      <td>LICENSE APPROVED FOR ISSUANCE</td>
+      <td>2000-06-16</td>
+      <td>2026-11-18</td>
+      <td>0</td>
+      <td>0</td>
+      <td>–</td>
+    </tr>
+    <tr>
+      <td>DATE ISSUED</td>
+      <td>2002-01-02</td>
+      <td>2026-11-18</td>
+      <td>0</td>
+      <td>0</td>
+      <td>–</td>
+    </tr>
+    <tr>
+      <td>LICENSE STATUS CHANGE DATE</td>
+      <td>2002-01-08</td>
+      <td>2026-11-18</td>
+      <td>0</td>
+      <td>0</td>
+      <td>–</td>
+    </tr>
+  </tbody>
+</table></div>
+<p>기준일: 2026-11-20 (원본 파일명 날짜)</p>
+<p>시작일이 만료일보다 늦음: 2,963건 (두 날짜가 유효한 1,209,418건 중)</p>
+<h3>숫자 변환 유효성 및 이상값</h3>
+<div class="table-container"><table class="dataframe">
+  <thead>
+    <tr style="text-align: left;">
+      <th>column</th>
+      <th>expected</th>
+      <th>invalid_number</th>
+      <th>negative</th>
+      <th>outside_range</th>
+      <th>invalid_examples</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>LICENSE ID</td>
+      <td>정수</td>
+      <td>0</td>
+      <td>0</td>
+      <td>–</td>
+      <td>–</td>
+    </tr>
+    <tr>
+      <td>LICENSE NUMBER</td>
+      <td>정수</td>
+      <td>0</td>
+      <td>0</td>
+      <td>–</td>
+      <td>–</td>
+    </tr>
+    <tr>
+      <td>ACCOUNT NUMBER</td>
+      <td>정수</td>
+      <td>0</td>
+      <td>0</td>
+      <td>–</td>
+      <td>–</td>
+    </tr>
+    <tr>
+      <td>SITE NUMBER</td>
+      <td>정수</td>
+      <td>0</td>
+      <td>0</td>
+      <td>–</td>
+      <td>–</td>
+    </tr>
+    <tr>
+      <td>WARD</td>
+      <td>정수</td>
+      <td>0</td>
+      <td>0</td>
+      <td>–</td>
+      <td>–</td>
+    </tr>
+    <tr>
+      <td>PRECINCT</td>
+      <td>정수</td>
+      <td>0</td>
+      <td>0</td>
+      <td>–</td>
+      <td>–</td>
+    </tr>
+    <tr>
+      <td>POLICE DISTRICT</td>
+      <td>정수</td>
+      <td>0</td>
+      <td>0</td>
+      <td>–</td>
+      <td>–</td>
+    </tr>
+    <tr>
+      <td>COMMUNITY AREA</td>
+      <td>정수</td>
+      <td>0</td>
+      <td>0</td>
+      <td>–</td>
+      <td>–</td>
+    </tr>
+    <tr>
+      <td>LICENSE CODE</td>
+      <td>정수</td>
+      <td>0</td>
+      <td>0</td>
+      <td>–</td>
+      <td>–</td>
+    </tr>
+    <tr>
+      <td>SSA</td>
+      <td>정수</td>
+      <td>0</td>
+      <td>0</td>
+      <td>–</td>
+      <td>–</td>
+    </tr>
+    <tr>
+      <td>LATITUDE</td>
+      <td>좌표</td>
+      <td>0</td>
+      <td>–</td>
+      <td>0</td>
+      <td>–</td>
+    </tr>
+    <tr>
+      <td>LONGITUDE</td>
+      <td>좌표</td>
+      <td>0</td>
+      <td>–</td>
+      <td>0</td>
+      <td>–</td>
+    </tr>
+  </tbody>
+</table></div>
+<p>허용 범위: 위도 -90~90, 경도 -180~180</p>
+</section>
+<section id="community_areas"><h2>Community Areas</h2>
+<p>Community_Areas.csv</p>
+<p>행 수: 77 / 열 수: 6</p>
+<h3>결측값</h3>
+<p>NULL 표기와 빈 문자열·공백을 별도로 집계</p>
+<div class="table-container"><table class="dataframe">
+  <thead>
+    <tr style="text-align: left;">
+      <th>column</th>
+      <th>null_count</th>
+      <th>null_pct</th>
+      <th>blank_count</th>
+      <th>blank_pct</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>the_geom</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <td>AREA_NUMBE</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <td>COMMUNITY</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <td>AREA_NUM_1</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <td>SHAPE_AREA</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <td>SHAPE_LEN</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table></div>
+<h3>중복값</h3>
+<p>첫 행을 제외한 초과 중복 건수</p>
+<p>전체 행 중복: 0건</p>
+<p>AREA_NUMBE: 초과 0건, 중복 ID 0개, 예시 –</p>
+<p>AREA_NUM_1: 초과 0건, 중복 ID 0개, 예시 –</p>
+<h3>범주형 고유값과 빈도</h3>
+<p>비율은 결측·빈값을 제외한 건수 기준</p>
+<p>
+COMMUNITY: 77종, 유효 값 77건</p>
+<div class="table-container"><table class="dataframe">
+  <thead>
+    <tr style="text-align: left;">
+      <th>value</th>
+      <th>count</th>
+      <th>pct</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ROGERS PARK</td>
+      <td>1</td>
+      <td>1.3</td>
+    </tr>
+    <tr>
+      <td>WEST RIDGE</td>
+      <td>1</td>
+      <td>1.3</td>
+    </tr>
+    <tr>
+      <td>UPTOWN</td>
+      <td>1</td>
+      <td>1.3</td>
+    </tr>
+    <tr>
+      <td>LINCOLN SQUARE</td>
+      <td>1</td>
+      <td>1.3</td>
+    </tr>
+    <tr>
+      <td>NORTH CENTER</td>
+      <td>1</td>
+      <td>1.3</td>
+    </tr>
+    <tr>
+      <td>LAKE VIEW</td>
+      <td>1</td>
+      <td>1.3</td>
+    </tr>
+    <tr>
+      <td>LINCOLN PARK</td>
+      <td>1</td>
+      <td>1.3</td>
+    </tr>
+    <tr>
+      <td>NEAR NORTH SIDE</td>
+      <td>1</td>
+      <td>1.3</td>
+    </tr>
+    <tr>
+      <td>EDISON PARK</td>
+      <td>1</td>
+      <td>1.3</td>
+    </tr>
+    <tr>
+      <td>NORWOOD PARK</td>
+      <td>1</td>
+      <td>1.3</td>
+    </tr>
+    <tr>
+      <td>JEFFERSON PARK</td>
+      <td>1</td>
+      <td>1.3</td>
+    </tr>
+    <tr>
+      <td>FOREST GLEN</td>
+      <td>1</td>
+      <td>1.3</td>
+    </tr>
+    <tr>
+      <td>NORTH PARK</td>
+      <td>1</td>
+      <td>1.3</td>
+    </tr>
+    <tr>
+      <td>ALBANY PARK</td>
+      <td>1</td>
+      <td>1.3</td>
+    </tr>
+    <tr>
+      <td>PORTAGE PARK</td>
+      <td>1</td>
+      <td>1.3</td>
+    </tr>
+  </tbody>
+</table></div>
+<p>나머지 62종, 62건</p>
+<h3>날짜 범위와 변환 유효성</h3>
+<p>MM/DD/YYYY 기준</p>
+<p>점검 대상 날짜 컬럼 없음</p>
+<h3>숫자 변환 유효성 및 이상값</h3>
+<div class="table-container"><table class="dataframe">
+  <thead>
+    <tr style="text-align: left;">
+      <th>column</th>
+      <th>expected</th>
+      <th>invalid_number</th>
+      <th>negative</th>
+      <th>outside_range</th>
+      <th>invalid_examples</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>AREA_NUMBE</td>
+      <td>정수</td>
+      <td>0</td>
+      <td>0</td>
+      <td>–</td>
+      <td>–</td>
+    </tr>
+    <tr>
+      <td>AREA_NUM_1</td>
+      <td>정수</td>
+      <td>0</td>
+      <td>0</td>
+      <td>–</td>
+      <td>–</td>
+    </tr>
+    <tr>
+      <td>SHAPE_AREA</td>
+      <td>숫자</td>
+      <td>0</td>
+      <td>0</td>
+      <td>–</td>
+      <td>–</td>
+    </tr>
+    <tr>
+      <td>SHAPE_LEN</td>
+      <td>숫자</td>
+      <td>0</td>
+      <td>0</td>
+      <td>–</td>
+      <td>–</td>
+    </tr>
+  </tbody>
+</table></div>
+</section>
+</main>
+</html>

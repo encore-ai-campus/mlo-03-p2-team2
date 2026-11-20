@@ -1,5 +1,5 @@
 ﻿"File","Status","Bytes","SHA256","Source"
-"food_inspections.csv","downloaded","356846515","C97464B9AA02801C7E7BEDCA876D0D6FFF482FB56366AD35BEFE5C68897E4FE7","https://data.cityofchicago.org/api/v3/views/4ijn-s7e5/export.csv?accessType=DOWNLOAD"
+"food_inspections.csv","team_shared_verified","356934166","B43BEB7FAE834A8698CA162004CAF2929CB2ECA7FF75C27B4DB6BF07AA103C98","https://data.cityofchicago.org/d/4ijn-s7e5"
 "business_licenses.csv","downloaded","522287024","783354424BEBE4D367BD3A0F9CDC63A846FAE28D50580B9CCF89590D10CC61BB","https://data.cityofchicago.org/api/v3/views/r5kz-chrr/export.csv?accessType=DOWNLOAD"
 "community_areas.geojson","downloaded","2082874","C4B9C42ADC19BACA0A9C6EE3E84B302D40073D3AD99EE3D8B101D5D8217B0D16","https://data.cityofchicago.org/api/v3/views/igwz-8jzy/query.geojson?accessType=DOWNLOAD"
 "food_columns.json","downloaded","36470","C6F6B26D9DA56C5A38FFDB26436B07C3F11CC608151D23A979484D54F59C1987","https://data.cityofchicago.org/api/views/4ijn-s7e5/columns.json"
