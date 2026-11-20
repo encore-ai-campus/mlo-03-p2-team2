@@ -61,4 +61,4 @@ Git의 `data/origin/`에는 점검·인허가 CSV의 gzip 조각 각 2개, GeoJS
 python src/ingestion/restore_origin.py --restore
 ```
 
-분할 조각은 각각 100 MB 이하입니다. 복원한 CSV와 각 파트의 생성 Parquet는 로컬에서 사용하고, Git에는 원천 분할 파일과 변환·검증 코드를 유지합니다. [업로드 파일 SHA-256](../data/origin/SHA256SUMS) · [원천 6개 SHA-256](../metadata/source_catalog/verification/download_manifest.csv)
+원천 분할 조각은 각각 100 MB 이하입니다. 복원한 CSV는 로컬에서 사용합니다. Git에는 원천 파일과 검증 코드, 공유하기로 한 관점별 산출물을 유지합니다. 04번 Parquet는 기존 Bronze·Silver·Gold의 `04_license/`에서 받습니다. [원천 분할 파일 SHA-256](../data/origin/SHA256SUMS) · [원천 6개 SHA-256](../metadata/source_catalog/verification/download_manifest.csv) · [04번 Parquet 이용 방법](domains/04_license.md#산출물-재현)

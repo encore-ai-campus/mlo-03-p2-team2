@@ -2,3 +2,5 @@
 /data/origin/*.geojson -text
 /data/origin/*.part-* -text
 /data/origin/SHA256SUMS text eol=lf
+*.parquet binary
+/data/01_bronze/04_license/*.parquet.part-* binary

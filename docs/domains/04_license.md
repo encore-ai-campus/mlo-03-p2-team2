@@ -84,4 +84,20 @@ python "$domain/run_pipeline.py" --raw-dir data/origin `
 
 ## 산출물 재현
 
-로컬에서 생성한 04번 Parquet는 `data/01_bronze/04_license/` 2개, `data/02_silver/04_license/` 2개, `data/03_gold/04_license/` 5개입니다. 각 파일명은 `04_`로 시작합니다. 공용본은 Python 3.14.10과 PyArrow 26.0.1로 검증했으며, 같은 환경에서 생성한 Parquet의 SHA-256을 비교할 수 있습니다. 새 경로에서 처음 실행하면 `ingestion_manifest.json`의 실제 적재 시각이 새로 기록됩니다. [Parquet 체크섬](../../reports/04_license/parquet_sha256sums.txt)
+04번 Parquet는 `data/01_bronze/04_license/` 2개, `data/02_silver/04_license/` 2개, `data/03_gold/04_license/` 5개에 있습니다. 100 MB를 넘는 Bronze 인허가만 같은 폴더에 `.part-001`, `.part-002`로 나눴습니다. 전체 파일과 조각의 SHA-256은 아래 목록에서 확인합니다. [Parquet 체크섬](../../reports/04_license/parquet_sha256sums.txt)
+
+원천 CSV를 복원한 뒤 `python src/domains/04_license/01_bronze.py`를 실행하면 동일한 Bronze 파일을 재생성합니다. 분할 파일에서 직접 복원하려면 저장소 루트에서 다음 코드를 실행합니다. `xb`는 기존 파일을 보호합니다.
+
+```python
+from pathlib import Path
+from shutil import copyfileobj
+
+bronze = Path("data/01_bronze/04_license/04_business_licenses.parquet")
+first = bronze.with_name(bronze.name + ".part-001")
+second = bronze.with_name(bronze.name + ".part-002")
+with first.open("rb") as left, second.open("rb") as right, bronze.open("xb") as output:
+    copyfileobj(left, output)
+    copyfileobj(right, output)
+```
+
+공용본은 Python 3.14.10과 PyArrow 26.0.1로 검증했습니다. 동일한 환경에서 생성한 파일은 SHA-256으로 비교할 수 있습니다. 새 경로에 처음 적재하면 `ingestion_manifest.json`에 실제 적재 시각이 기록됩니다.
