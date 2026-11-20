@@ -8,6 +8,6 @@
 | Silver | [표준 스키마와 행 추적 검증 6/6](validation_silver.csv) |
 | 품질 검사 | [품질 관리 MD](품질%20관리.md) · [규칙별 전후 비교 CSV](quality_comparison.csv) · [보고서 검증 3/3](validation_quality.csv) |
 | Gold | [키·기간 매칭·Silver 대비 사실 검증 23/23](validation_gold.csv) |
-| 체크섬 | [Git 원천 파일 SHA-256](../../data/origin/SHA256SUMS) · [04번 Parquet SHA-256](parquet_sha256sums.txt) |
+| 체크섬 | [Git 원천 파일 SHA-256](../../data/00_origin/SHA256SUMS) · [04번 Parquet SHA-256](parquet_sha256sums.txt) |
 
 [기존 318,552행 대비 매칭 건수 비교](match_comparison.md) · [04번 통합 문서와 실행 방법](../../docs/domains/04_license.md) · [컬럼 변환 목록](../../metadata/lineage/04_license/column_lineage.csv)

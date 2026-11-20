@@ -104,7 +104,7 @@ def run(root, catalog, restore):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--origin-dir", type=Path, default=PROJECT / "data" / "origin")
+    parser.add_argument("--origin-dir", type=Path, default=PROJECT / "data" / "00_origin")
     parser.add_argument("--catalog", type=Path, default=PROJECT / "metadata/source_catalog/verification/download_manifest.csv")
     parser.add_argument("--restore", action="store_true", help="Write CSVs missing from the Origin directory")
     args = parser.parse_args()

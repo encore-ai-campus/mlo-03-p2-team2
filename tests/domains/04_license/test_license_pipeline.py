@@ -33,7 +33,7 @@ def write_csv(path, columns, rows):
 @pytest.fixture
 def project(tmp_path):
     data, reports = (tmp_path / name for name in ("data", "reports"))
-    raw = data / "origin"
+    raw = data / "00_origin"
     raw.mkdir(parents=True)
 
     def license_row(key, number, start, end):

@@ -68,7 +68,7 @@ def settings(args):
     if args.raw_dir:
         raw = args.raw_dir.resolve()
     else:
-        raw = project_path(os.environ.get(env_key) or dotenv_value(env_key) or "data/origin")
+        raw = project_path(os.environ.get(env_key) or dotenv_value(env_key) or "data/00_origin")
     data, reports = args.data_dir.resolve(), args.report_dir.resolve()
     stages = [(data / dirname).resolve() for dirname in STAGE_DIRS.values()]
     if (directories_overlap(data, reports)

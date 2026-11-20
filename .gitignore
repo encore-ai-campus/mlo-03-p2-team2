@@ -60,13 +60,13 @@ download_manifest.csv
 Thumbs.db
 
 # The team tracks one shared Origin snapshot. Restored CSV files remain local.
-!/data/origin/SHA256SUMS
-!/data/origin/food_inspections.csv.gz.part-00[12]
-!/data/origin/business_licenses.csv.gz.part-00[12]
-!/data/origin/community_areas.geojson
-!/data/origin/area_columns.json
-!/data/origin/food_columns.json
-!/data/origin/license_columns.json
+!/data/00_origin/SHA256SUMS
+!/data/00_origin/food_inspections.csv.gz.part-00[12]
+!/data/00_origin/business_licenses.csv.gz.part-00[12]
+!/data/00_origin/community_areas.geojson
+!/data/00_origin/area_columns.json
+!/data/00_origin/food_columns.json
+!/data/00_origin/license_columns.json
 
 # Published Domain 04 snapshot. The reassembled Bronze file stays local.
 !/data/01_bronze/04_license/04_food_inspections.parquet

@@ -39,7 +39,7 @@ with pq.ParquetFile("data/02_silver/04_license/04_food_inspections.parquet") as 
 
 | 로컬 위치 | 내용 |
 | --- | --- |
-| `data/origin/` | 팀 공용 원천 분할 파일, GeoJSON, 컬럼 설명 JSON, 체크섬과 복원된 CSV |
+| `data/00_origin/` | 팀 공용 원천 분할 파일, GeoJSON, 컬럼 설명 JSON, 체크섬과 복원된 CSV |
 | `data/01_bronze/04_license/` · `data/02_silver/04_license/` | 공용본으로 실행한 04번 원천 보존본과 표준화본 |
 | `data/03_gold/04_license/` | 공용본으로 생성한 04번 사실·차원 Parquet |
 | `src/domains/04_license/` · `src/ingestion/` | 04번 변환·검증 코드와 원천 프로파일링 코드 |
@@ -47,7 +47,7 @@ with pq.ParquetFile("data/02_silver/04_license/04_food_inspections.parquet") as 
 | `reports/04_license/` | 팀 공유 스냅샷의 품질 검사와 단계별 검증 보고서 |
 | `reports/runs/04_license/` | 공용본 실행에서 생성한 로컬 보고서 |
 
-`.env`나 환경 변수에서 원천 경로를 지정한 경우 `CHICAGO_RAW_DIR=data/origin`으로 맞춥니다.
+`.env`나 환경 변수에서 원천 경로를 지정한 경우 `CHICAGO_RAW_DIR=data/00_origin`으로 맞춥니다.
 
 공용 점검 CSV는 03번의 `Food_Inspections_20261119.zip`에서 가져온 **318,627행** 버전입니다. 나머지 원천 5개는 기존 파일을 체크섬으로 대조했습니다. 기본 단계 폴더와 공유 보고서는 이 공용본의 결과입니다. [현재 공용 원천 체크섬](../metadata/source_catalog/verification/download_manifest.csv) · [기존·공용본 매칭 비교](../reports/04_license/match_comparison.md)
 
@@ -55,10 +55,10 @@ Bronze·Silver·Gold는 각각 동일한 01~05 관점 폴더를 사용합니다.
 
 ## 팀 공용 원천
 
-Git의 `data/origin/`에는 점검·인허가 CSV의 gzip 조각 각 2개, GeoJSON, 설명 JSON 3개와 `SHA256SUMS`가 있습니다. 팀원은 저장소를 받은 뒤 아래 명령으로 같은 폴더에 CSV를 복원합니다. 이미 복원된 파일은 SHA-256을 대조하며, 검증만 할 때는 `--restore`를 빼면 됩니다.
+Git의 `data/00_origin/`에는 점검·인허가 CSV의 gzip 조각 각 2개, GeoJSON, 설명 JSON 3개와 `SHA256SUMS`가 있습니다. 팀원은 저장소를 받은 뒤 아래 명령으로 같은 폴더에 CSV를 복원합니다. 이미 복원된 파일은 SHA-256을 대조하며, 검증만 할 때는 `--restore`를 빼면 됩니다.
 
 ```powershell
 python src/ingestion/restore_origin.py --restore
 ```
 
-원천 분할 조각은 각각 100 MB 이하입니다. 복원한 CSV는 로컬에서 사용합니다. Git에는 원천 파일과 검증 코드, 공유하기로 한 관점별 산출물을 유지합니다. 04번 Parquet는 기존 Bronze·Silver·Gold의 `04_license/`에서 받습니다. [원천 분할 파일 SHA-256](../data/origin/SHA256SUMS) · [원천 6개 SHA-256](../metadata/source_catalog/verification/download_manifest.csv) · [04번 Parquet 이용 방법](domains/04_license.md#산출물-재현)
+원천 분할 조각은 각각 100 MB 이하입니다. 복원한 CSV는 로컬에서 사용합니다. Git에는 원천 파일과 검증 코드, 공유하기로 한 관점별 산출물을 유지합니다. 04번 Parquet는 기존 Bronze·Silver·Gold의 `04_license/`에서 받습니다. [원천 분할 파일 SHA-256](../data/00_origin/SHA256SUMS) · [원천 6개 SHA-256](../metadata/source_catalog/verification/download_manifest.csv) · [04번 Parquet 이용 방법](domains/04_license.md#산출물-재현)

@@ -28,7 +28,7 @@
 
 | 단계 | 입력 → 출력 | 변환 내용 | 상세 기록 |
 | --- | --- | --- | --- |
-| 00 Origin | `data/origin/`의 점검·인허가 CSV와 컬럼 설명 JSON | 원천 컬럼, 제공 타입, 결측·형식·키, 스냅샷 체크섬 확인 | [00 Origin](04_license/00_origin/README.md) |
+| 00 Origin | `data/00_origin/`의 점검·인허가 CSV와 컬럼 설명 JSON | 원천 컬럼, 제공 타입, 결측·형식·키, 스냅샷 체크섬 확인 | [00 Origin](04_license/00_origin/README.md) |
 | 01 Bronze | 원천 CSV 2개 → `data/01_bronze/04_license/`의 Parquet 2개와 적재 기록 | 원천 컬럼·문자열 값 보존, `source_row_num` 추가 | [01 Bronze](04_license/01_bronze/README.md) |
 | 02 Silver | Bronze Parquet 2개 → `data/02_silver/04_license/`의 Parquet 2개 | 필요한 업무 컬럼 선택, 이름·타입·결측·코드 표준화 | [02 Silver](04_license/02_silver/README.md) |
 | 품질 검사 | Bronze·Silver Parquet → `reports/runs/04_license/`의 MD·CSV | 13개 결정 ID로 표준화 전후 위반 비교 | [품질 검사](04_license/quality/README.md) · [공유 보고서](../../reports/04_license/README.md) |
@@ -45,7 +45,7 @@
 ```powershell
 python src/ingestion/restore_origin.py --restore
 $domain = 'src/domains/04_license'
-$options = @('--raw-dir', 'data/origin', '--data-dir', 'data',
+$options = @('--raw-dir', 'data/00_origin', '--data-dir', 'data',
              '--report-dir', 'reports/runs/04_license')
 
 python "$domain/01_bronze.py" @options
@@ -60,7 +60,7 @@ python "$domain/validate_gold.py" @options
 
 [공용 원천 설정 예시](../../config/sources.example.yaml)의 `food_inspections`와 `business_licenses`를 사용합니다. `--sources-config`로 다른 YAML를 지정할 수 있습니다. 각 소스에 `file`, `format`, 선택 사항 `columns`를 지정합니다. `format: xlsx`는 `sheet`로 읽을 시트를 선택하며, 워크북에 저장된 셀 값을 읽습니다. 다른 헤더로 Silver를 만들 때는 `--dictionary`로 대응하는 컬럼 사전을 지정합니다.
 
-기본 원천 폴더는 `data/origin/`입니다. 원천 경로를 따로 지정하면 `--raw-dir`, `CHICAGO_RAW_DIR` 환경 변수, `.env` 순서로 적용됩니다. `data/01_bronze/`, `data/02_silver/`, `data/03_gold/`에는 이번 **318,627행** 공용본으로 만든 결과를 둡니다. 같은 입력과 라이브러리 버전으로 다시 돌리면 기존 Parquet와 체크섬을 대조합니다. 새 스냅샷을 검증할 때는 출력 위치를 따로 지정할 수 있습니다.
+기본 원천 폴더는 `data/00_origin/`입니다. 원천 경로를 따로 지정하면 `--raw-dir`, `CHICAGO_RAW_DIR` 환경 변수, `.env` 순서로 적용됩니다. `data/01_bronze/`, `data/02_silver/`, `data/03_gold/`에는 이번 **318,627행** 공용본으로 만든 결과를 둡니다. 같은 입력과 라이브러리 버전으로 다시 돌리면 기존 Parquet와 체크섬을 대조합니다. 새 스냅샷을 검증할 때는 출력 위치를 따로 지정할 수 있습니다.
 
 ## 전체 실행, 검증, 추가 데이터 반영
 
@@ -75,7 +75,7 @@ python "$domain/run_pipeline.py" @options --validate-only         # 생성된 �
 새 파일이 **전체 스냅샷**이면 `--raw-dir`에 새 원천 폴더를 지정하고, `--data-dir`과 `--report-dir`에 새 버전의 경로를 지정해 실행합니다. **추가·수정 행만** 받은 경우에는 다음 순서로 실행합니다. `data/incoming/next`에 `food_inspections.csv`, `business_licenses.csv` 중 받은 파일을 둡니다. 각 행은 기존 CSV의 모든 컬럼을 포함해야 하며, 열 순서는 바뀌어도 됩니다.
 
 ```powershell
-python "$domain/run_pipeline.py" --raw-dir data/origin `
+python "$domain/run_pipeline.py" --raw-dir data/00_origin `
   --delta-dir data/incoming/next --combined-raw-dir data/combined_04/next `
   --data-dir data/team_next --report-dir reports/runs/team_next/04_license
 ```
