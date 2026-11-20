@@ -51,7 +51,7 @@ for target, expected in hashes.items():
                 with part.open("rb") as source:
                     copyfileobj(source, output, length=1024 * 1024)
         verify(pending, expected)
-        pending.hardlink_to(target)
+        target.hardlink_to(pending)
     finally:
         if pending is not None:
             pending.unlink(missing_ok=True)
