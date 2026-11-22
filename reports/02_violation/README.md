@@ -4,6 +4,8 @@
 
 아래 표와 체크섬은 당시 Git에 공개한 스냅샷에 해당합니다. 공용 Bronze의 적재 이력을 이어받는 현재 코드는 별도 실행 폴더에 결과를 생성합니다. [현재 실행 및 검증 방법](../../docs/domains/02_violation/folder_structure_alignment.md)
 
+초기 02 실행의 [프로파일](legacy/violations_profile.json), [품질 보고서](legacy/violations_quality_report.csv), [분석 HTML](legacy/violations_analysis.html)은 이 폴더의 `legacy/`에 보관합니다. 당시 변환 기록은 [02 레거시 매핑 폴더](../../metadata/standards/02_violation/legacy/)에 있습니다. 초기 대사 보고서는 03의 예전 입력 경로와 호환되도록 [기존 위치](../quality/violations_reconciliation.json)에 보관합니다.
+
 | 단계 | Parquet | 행 수 | Git에 저장한 형태 |
 | --- | --- | ---: | --- |
 | Bronze | `02_food_inspections.parquet` | 318,627 | 단일 파일 |

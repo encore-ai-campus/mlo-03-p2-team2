@@ -38,7 +38,7 @@ fact_inspection_violation (bronze_row_number, item_sequence_num grain)
 
 최종 코드로 실제 실행을 두 번 했으며 두 실행 모두 위 건수·schema·PK/FK 검증이 같았다. 두 실행의 Dimension content SHA-256은 `cb1b940e5dcff69603252717aa13aa9d1476667badbd6e0347448d051b603830`, Fact content SHA-256은 `1ad308a036fc8c98e60238539cf5583d6d76585e80f817e2769ad08ab864fb26`로 일치했다. 파일 SHA-256도 각각 `cb84660a2e5048a9e23e8dcc17c03b4f39c2f45762acb4b3234a1a07f822a682`, `ff8c8749d4209ab91c985a18f0d090fc2af42afbc3ef38ba1e6153eef4bb1835`로 일치했다. 최종 두 실행의 UTC 시작 시각은 각각 `2026-11-20T05:49:39`, `2026-11-20T05:50:36`이며 실제 기록은 `logs/violations_gold_runs.jsonl`에 있다.
 
-출력은 `data/03_gold/dimensions/dim_violation.parquet`과 `data/03_gold/facts/fact_inspection_violation.parquet`이다. 컬럼별 변환 및 적용 건수는 `metadata/standards/violations_gold_mapping.csv`에 기록했다. 코드는 `src/gold/violations.py`의 `validate_inputs → dimension_members → build → content_hash` 흐름이다. 기존 입력 파일은 읽기만 하고, 다른 내용의 Gold 출력이 이미 있으면 덮어쓰지 않는다.
+출력은 `data/03_gold/dimensions/dim_violation.parquet`과 `data/03_gold/facts/fact_inspection_violation.parquet`이다. 컬럼별 변환 및 적용 건수는 `metadata/standards/02_violation/legacy/violations_gold_mapping.csv`에 기록했다. 코드는 `src/gold/violations.py`의 `validate_inputs → dimension_members → build → content_hash` 흐름이다. 기존 입력 파일은 읽기만 하고, 다른 내용의 Gold 출력이 이미 있으면 덮어쓰지 않는다.
 
 `python -m pytest -q --basetemp C:/violations-gold-all-tests-final` 실행 결과 전체 20개 테스트가 통과했다. Gold 전용 테스트는 3개로 grain/PK/FK·건수 정합성·반복 실행·신규 입력 건수 계산·불일치 시 중단을 확인했다. `git diff --check`도 통과했다. Origin, Bronze, 기존 Silver, Accepted Silver, Quarantine의 SHA-256을 이전 기록과 대조해 모두 일치했다. 실제 Gold 실행 로그는 Git 제외 정책에 따라 커밋하지 않는다.
 

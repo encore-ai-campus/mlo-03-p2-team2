@@ -51,7 +51,7 @@ src/silver/violations.py의 parse_fragment는 조각을 파싱하고, run은 Bro
 
 ## Mapping 기록
 
-metadata/standards/violations_mapping.csv는 실제 실행 건수로 생성했다. 원천 파일·Bronze 파일·원천 컬럼·대상 파일·대상 컬럼·변환·적용 패턴·처리 건수·처리 단위·상태·비고를 기록한다. 주요 매핑은 Violations → source_violations_fragment, violation_code, violation_description, violation_comments, parsing_status다. 여러 조각을 가진 197,271개 원천 셀과 빈 셀 90,000개 처리 방식도 별도 행으로 기록했다.
+metadata/standards/02_violation/legacy/violations_mapping.csv는 실제 실행 건수로 생성했다. 원천 파일·Bronze 파일·원천 컬럼·대상 파일·대상 컬럼·변환·적용 패턴·처리 건수·처리 단위·상태·비고를 기록한다. 주요 매핑은 Violations → source_violations_fragment, violation_code, violation_description, violation_comments, parsing_status다. 여러 조각을 가진 197,271개 원천 셀과 빈 셀 90,000개 처리 방식도 별도 행으로 기록했다.
 
 ## 실행 로그와 보존 검증
 

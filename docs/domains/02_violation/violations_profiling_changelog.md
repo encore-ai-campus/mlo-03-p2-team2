@@ -6,7 +6,7 @@
 - 브랜치: feature/violations-profiling
 - 기준 커밋: 25b70f168abdd36c3d2e0ddccd90f70f54340b05
 - 범위: Food Inspections의 Violations 원문을 읽어 구조와 파싱 가능성을 측정했다.
-- 코드와 결과: src/profiling/profile_violations.py, reports/profiling/violations_profile.json
+- 코드와 결과: src/profiling/profile_violations.py, reports/02_violation/legacy/violations_profile.json
 
 ## 입력 데이터와 방법
 
@@ -65,7 +65,7 @@ Comments: 표식이 없는 1,791개 조각도 모두 코드 헤더와 비어 있
 
 ## 검증과 보존
 
-측정 결과 JSON에는 Origin 및 Bronze 파일 크기와 SHA-256, 배치 크기, 사용한 정규식과 건수 집계가 포함된다. 결과 파일은 reports/profiling/violations_profile.json이다. 프로파일링 코드는 해당 Parquet 컬럼을 읽고 JSON 결과만 쓴다.
+측정 결과 JSON에는 Origin 및 Bronze 파일 크기와 SHA-256, 배치 크기, 사용한 정규식과 건수 집계가 포함된다. 결과 파일은 reports/02_violation/legacy/violations_profile.json이다. 프로파일링 코드는 해당 Parquet 컬럼을 읽고 JSON 결과만 쓴다.
 
 검증 명령 python -m pytest tests/profiling -q --basetemp C:/violations-profile-test는 6개 통과했고, python -m pytest -q --basetemp C:/violations-profile-all은 전체 9개 통과했다. 프로파일 실행은 10,000행 배치로 완료됐다. JSON 결과를 다시 읽었고, 입력 행 수가 Parquet 메타데이터와 일치하며 NULL·빈 문자열·공백 전용·비공란 건수의 합이 318,552인 것을 확인했다. 802,254개 원문 파이프와 인식한 구분자 수도 일치했다. 원천과 Bronze SHA-256은 각각 c97464b9aa02801c7e7bedca876d0d6fff482fb56366ad35befe5c68897e4fe7 및 cbc2b9eb8d5feb883d93619d250193ec6d9d59e572ba4f4e9f0b26a9c40c79c5로 결과 JSON에 기록됐다.
 

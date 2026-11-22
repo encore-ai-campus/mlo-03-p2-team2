@@ -10,7 +10,7 @@
 
 - 코드: `src/domains/02_violation/build_analysis_mart.py`
 - Mart: `data/03_gold/marts/violations_analysis_mart.parquet`
-- HTML: `reports/violations_analysis.html`
+- HTML: `reports/02_violation/legacy/violations_analysis.html`
 - 실행 로그: `logs/violations_analysis_runs.jsonl`
 - 테스트: `tests/domains/02_violation/test_analysis_mart.py`
 

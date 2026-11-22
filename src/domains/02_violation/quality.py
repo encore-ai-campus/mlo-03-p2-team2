@@ -515,7 +515,7 @@ def run(root: Path = PROJECT_ROOT) -> dict:
                 note += " NULL is intentional only for MISSING_COMMENTS_MARKER records."
             _add_rule(rules, "column_null_count", column, output_rows, issue_rows, note)
         _add_rule(
-            rules, "mapping_affected_counts", "metadata/standards/violations_mapping.csv",
+            rules, "mapping_affected_counts", MAPPING_RELATIVE.as_posix(),
             len(mapping_expected), mapping_issues,
             f"Mapping rows={mapping_meta['mapping_rows']}; mismatches={mapping_mismatches}; "
             f"missing targets={mapping_meta['missing_targets']}; "
