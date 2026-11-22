@@ -13,11 +13,11 @@ Silver 표준화나 다른 데이터셋 품질관리는 수행하지 않았다. 
 
 ## 검사 입력과 기준
 
-Bronze 입력은 data/01_bronze/food_inspections/food_inspections.parquet이며, Violations, Inspection ID와 _SRC_FILE/_LOAD_DTM lineage를 사용했다. 검사 대상 Silver는 data/02_silver/food_inspections/violations/inspection_violations.parquet이다. 프로파일 결과 reports/profiling/violations_profile.json과 metadata/standards/violations_mapping.csv를 실제 Bronze/Silver 결과와 대조했다.
+Bronze 입력은 data/01_bronze/food_inspections/food_inspections.parquet이며, Violations, Inspection ID와 _SRC_FILE/_LOAD_DTM lineage를 사용했다. 검사 대상 Silver는 data/02_silver/food_inspections/violations/inspection_violations.parquet이다. 프로파일 결과 reports/02_violation/legacy/violations_profile.json과 metadata/standards/02_violation/legacy/violations_mapping.csv를 실제 Bronze/Silver 결과와 대조했다.
 
 Quality 코드는 Bronze를 다시 배치로 읽어 분리 후보와 기대 파싱 값을 계산한다. 각 Silver 행의 원천 행 번호, 조각 순번, Inspection ID, lineage 값, 원문 조각을 해당 Bronze 행과 순서대로 대조한다. 코드·설명·코멘트·상태도 원문 조각에서 다시 계산해 비교한다. Silver grain은 Bronze 검사 행 안의 위반사항 조각 한 건이며 키는 bronze_row_number + item_sequence_num이다. 같은 코드가 반복돼도 중복으로 세지 않는다.
 
-각 품질 규칙은 issue_rows가 0이면 PASS, 0보다 크면 FAIL이다. 설명·코멘트 NULL은 MISSING_COMMENTS_MARKER 상태의 수와 같을 때 의도된 값으로 PASS 처리한다. 다른 Silver 컬럼의 NULL은 0건을 기대한다. 규칙별 결과는 reports/quality/violations_quality_report.csv에 남긴다.
+각 품질 규칙은 issue_rows가 0이면 PASS, 0보다 크면 FAIL이다. 설명·코멘트 NULL은 MISSING_COMMENTS_MARKER 상태의 수와 같을 때 의도된 값으로 PASS 처리한다. 다른 Silver 컬럼의 NULL은 0건을 기대한다. 규칙별 결과는 reports/02_violation/legacy/violations_quality_report.csv에 남긴다.
 
 ## 실제 검사 결과
 
@@ -43,7 +43,7 @@ Silver의 NULL은 inspection_id 0, bronze_row_number 0, item_sequence_num 0, _SR
 
 ## Mapping 확인
 
-metadata/standards/violations_mapping.csv는 8개 대상 행을 검사했다. 중복 target, 누락 target, 예상 외 target, 처리 건수 불일치가 모두 0이다.
+metadata/standards/02_violation/legacy/violations_mapping.csv는 8개 대상 행을 검사했다. 중복 target, 누락 target, 예상 외 target, 처리 건수 불일치가 모두 0이다.
 
 | Mapping 대상 | 실제 affected_rows |
 | --- | ---: |

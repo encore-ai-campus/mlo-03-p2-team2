@@ -17,12 +17,12 @@ Profiling → Silver 분리·표준화 → Quality / Quarantine
 
 | 단계 | 산출물 |
 | --- | --- |
-| Profiling | `reports/profiling/violations_profile.json` |
+| Profiling | `reports/02_violation/legacy/violations_profile.json` |
 | Silver 정상 | `data/02_silver/food_inspections/violations/inspection_violations_accepted.parquet` |
-| Quality / 격리 | `reports/quality/violations_quality_report.csv`, `data/quarantine/food_inspections/violations/inspection_violations_quarantine.parquet` |
+| Quality / 격리 | `reports/02_violation/legacy/violations_quality_report.csv`, `data/quarantine/food_inspections/violations/inspection_violations_quarantine.parquet` |
 | Gold | `data/03_gold/dimensions/dim_violation.parquet`, `data/03_gold/facts/fact_inspection_violation.parquet` |
 | 분석 Mart | `data/03_gold/marts/violations_analysis_mart.parquet` |
-| 분석 HTML | `reports/violations_analysis.html` |
+| 분석 HTML | `reports/02_violation/legacy/violations_analysis.html` |
 | 실행 로그 | `logs/violations_gold_runs.jsonl`, `logs/violations_analysis_runs.jsonl` |
 
 ## 새 원천 기준 건수
