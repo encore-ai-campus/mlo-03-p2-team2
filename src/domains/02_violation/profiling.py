@@ -136,6 +136,44 @@ def parse_fragment(fragment: str) -> dict:
     }
 
 
+def classify_fragment(fragment: str, unrecognized_separator: bool = False) -> dict:
+    """Parse only fields with a visible boundary in the observed source pattern."""
+    header = None if unrecognized_separator else CODE_HEADER.match(fragment)
+    if not header:
+        return {
+            "violation_code": None,
+            "violation_description": None,
+            "violation_comments": None,
+            "parsing_status": "UNRECOGNIZED_SEPARATOR" if unrecognized_separator else "UNPARSED_CODE_HEADER",
+        }
+    body_start = header.start("body")
+    marker = COMMENTS_MARKER.search(fragment, body_start)
+    if not marker:
+        # Without a Comments marker, the boundary between description and
+        # comments cannot be inferred. Keep only the code and raw fragment.
+        return {
+            "violation_code": header.group("code"),
+            "violation_description": None,
+            "violation_comments": None,
+            "parsing_status": "MISSING_COMMENTS_MARKER",
+        }
+
+    description = fragment[body_start:marker.start()].strip()
+    comments = fragment[marker.end():].strip()
+    if not description:
+        status = "EMPTY_DESCRIPTION"
+    elif not comments:
+        status = "EMPTY_COMMENTS"
+    else:
+        status = "PARSED"
+    return {
+        "violation_code": header.group("code"),
+        "violation_description": description or None,
+        "violation_comments": comments or None,
+        "parsing_status": status,
+    }
+
+
 def profile_violations(root: Path = PROJECT_ROOT, batch_size: int = 10_000) -> dict:
     """Stream Bronze and return row, separator, code and text-pattern metrics."""
     root = Path(root)
@@ -154,6 +192,8 @@ def profile_violations(root: Path = PROJECT_ROOT, batch_size: int = 10_000) -> d
 
     counts: Counter[str] = Counter()
     code_counts: Counter[str] = Counter()
+    status_counts: Counter[str] = Counter()
+    extracted = Counter(dict.fromkeys(("code_rows", "description_rows", "comments_rows"), 0))
     examples: list[str] = []
     exception_examples: dict[str, list[str]] = {
         "missing_comments_marker": [],
@@ -187,25 +227,33 @@ def profile_violations(root: Path = PROJECT_ROOT, batch_size: int = 10_000) -> d
             counts["rows_with_literal_pipe"] += int(literal_pipe_count > 0)
             counts["recognized_pipe_separators"] += separator_count
             counts["literal_pipe_characters"] += literal_pipe_count
-            if literal_pipe_count > separator_count:
+            bad_separator = literal_pipe_count > separator_count
+            if bad_separator:
                 counts["rows_with_unrecognized_pipe_separator"] += 1
                 if len(exception_examples["unrecognized_pipe_separator"]) < MAX_EXAMPLES:
                     exception_examples["unrecognized_pipe_separator"].append(shortened(raw))
+                fragments = [raw]
 
             fragment_complete = 0
             for fragment in fragments:
                 counts["candidate_fragments"] += 1
+                classified = classify_fragment(fragment, bad_separator)
+                status = classified["parsing_status"]
+                status_counts[status] += 1
+                extracted["code_rows"] += classified["violation_code"] is not None
+                extracted["description_rows"] += classified["violation_description"] is not None
+                extracted["comments_rows"] += classified["violation_comments"] is not None
                 parsed = parse_fragment(fragment)
-                if parsed["has_code_header"]:
+                if classified["violation_code"] is not None:
                     counts["code_header_matches"] += 1
-                    code_counts[parsed["code"]] += 1
-                else:
+                    code_counts[classified["violation_code"]] += 1
+                elif status == "UNPARSED_CODE_HEADER":
                     counts["code_header_failures"] += 1
                     if len(exception_examples["no_code_header"]) < MAX_EXAMPLES:
                         exception_examples["no_code_header"].append(shortened(fragment))
                 if parsed["has_comments_marker"]:
                     counts["comments_marker_fragments"] += 1
-                else:
+                elif status == "MISSING_COMMENTS_MARKER":
                     counts["missing_comments_marker_fragments"] += 1
                     if len(exception_examples["missing_comments_marker"]) < MAX_EXAMPLES:
                         exception_examples["missing_comments_marker"].append(shortened(fragment))
@@ -221,7 +269,7 @@ def profile_violations(root: Path = PROJECT_ROOT, batch_size: int = 10_000) -> d
                     counts["empty_descriptions"] += 1
                 if parsed["comments_nonempty"]:
                     counts["nonempty_comments"] += 1
-                if parsed["has_code_header"] and parsed["has_comments_marker"] and parsed["description_nonempty"]:
+                if status == "PARSED":
                     counts["fully_parseable_fragments"] += 1
                     fragment_complete += 1
             if fragment_complete == len(fragments):
@@ -247,8 +295,6 @@ def profile_violations(root: Path = PROJECT_ROOT, batch_size: int = 10_000) -> d
         + counts["whitespace_only_rows"] + counts["nonempty_rows"]
     ):
         raise ValueError("Null/empty/whitespace/nonempty row categories do not sum to total")
-    if counts["literal_pipe_characters"] != counts["recognized_pipe_separators"]:
-        raise ValueError("Some literal pipes are outside the observed padded separator format")
     result = {
         "profiled_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "dataset": "food_inspections",
@@ -271,9 +317,11 @@ def profile_violations(root: Path = PROJECT_ROOT, batch_size: int = 10_000) -> d
             "fragment_separator_regex": FRAGMENT_SEPARATOR.pattern,
             "code_header_regex": CODE_HEADER.pattern,
             "description_comments_regex": DESCRIPTION_PATTERN.pattern,
-            "fully_parseable_definition": "code header + nonempty description + Comments marker",
+            "fully_parseable_definition": "recognized separator, code header, Comments marker, nonempty description and comments",
         },
         "counts": dict(sorted(counts.items())),
+        "fragment_status_counts": dict(sorted(status_counts.items())),
+        "extracted_field_counts": dict(extracted),
         "code_pattern": {
             "distinct_codes": len(code_counts),
             "top_20_codes_by_fragment_count": [

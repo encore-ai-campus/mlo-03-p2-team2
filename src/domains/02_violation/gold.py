@@ -6,6 +6,7 @@ Run: python -m src.domains.02_violation.gold
 from __future__ import annotations
 
 from collections import Counter, defaultdict
+import csv
 from datetime import datetime, timezone
 import hashlib
 import json
@@ -25,6 +26,9 @@ DIM_RELATIVE = Path("data/03_gold/02_violation/02_dim_violation.parquet")
 FACT_RELATIVE = Path("data/03_gold/02_violation/02_fact_inspection_violation.parquet")
 MAPPING_RELATIVE = Path("metadata/standards/02_violation/violations_gold_mapping.csv")
 LOG_RELATIVE = Path("logs/02_violation/violations_gold_runs.jsonl")
+SEED_PATH = PROJECT_ROOT / "metadata/standards/02_violation/violation_key_seed.csv"
+REGISTRY_RELATIVE = Path("data/03_gold/02_violation/02_violation_key_registry.csv")
+KEY_COLUMNS = ("violation_key", "violation_code", "violation_description")
 DIM_SCHEMA = pa.schema([
     pa.field("violation_key", pa.int32(), nullable=False),
     pa.field("violation_code", pa.string(), nullable=False),
@@ -54,16 +58,57 @@ def content_hash(path: Path) -> str:
     return digest.hexdigest()
 
 
-def dimension_members(accepted: Path) -> list[dict]:
-    """Sort observed pairs, so keys never depend on input row order."""
+def read_key_registry(path: Path) -> dict[tuple[str, str], int]:
+    with path.open(encoding="utf-8", newline="") as stream:
+        reader = csv.DictReader(stream)
+        if tuple(reader.fieldnames or ()) != KEY_COLUMNS:
+            raise ValueError(f"Invalid violation key registry header: {path}")
+        registry = {}
+        for expected_key, row in enumerate(reader, 1):
+            pair = row["violation_code"], row["violation_description"]
+            if row["violation_key"] != str(expected_key) or not all(pair) or pair in registry or None in row:
+                raise ValueError(f"Invalid violation key registry row {expected_key}: {path}")
+            registry[pair] = expected_key
+    return registry
+
+
+def dimension_members(accepted: Path, registry_path: Path) -> list[dict]:
+    """Reserve keys for unseen pairs while retaining every previously issued key."""
     pairs = set()
     for row in rows(accepted, ["violation_code", "violation_description"]):
         pair = row["violation_code"], row["violation_description"]
         if not all(pair):
             raise ValueError("Accepted Silver contains a missing code/description")
         pairs.add(pair)
-    return [dict(violation_key=i, violation_code=code, violation_description=description)
-            for i, (code, description) in enumerate(sorted(pairs), start=1)]
+    seed = read_key_registry(SEED_PATH)
+    registry_path.parent.mkdir(parents=True, exist_ok=True)
+    lock = registry_path.with_suffix(".lock")
+    try:
+        lock.mkdir()
+    except FileExistsError as error:
+        raise RuntimeError(f"Violation key registry is locked: {lock}") from error
+    try:
+        registry = read_key_registry(registry_path) if registry_path.exists() else seed.copy()
+        if any(registry.get(pair) != key for pair, key in seed.items()):
+            raise ValueError(f"Violation key registry changes a published key: {registry_path}")
+        new_pairs = sorted(pairs - registry.keys())
+        if new_pairs:
+            if len(registry) + len(new_pairs) > 2**31 - 1:
+                raise ValueError("Violation keys exceed the Gold int32 range")
+            registry.update((pair, key) for key, pair in enumerate(new_pairs, len(registry) + 1))
+            pending = registry_path.with_suffix(f".{uuid.uuid4().hex}.tmp")
+            try:
+                with pending.open("x", encoding="utf-8", newline="") as stream:
+                    writer = csv.writer(stream, lineterminator="\n")
+                    writer.writerow(KEY_COLUMNS)
+                    writer.writerows((key, *pair) for pair, key in registry.items())
+                os.replace(pending, registry_path)
+            finally:
+                pending.unlink(missing_ok=True)
+        return [dict(violation_key=registry[pair], violation_code=pair[0], violation_description=pair[1])
+                for pair in sorted(pairs, key=registry.__getitem__)]
+    finally:
+        lock.rmdir()
 
 
 def validate_inputs(root: Path) -> dict:
@@ -95,7 +140,7 @@ def _publish(temp: Path, final: Path) -> None:
         os.replace(temp, final)
 
 
-def build(root: Path = PROJECT_ROOT, output_root: Path | None = None) -> dict:
+def build(root: Path = PROJECT_ROOT, output_root: Path | None = None, *, registry_path: Path | None = None) -> dict:
     root = Path(root)
     output_root = Path(output_root) if output_root is not None else root
     counts = validate_inputs(root)
@@ -103,7 +148,8 @@ def build(root: Path = PROJECT_ROOT, output_root: Path | None = None) -> dict:
     quarantine = root / QUARANTINE_RELATIVE
     protected = {str(path): sha256(path) for path in (accepted, quarantine)}
     started_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
-    members = dimension_members(accepted)
+    registry_path = Path(registry_path) if registry_path is not None else root / REGISTRY_RELATIVE
+    members = dimension_members(accepted, registry_path)
     pair_to_key = {(m["violation_code"], m["violation_description"]): m["violation_key"] for m in members}
     if len(pair_to_key) != len(members) or len({m["violation_key"] for m in members}) != len(members):
         raise ValueError("Duplicate dimension grain or surrogate key")
@@ -179,6 +225,7 @@ def build(root: Path = PROJECT_ROOT, output_root: Path | None = None) -> dict:
             "fact_schema": str(FACT_SCHEMA), "accepted_sha256": protected[str(accepted)],
             "quarantine_sha256": protected[str(quarantine)], "dimension_sha256": sha256(dim_path),
             "fact_sha256": sha256(fact_path),
+            "violation_key_registry": str(registry_path.resolve()),
         }
         log = root / LOG_RELATIVE
         log.parent.mkdir(parents=True, exist_ok=True)

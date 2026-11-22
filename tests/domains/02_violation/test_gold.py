@@ -61,7 +61,7 @@ def test_gold_grain_keys_fk_reconciliation_and_repeat(tmp_path):
     assert len({(f["source_row_num"], f["item_sequence_num"]) for f in fact}) == len(fact)
     assert {f["violation_key"] for f in fact} <= {d["violation_key"] for d in dim}
     pq.write_table(pa.Table.from_pylist(list(reversed(valid)), schema=SILVER_SCHEMA), accepted)
-    assert dimension_members(accepted) == dim
+    assert dimension_members(accepted, root / gold.REGISTRY_RELATIVE) == dim
 
 
 def test_new_input_counts_are_calculated(tmp_path):
@@ -76,6 +76,26 @@ def test_new_input_counts_are_calculated(tmp_path):
     result = build(root, tmp_path / "new_output")
     assert result["fact_rows"] == 4
     assert result["dimension_rows"] == 4
+
+
+def test_published_keys_survive_new_types_and_disappearing_pairs(tmp_path):
+    original = pq.read_table(gold.PROJECT_ROOT / DIM_RELATIVE).to_pylist()
+    assert len(original) == 110
+    registry = tmp_path / "registry.csv"
+    snapshot = tmp_path / "accepted.parquet"
+    columns = ["violation_code", "violation_description"]
+    type_92 = next(row for row in original if row["violation_key"] == 92)
+    earlier = {"violation_code": "0", "violation_description": "New type"}
+    pq.write_table(pa.Table.from_pylist([earlier, *original]).select(columns), snapshot)
+    assert dimension_members(snapshot, registry) == [*original, {**earlier, "violation_key": 111}]
+    assert type_92["violation_code"] == "55"
+
+    later = {"violation_code": "0", "violation_description": "Another new type"}
+    pq.write_table(pa.Table.from_pylist([later, type_92]).select(columns), snapshot)
+    assert dimension_members(snapshot, registry) == [type_92, {**later, "violation_key": 112}]
+
+    pq.write_table(pa.Table.from_pylist([earlier]).select(columns), snapshot)
+    assert dimension_members(snapshot, registry) == [{**earlier, "violation_key": 111}]
 
 
 def test_reconciliation_mismatch_stops_before_gold(tmp_path):

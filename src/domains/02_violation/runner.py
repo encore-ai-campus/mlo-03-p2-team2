@@ -1,5 +1,6 @@
 """Run Domain 02 into a fresh local directory using the existing shared Bronze."""
 
+from argparse import ArgumentParser
 from datetime import datetime, timezone
 import json
 import os
@@ -14,7 +15,7 @@ from src.bronze.paths import PROJECT_ROOT
 from . import bronze, build_analysis_mart, gold, profiling, quality, reconciliation, silver
 
 
-def run(repo: Path = PROJECT_ROOT) -> Path:
+def run(repo: Path = PROJECT_ROOT, *, registry_path: Path | None = None) -> Path:
     repo = repo.resolve()
     shared = repo / bronze.SHARED_BRONZE_RELATIVE
     if not shared.is_file():
@@ -67,7 +68,8 @@ def run(repo: Path = PROJECT_ROOT) -> Path:
         stage = "reconciliation"
         record["counts"] = reconciliation.run(root)["counts"]
         stage = "gold"
-        gold.build(root)
+        gold_report = gold.build(root, registry_path=registry_path or repo / gold.REGISTRY_RELATIVE)
+        record["violation_key_registry"] = gold_report["violation_key_registry"]
         stage = "analysis_mart"
         build_analysis_mart.build(root)
         record["status"] = "PASS"
@@ -81,4 +83,6 @@ def run(repo: Path = PROJECT_ROOT) -> Path:
 
 
 if __name__ == "__main__":
-    run()
+    parser = ArgumentParser(description=__doc__)
+    parser.add_argument("--registry", type=Path, help="Persistent Domain 02 violation key CSV")
+    run(registry_path=parser.parse_args().registry)

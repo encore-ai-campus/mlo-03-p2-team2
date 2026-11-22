@@ -20,11 +20,10 @@ import pyarrow.parquet as pq
 from src.bronze.paths import PROJECT_ROOT
 from .profiling import (
     BRONZE_RELATIVE,
-    CODE_HEADER,
     FRAGMENT_SEPARATOR,
     ORIGIN_RELATIVE,
     OUTPUT_RELATIVE as PROFILE_RELATIVE,
-    COMMENTS_MARKER,
+    classify_fragment as parse_fragment,
     origin_snapshot,
     sha256,
 )
@@ -72,44 +71,6 @@ MAPPING_FIELDS = [
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
-
-
-def parse_fragment(fragment: str) -> dict:
-    """Parse only fields with a visible boundary in the observed source pattern."""
-    header = CODE_HEADER.match(fragment)
-    if not header:
-        return {
-            "violation_code": None,
-            "violation_description": None,
-            "violation_comments": None,
-            "parsing_status": "UNPARSED_CODE_HEADER",
-        }
-    body_start = header.start("body")
-    marker = COMMENTS_MARKER.search(fragment, body_start)
-    if not marker:
-        # Without a Comments marker, the boundary between description and
-        # comments cannot be inferred. Keep only the code and raw fragment.
-        return {
-            "violation_code": header.group("code"),
-            "violation_description": None,
-            "violation_comments": None,
-            "parsing_status": "MISSING_COMMENTS_MARKER",
-        }
-
-    description = fragment[body_start:marker.start()].strip()
-    comments = fragment[marker.end():].strip()
-    if not description:
-        status = "EMPTY_DESCRIPTION"
-    elif not comments:
-        status = "EMPTY_COMMENTS"
-    else:
-        status = "PARSED"
-    return {
-        "violation_code": header.group("code"),
-        "violation_description": description or None,
-        "violation_comments": comments or None,
-        "parsing_status": status,
-    }
 
 
 def _mapping_rows(counts: Counter, actual: dict, silver_path: str) -> list[dict]:
@@ -307,6 +268,8 @@ def run(root: Path = PROJECT_ROOT) -> dict:
     log_written = False
     try:
         profiling = json.loads(profile_path.read_text(encoding="utf-8"))
+        if not {"fragment_status_counts", "extracted_field_counts"} <= profiling.keys():
+            raise ValueError(f"Run source profiling again with the current classification rules: {profile_path}")
         expected = profiling["counts"]
         input_origin_sha = origin_before["source_sha256"]
         input_origin_guard_sha = origin_before["guard_sha256"]
@@ -381,16 +344,7 @@ def run(root: Path = PROJECT_ROOT) -> dict:
 
                     for sequence, fragment in enumerate(fragments, 1):
                         counters["candidate_records"] += 1
-                        parsed = (
-                            {
-                                "violation_code": None,
-                                "violation_description": None,
-                                "violation_comments": None,
-                                "parsing_status": "UNRECOGNIZED_SEPARATOR",
-                            }
-                            if literal_pipes > recognized_pipes
-                            else parse_fragment(fragment)
-                        )
+                        parsed = parse_fragment(fragment, literal_pipes > recognized_pipes)
                         status = parsed["parsing_status"]
                         counters[f"status:{status}"] += 1
                         counters["code_rows"] += parsed["violation_code"] is not None
@@ -424,9 +378,6 @@ def run(root: Path = PROJECT_ROOT) -> dict:
             "nonempty_rows": "nonempty_cells",
             "rows_with_multiple_fragments": "multi_violation_cells",
             "candidate_fragments": "candidate_records",
-            "fully_parseable_fragments": "status:PARSED",
-            "missing_comments_marker_fragments": "status:MISSING_COMMENTS_MARKER",
-            "code_header_failures": "status:UNPARSED_CODE_HEADER",
             "rows_with_unrecognized_pipe_separator": "unrecognized_separator_cells",
         }
         comparisons = {
@@ -444,17 +395,13 @@ def run(root: Path = PROJECT_ROOT) -> dict:
         readback = _readback(temp_output)
         if readback["output_rows"] != counters["candidate_records"]:
             raise ValueError("Silver readback rows differ from parsed candidates")
-        if readback["status_counts"] != {
-            key.removeprefix("status:"): value
-            for key, value in counters.items() if key.startswith("status:")
-        }:
-            raise ValueError("Silver readback parsing status counts differ from processing counts")
+        if readback["status_counts"] != profiling["fragment_status_counts"]:
+            raise ValueError("Silver parsing status counts differ from Profiling")
         if readback["distinct_codes"] != profiling["code_pattern"]["distinct_codes"]:
             raise ValueError("Silver readback distinct code count differs from Profiling")
-        if readback["description_rows"] != expected["fully_parseable_fragments"]:
-            raise ValueError("Silver description count differs from Profiling")
-        if readback["comments_rows"] != expected["comments_marker_fragments"]:
-            raise ValueError("Silver comments count differs from Profiling")
+        for count_name, expected_count in profiling["extracted_field_counts"].items():
+            if readback[count_name] != expected_count:
+                raise ValueError(f"Silver {count_name} differs from Profiling")
 
         mapping_rows = _mapping_rows(counters, readback, SILVER_RELATIVE.as_posix())
         _write_mapping(temp_mapping, mapping_rows)
