@@ -99,7 +99,9 @@ def run(root: Path = PROJECT_ROOT, output_root: Path | None = None) -> dict:
     bronze_before = sha256(bronze_path)
     origin_before_sha = origin_before["source_sha256"]
     started = datetime.now(timezone.utc).isoformat()
-    counts, reasons = Counter(), Counter()
+    counts = Counter(dict.fromkeys(("bronze_inspections", "empty_inspections", "nonblank_inspections",
+                                   "candidate_fragments", "accepted", "quarantined"), 0))
+    reasons = Counter()
     expected_lineage = hashlib.sha256()
     accepted_path = output_root / ACCEPTED_RELATIVE
     quarantine_path = output_root / QUARANTINE_RELATIVE
@@ -133,9 +135,7 @@ def run(root: Path = PROJECT_ROOT, output_root: Path | None = None) -> dict:
                     counts["unexpected_delimiter_inspections"] += 1
                 for sequence, fragment in enumerate(fragments, 1):
                     counts["candidate_fragments"] += 1
-                    parsed = ({"violation_code": None, "violation_description": None,
-                               "violation_comments": None, "parsing_status": "UNRECOGNIZED_SEPARATOR"}
-                              if bad_separator else parse_fragment(fragment))
+                    parsed = parse_fragment(fragment, bad_separator)
                     item = {"inspection_id": source_row["Inspection ID"],
                             "source_row_num": source_row["source_row_num"], "item_sequence_num": sequence,
                             "source_violations_fragment": fragment, **parsed}

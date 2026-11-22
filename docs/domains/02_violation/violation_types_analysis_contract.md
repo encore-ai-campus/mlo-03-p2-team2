@@ -11,6 +11,12 @@
 - 미기재 시설 유형: 원문 빈 문자열을 Mart에 그대로 보존하고 HTML 표시만 `(미기재)`로 바꾼다.
 - 격리 데이터: Gold 분석에서 제외하며 `Accepted + Quarantine = 전체 candidate`를 계속 검증한다.
 
+## 공란과 해석 불가 원문
+
+- 원천 위반란이 모두 공란이어도 점검은 Bronze에 보존한다. 대사 보고서에 위반 후보·정상·격리 건수를 각각 `0`으로 기록하고, 기존 스키마를 가진 빈 Gold 팩트·차원·마트를 생성한다.
+- Profiling과 Silver는 같은 분류 함수로 상태를 기록한다. 코드 머리를 읽을 수 없으면 `UNPARSED_CODE_HEADER`, 인식할 수 없는 파이프 구분자가 섞이면 셀 원문 전체를 `UNRECOGNIZED_SEPARATOR` 한 건으로 남긴다. 코드가 있으나 코멘트 구분자가 없으면 `MISSING_COMMENTS_MARKER`, 구분 후 설명이나 코멘트가 비면 각각 `EMPTY_DESCRIPTION`, `EMPTY_COMMENTS`로 기록한다.
+- 품질 검사는 원문에서 해당 상태 때문에 생길 NULL을 계산하고 Silver의 값과 대조한다. 격리 파일에는 원문 조각, 점검 ID, 원천 행 번호, 조각 순번과 사유를 기록한다. 정상 위반만 Gold에 적재한다.
+
 ## Gold 위반 유형 키 유지
 
 워크트리는 `C:\mlo-03-p2-team2`, 작업 브랜치는 `codex/domain-02-stable-violation-keys`다.

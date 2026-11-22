@@ -46,7 +46,6 @@ EXPECTED_STATUSES = {
     "EMPTY_DESCRIPTION",
     "EMPTY_COMMENTS",
 }
-INTENTIONAL_NULL_COLUMNS = {"violation_description", "violation_comments"}
 MAPPING_EXPECTED_TARGETS = {
     "source_violations_fragment",
     "inspection_id",
@@ -253,6 +252,7 @@ def run(root: Path = PROJECT_ROOT) -> dict:
         actual_status_counts: Counter = Counter()
         actual_code_set: set[str] = set()
         null_counts: Counter = Counter()
+        expected_nulls: Counter = Counter()
         code_format_failures = 0
         field_mismatch_counts: Counter = Counter()
         duplicate_grain_keys = 0
@@ -329,6 +329,8 @@ def run(root: Path = PROJECT_ROOT) -> dict:
                 source_counts["candidate_records"] += 1
                 parsed = _expected_fields(fragment, unrecognized_separator=unrecognized)
                 expected_status_counts[parsed["parsing_status"]] += 1
+                for field in ("violation_code", "violation_description", "violation_comments"):
+                    expected_nulls[field] += parsed[field] is None
                 if parsed["violation_code"] is not None:
                     expected_code_set.add(parsed["violation_code"])
 
@@ -384,26 +386,9 @@ def run(root: Path = PROJECT_ROOT) -> dict:
             if status not in EXPECTED_STATUSES
         )
         code_set_difference = expected_code_set.symmetric_difference(actual_code_set)
-        expected_intentional_nulls = expected_status_counts["MISSING_COMMENTS_MARKER"]
-        null_issue_counts = {
-            column: max(
-                0,
-                null_counts[column] - (
-                    expected_intentional_nulls
-                    if column in INTENTIONAL_NULL_COLUMNS
-                    else 0
-                ),
-            )
-            for column in SILVER_COLUMNS
-        }
-        null_count_mismatch_rows = sum(
-            abs(null_counts[column] - (
-                expected_intentional_nulls
-                if column in INTENTIONAL_NULL_COLUMNS
-                else 0
-            ))
-            for column in SILVER_COLUMNS
-        )
+        missing_marker_count = expected_status_counts["MISSING_COMMENTS_MARKER"]
+        null_issue_counts = {column: abs(null_counts[column] - expected_nulls[column]) for column in SILVER_COLUMNS}
+        null_count_mismatch_rows = sum(null_issue_counts.values())
 
         mapping_expected = {
             "source_violations_fragment": output_rows,
@@ -448,21 +433,19 @@ def run(root: Path = PROJECT_ROOT) -> dict:
         _add_rule(
             rules, "violation_code_extraction", "violation_code",
             source_counts["candidate_records"],
-            field_mismatch_counts["violation_code"] + null_counts["violation_code"],
+            field_mismatch_counts["violation_code"],
             f"Bronze code header failures={expected_status_counts['UNPARSED_CODE_HEADER']}; "
             f"Silver NULL code={null_counts['violation_code']}.",
         )
         _add_rule(
             rules, "description_extraction", "violation_description",
             source_counts["candidate_records"], field_mismatch_counts["violation_description"],
-            f"Description NULL is expected only for MISSING_COMMENTS_MARKER; "
-            f"intended count={expected_intentional_nulls}.",
+            f"NULL description expected from Bronze={expected_nulls['violation_description']}.",
         )
         _add_rule(
             rules, "comments_extraction", "violation_comments",
             source_counts["candidate_records"], field_mismatch_counts["violation_comments"],
-            f"Comments NULL is expected only for MISSING_COMMENTS_MARKER; "
-            f"intended count={expected_intentional_nulls}.",
+            f"NULL comments expected from Bronze={expected_nulls['violation_comments']}.",
         )
         _add_rule(
             rules, "parsing_status_matches_source", "parsing_status",
@@ -472,13 +455,13 @@ def run(root: Path = PROJECT_ROOT) -> dict:
         )
         _add_rule(
             rules, "missing_comments_marker_status", "parsing_status",
-            expected_intentional_nulls,
-            abs(actual_status_counts["MISSING_COMMENTS_MARKER"] - expected_intentional_nulls),
+            missing_marker_count,
+            abs(actual_status_counts["MISSING_COMMENTS_MARKER"] - missing_marker_count),
             "Comments boundary is not inferred when its marker is absent.",
         )
         _add_rule(
             rules, "violation_code_nonnull", "violation_code", output_rows,
-            null_counts["violation_code"],
+            null_issue_counts["violation_code"],
             f"Distinct Silver codes={len(actual_code_set)}.",
         )
         _add_rule(
@@ -506,13 +489,9 @@ def run(root: Path = PROJECT_ROOT) -> dict:
             "Grain key identifies one violation fragment within its source inspection row; repeated codes are allowed.",
         )
         for column in SILVER_COLUMNS:
-            allowed_nulls = (
-                expected_intentional_nulls if column in INTENTIONAL_NULL_COLUMNS else 0
-            )
+            allowed_nulls = expected_nulls[column]
             issue_rows = null_issue_counts[column]
             note = f"Observed NULL={null_counts[column]}; expected NULL={allowed_nulls}."
-            if column in INTENTIONAL_NULL_COLUMNS:
-                note += " NULL is intentional only for MISSING_COMMENTS_MARKER records."
             _add_rule(rules, "column_null_count", column, output_rows, issue_rows, note)
         _add_rule(
             rules, "mapping_affected_counts", MAPPING_RELATIVE.as_posix(),
