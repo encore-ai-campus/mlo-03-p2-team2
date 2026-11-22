@@ -2,6 +2,8 @@
 
 팀 공용 Food Inspections CSV에서 만든 Bronze, Silver, Gold 결과입니다. 원천 CSV의 SHA-256은 `b43beb7fae834a8698ca162004caf2929cb2eca7ff75c27b4db6bf07aa103c98`입니다.
 
+아래 표와 체크섬은 당시 Git에 공개한 스냅샷에 해당합니다. 공용 Bronze의 적재 이력을 이어받는 현재 코드는 별도 실행 폴더에 결과를 생성합니다. [현재 실행 및 검증 방법](../../docs/domains/02_violation/folder_structure_alignment.md)
+
 | 단계 | Parquet | 행 수 | Git에 저장한 형태 |
 | --- | --- | ---: | --- |
 | Bronze | `02_food_inspections.parquet` | 318,627 | 단일 파일 |

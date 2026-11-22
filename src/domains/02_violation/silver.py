@@ -146,7 +146,7 @@ def _mapping_rows(counts: Counter, actual: dict, silver_path: str) -> list[dict]
         ),
         (
             "source_row_num",
-            "Copy the source row number preserved in the shared Bronze Parquet.",
+            "Copy the logical row number assigned in the Domain 02 Bronze projection.",
             "Positive integer source row number",
             "The original inspection record number is repeated for each violation fragment.",
             actual["output_rows"],
