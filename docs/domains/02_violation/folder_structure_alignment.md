@@ -2,7 +2,43 @@
 
 02 위반유형은 팀 공용 Food Inspections Bronze인 `data/01_bronze/food_inspections/food_inspections.parquet`를 재사용합니다. 공용 Bronze에 적힌 원천 파일명 `_SRC_FILE`과 최초 Bronze 적재 시각 `_LOAD_DTM`은 02 Bronze 파생에도 그대로 보존합니다. 강사 실습의 Silver 저장 규칙에 따라 두 기술 컬럼은 Silver부터 제외합니다. 원천 CSV는 공용 Bronze의 값·순서·행 수와 SHA-256을 검증할 때 읽습니다.
 
-개발 워크트리는 `C:\mlo-03-p2-team2`이며 작업 브랜치는 `codex/domain-02-bronze-lineage`입니다.
+개발 워크트리는 `C:\mlo-03-p2-team2`입니다. 공용 Bronze 재사용은 `codex/domain-02-bronze-lineage`에서 구현하여 [PR #6](https://github.com/encore-ai-campus/mlo-03-p2-team2/pull/6)으로 반영했습니다.
+
+## 팀원 첫 실행
+
+팀원 통합 작업 브랜치는 `codex/domain-02-team-integration`입니다. 저장소 루트에서 `python -m pip install -r requirements.txt`를 실행합니다.
+
+02의 공용 입력은 `data/01_bronze/food_inspections/food_inspections.parquet`입니다. 팀에서 같은 원천 SHA-256으로 만든 공용 Bronze를 받았다면 이 경로에 놓고 전체 실행으로 넘어갑니다. Git의 과거 `02_food_inspections.parquet`는 02 전용 스냅샷입니다.
+
+공용 Bronze가 없다면 아래 명령으로 팀 원천을 복원하고 **점검만** 공용 적재기로 생성합니다. 기존 공용 Bronze가 있으면 건드리지 않습니다. 원천 스냅샷과 체크섬이 바뀐 경우 먼저 팀의 새 원천 계약을 확인합니다.
+
+```powershell
+python -m src.ingestion.restore_origin --restore
+if ($LASTEXITCODE -ne 0) { throw '팀 공용 원천 복원 실패' }
+@'
+from dataclasses import replace
+from importlib import import_module
+from uuid import uuid4
+
+from src.bronze.load_bronze import load_source, utc_now
+from src.bronze.paths import PROJECT_ROOT, SOURCES
+
+profile = import_module("src.domains.02_violation.profiling")
+contract = next(source for source in SOURCES if source.name == "food_inspections")
+if not contract.output.exists():
+    origin = (PROJECT_ROOT / profile.ORIGIN_RELATIVE).resolve()
+    digest = profile.origin_snapshot()["source_sha256"]
+    sidecar = origin.with_suffix(".csv.sha256")
+    if sidecar.exists():
+        if sidecar.read_text(encoding="ascii").split()[0].lower() != digest:
+            raise ValueError(f"팀 원천 체크섬과 기존 확인 파일이 다릅니다: {sidecar}")
+    else:
+        sidecar.write_text(f"{digest}  {origin.name}\n", encoding="ascii")
+    load_source(replace(contract, relative_path=str(origin)), uuid4().hex, utc_now())
+print(contract.output)
+'@ | python -
+if ($LASTEXITCODE -ne 0) { throw '공용 점검 Bronze 적재 실패' }
+```
 
 ## 전체 실행
 
@@ -13,6 +49,8 @@ python -m src.domains.02_violation.runner
 ```
 
 명령이 출력한 `reports/runs/02_violation/lineage-…/` 아래에 새 산출물이 생성됩니다. 실행별 폴더에는 `data/`, `metadata/`, `reports/`, `logs/`가 있습니다. 기존 Git 공유 스냅샷과 체크섬은 당시 실행의 기록으로 유지합니다. 실제 결과를 사용할 때는 해당 실행의 `run.json`에서 `status`가 `PASS`인지 확인합니다.
+
+03 담당자에게는 같은 실행 폴더 경로 전체를 넘깁니다. 03의 `--domain02-root`는 그 폴더를 읽어 정상·격리 Parquet과 대사 보고서를 함께 찾습니다. 05 연동용 두 테이블은 [공유 스키마 초안](team_integration_schema_draft.md)에 정리했습니다.
 
 다음 표의 단일 단계 명령은 해당 작업 루트에 각 단계의 입력이 준비돼 있을 때 사용합니다. 기존 공유 산출물이 있는 저장소에서는 위 전체 실행 명령으로 새 결과를 생성합니다.
 

@@ -6,6 +6,7 @@ Run from the repository root: python -m src.domains.02_violation.build_analysis_
 from __future__ import annotations
 
 from collections import Counter, defaultdict
+import csv
 from datetime import datetime, timezone
 from html import escape
 import hashlib
@@ -43,6 +44,7 @@ FACT_COLUMNS = [
     "source_row_num", "item_sequence_num", "inspection_id", "violation_key", "violation_comments"
 ]
 FAIL_VALUE = "Fail"
+SHARED_CODE_MAP = PROJECT_ROOT / "metadata/data_dictionary/shared_code_map.csv"
 TOP_N = 15
 CHUNK = 20_000
 
@@ -66,6 +68,12 @@ def _content_hash(path: Path) -> str:
 
 def _rank(counter: Counter, limit: int = TOP_N) -> list[tuple[object, int]]:
     return sorted(counter.items(), key=lambda item: (-item[1], str(item[0])))[:limit]
+
+
+def _known_result_values() -> set[str]:
+    with SHARED_CODE_MAP.open(encoding="utf-8-sig", newline="") as stream:
+        return {row["source_value"] for row in csv.DictReader(stream)
+                if row["dataset"] == "food_inspections" and row["source_column"] == "Results"}
 
 
 def _bar_table(headers: list[str], records: list[list[object]], count_index: int) -> str:
@@ -93,7 +101,13 @@ def _render_html(summary: dict) -> str:
     for facility, total, leaders in summary["top_facilities"]:
         for rank, ((code, description), count) in enumerate(leaders, start=1):
             facility_rows.append([facility, total, rank, code, description, count])
-    top_pair, top_count = summary["top_types"][0]
+    top_types = summary["top_types"]
+    top_type_card = '<p class="note">정상 위반 기록이 없습니다.</p>'
+    if top_types:
+        (code, description), count = top_types[0]
+        top_type_card = f'<div class="card"><b>{escape(code)} · {escape(description)}</b><div class="big">{count:,}</div></div>'
+    fail_section = (_bar_table(['코드','설명','Fail 위반 건수'], fail_rows, 2)
+                    if fail_rows else '<p class="note">Fail 점검에서 집계할 정상 위반 기록이 없습니다.</p>')
     return f"""<!doctype html>
 <html lang="ko"><head><meta charset="utf-8"><title>Food Inspections 위반 유형 분석</title>
 <style>
@@ -109,9 +123,9 @@ h1,h2{{color:#16324f}} .cards{{display:flex;gap:16px;flex-wrap:wrap}} .card{{pad
 <h2>1. 위반 코드별 빈도 TOP {TOP_N}</h2>{_bar_table(['위반 코드','위반 건수'], code_rows, 1)}
 <h2>2. 시설 유형별 주요 위반</h2><p class="note">위반 건수가 많은 시설 유형 {TOP_N}개에서 유형별 상위 3건입니다. 빈 시설 유형은 미기재로 분리했습니다.</p>
 {_bar_table(['시설 유형','시설 전체 위반','순위','코드','설명','위반 건수'], facility_rows, 5)}
-<h2>3. 가장 빈번한 위반 유형</h2><div class="card"><b>{escape(top_pair[0])} · {escape(top_pair[1])}</b><div class="big">{top_count:,}</div></div>
+<h2>3. 가장 빈번한 위반 유형</h2>{top_type_card}
 {_bar_table(['코드','설명','위반 건수'], type_rows, 2)}
-<h2>4. Fail 점검에서 자주 나타나는 위반</h2>{_bar_table(['코드','설명','Fail 위반 건수'], fail_rows, 2)}
+<h2>4. Fail 점검에서 자주 나타나는 위반</h2>{fail_section}
 <p class="note">Mart grain: 정상 violation fragment 1건. 연결 키: Inspection ID(원천에서 유일성·NULL 검증 완료).</p>
 </body></html>"""
 
@@ -148,14 +162,16 @@ def build(root: Path = PROJECT_ROOT, output_root: Path | None = None) -> dict:
         if not inspection_id or inspection_id in inspection:
             raise ValueError(f"Bronze Inspection ID is null or duplicated: {inspection_id!r}")
         facility = row["Facility Type"]
-        result = row["Results"]
-        if facility is None or result is None:
+        result = row["Results"] or ""
+        if facility is None:
             raise ValueError(f"Bronze analysis attribute is NULL: {inspection_id}")
         inspection[inspection_id] = (facility, result)
         result_values[result] += 1
         empty_facility_inspections += facility == ""
-    if FAIL_VALUE not in result_values:
-        raise ValueError(f"Observed Results does not contain exact value {FAIL_VALUE!r}")
+    known_results = _known_result_values()
+    missing_results = sum(count for value, count in result_values.items() if not value.strip())
+    unknown_results = {value: count for value, count in sorted(result_values.items())
+                       if value.strip() and value not in known_results}
 
     dimension = {}
     dimension_pairs = set()
@@ -248,6 +264,9 @@ def build(root: Path = PROJECT_ROOT, output_root: Path | None = None) -> dict:
             "inspection_id_duplicates": 0, "inspection_id_nulls": 0,
             "empty_facility_inspections": empty_facility_inspections,
             "observed_results": dict(sorted(result_values.items())), "fail_value": FAIL_VALUE,
+            "fail_inspection_rows": result_values[FAIL_VALUE],
+            "missing_inspection_result_rows": missing_results,
+            "unknown_inspection_result_counts": unknown_results,
             "fail_violation_rows": summary["fail_violations"], "violation_codes": len(code_counts),
             "violation_types": len(type_counts), "orphan_inspection": orphan_inspection,
             "orphan_dimension": orphan_dimension, "unexpected_row_change": mart_count - fact_count,
@@ -257,9 +276,10 @@ def build(root: Path = PROJECT_ROOT, output_root: Path | None = None) -> dict:
             "origin_guard_sha256": origin_before["guard_sha256"],
             "origin_storage_files": origin_before["storage_files"],
             "protected_sha256": protected,
-            "top_code": list(summary["top_codes"][0]),
-            "top_type": [*summary["top_types"][0][0], summary["top_types"][0][1]],
-            "top_fail_type": [*summary["top_fail_types"][0][0], summary["top_fail_types"][0][1]],
+            "top_code": list(summary["top_codes"][0]) if summary["top_codes"] else None,
+            "top_type": [*summary["top_types"][0][0], summary["top_types"][0][1]] if summary["top_types"] else None,
+            "top_fail_type": ([*summary["top_fail_types"][0][0], summary["top_fail_types"][0][1]]
+                              if summary["top_fail_types"] else None),
         }
         log_path = root / LOG_RELATIVE
         log_path.parent.mkdir(parents=True, exist_ok=True)

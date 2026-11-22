@@ -108,6 +108,27 @@ def test_new_rows_are_calculated_without_production_counts(tmp_path):
     assert result["fail_violation_rows"] == 2
 
 
+@pytest.mark.parametrize(("values", "missing", "unknown"), [
+    (["Pass", "Pass"], 0, {}),
+    ([None, "Unregistered"], 1, {"Unregistered": 1}),
+])
+def test_mart_publishes_when_no_inspection_failed(tmp_path, values, missing, unknown):
+    root, paths = _write_fixture(tmp_path)
+    bronze = pq.read_table(paths["bronze"])
+    idx = bronze.schema.get_field_index("Results")
+    bronze = bronze.set_column(idx, "Results", pa.array(values, type=pa.string()))
+    pq.write_table(bronze, paths["bronze"])
+
+    result = analysis.build(root)
+
+    assert result["mart_rows"] == 2
+    assert result["fail_inspection_rows"] == result["fail_violation_rows"] == 0
+    assert result["missing_inspection_result_rows"] == missing
+    assert result["unknown_inspection_result_counts"] == unknown
+    assert result["top_fail_type"] is None
+    assert "집계할 정상 위반 기록이 없습니다" in (root / analysis.HTML_RELATIVE).read_text(encoding="utf-8")
+
+
 def test_missing_inspection_parent_stops_without_output(tmp_path):
     root, paths = _write_fixture(tmp_path)
     fact = pq.read_table(paths["fact"]).to_pylist()
