@@ -89,17 +89,22 @@
 
 ### 공용 Gold Fact 9개
 
-| 관점 | Fact 테이블 | 한 행의 의미 | 주요 지표 |
-| --- | --- | --- | --- |
-| 01 | `01_fact_inspection` | 점검 1건 | 점검·평가 완료·불합격 건수 |
-| 02 | `02_fact_inspection_violation` | 정상으로 분류된 위반 조각 1개 | 위반 조각 수, 위반이 기록된 고유 점검 수 |
-| 03 | `03_fact_repeat_violation` | 기준 점검에서 관측된 위반 코드 버전과 코드 조합 1개 | 다음 비교 점검에서 같은 코드가 다시 기록됐는지 |
-| 03 | `03_fact_reinspection` | 기준 불합격 점검 1건 | 후속 점검 연결 여부, 경과일, 결과 |
-| 04 | `04_fact_inspection_license_match` | 면허 연결을 시도한 점검 1건 | 유효기간 후보 수와 매칭 상태 |
-| 04 | `04_fact_license_event` | 발급·갱신 등 인허가 이력 1건 | 인허가 이력 건수 |
-| 05 | `05_fact_inspection_area_period` | 기간 단위·시작일과 지역 배정 결과의 조합 1개 | 점검·평가 완료·불합격 건수 |
-| 05 | `05_fact_violation_coverage_area_period` | 지역·기간 집계와 위반 코드 버전의 조합 1개 | 관측·파싱 상태별 점검 수 |
-| 05 | `05_fact_violation_area_period` | 위반 관측 범위와 위반 코드의 조합 1개 | 해당 코드가 기록된 고유 점검 수 |
+행 수는 공용 Gold Parquet 스냅샷 기준입니다. 키는 팩트 검증 코드가 행의 유일성을 확인할 때 사용하는 컬럼입니다.
+
+| 관점 | Fact 테이블 | 한 행의 의미 | 행 식별 키 | 행 수 |
+| --- | --- | --- | --- | ---: |
+| 01 점검 성과 | `01_fact_inspection` | 점검 1건 | `inspection_key` | 318,627 |
+| 02 위반 유형 | `02_fact_inspection_violation` | 정상으로 분류된 위반 조각 1개 | `source_row_num` + `item_sequence_num` | 1,029,281 |
+| 03 반복 위반·재검사 | `03_fact_repeat_violation` | 기준 점검의 위반 코드 버전과 코드 조합 1개 | `base_inspection_key` + `code_system_version` + `violation_cd` | 444,768 |
+| 03 반복 위반·재검사 | `03_fact_reinspection` | 기준 불합격 점검 1건 | `base_inspection_key` | 61,344 |
+| 04 사업체 인허가 | `04_fact_inspection_license_match` | 인허가 연결 후보를 확인한 점검 1건 | `inspection_key` | 318,627 |
+| 04 사업체 인허가 | `04_fact_license_event` | 발급·갱신 등 인허가 이력 1건 | `license_event_key` | 1,212,132 |
+| 05 지역 분석 | `05_fact_inspection_area_period` | 기간 단위·시작일과 지역 배정 결과의 조합 1개 | 지역·기간 키 | 17,820 |
+| 05 지역 분석 | `05_fact_violation_coverage_area_period` | 지역·기간별 위반 코드 버전 1개 | 지역·기간 키 + `code_system_version` | 17,901 |
+| 05 지역 분석 | `05_fact_violation_area_period` | 지역·기간·위반 코드 버전별 위반 코드 1개 | 지역·기간 키 + `code_system_version` + `violation_cd` | 280,469 |
+
+**지역·기간 키**는 `period_grain_cd`, `period_start_dtm`, `community_area_match_status`, `community_area_num`의 조합입니다. 지역 미배정 행은 `community_area_num`이 비어 있을 수 있으며, 배정 상태로 구분합니다.
+
 
 [공용 Fact 산출물](data/03_gold/facts) · [Gold 생성·검증 코드](src/gold/build_dimensions.py)
 
