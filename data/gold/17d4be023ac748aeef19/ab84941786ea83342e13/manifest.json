@@ -1,0 +1,113 @@
+{
+  "layer": "gold",
+  "batch_id": "17d4be023ac748aeef19",
+  "gold_id": "ab84941786ea83342e13",
+  "rules_signature": "ab84941786ea83342e13c339a859d1606ec6da91914b4cc49c6e9f3aae8e41d7",
+  "built_at_utc": "2026-11-20T06:52:52.231000+00:00",
+  "silver_rules_id": "dffd2f330f1e61f4b17d",
+  "silver_manifest_sha256": "85fe44a2b0026392c8276dcb24e1a0bfce276530f73419564dc7d7daa5a653d4",
+  "silver_rules_signature": "dffd2f330f1e61f4b17d8c57e492bdd1b0bd0fbbfdc91591eec7da8e19ab6c2f",
+  "gold_source_code_sha256": {
+    "geographic_gold.py": "2d07b17ab1e6b6ba44aed86e9e5a48e74fa4e397b3486ade8ebc6bf9389b8497",
+    "geographic_medallion.py": "eea13fc1a84303b29187419aa02720848cc9aca9764becd039b37a3ba66a050d",
+    "silver_violations.py": "234802a0f6fdb97c63406d5b2c9bff7c765f0c661b22aac1745d728eeebcfd6e"
+  },
+  "runtime": {
+    "python": "3.14.7",
+    "pandas": "3.1.1",
+    "pyarrow": "26.0.1"
+  },
+  "scope": {
+    "start_date": null,
+    "end_date": null,
+    "facility_type": null,
+    "inspection_type": null,
+    "risk_level_cd": null,
+    "community_area_num": null
+  },
+  "artifacts": {
+    "inspection_area_period.parquet": {
+      "sha256": "c01465fe659115bb570e1e144e164708076824dc3e45da26a758a06c6479aa1c",
+      "size_bytes": 99325,
+      "rows": 17820,
+      "schema": {
+        "period_grain_cd": "string",
+        "period_start_dtm": "date32[day]",
+        "period_end_dtm": "date32[day]",
+        "covered_start_dtm": "date32[day]",
+        "covered_end_dtm": "date32[day]",
+        "partial_period_flag": "bool",
+        "community_area_match_status": "string",
+        "community_area_num": "int64",
+        "community_area_name": "string",
+        "boundary_version": "string",
+        "inspection_count": "int64",
+        "evaluated_count": "int64",
+        "failed_count": "int64",
+        "not_evaluated_count": "int64",
+        "unknown_result_count": "int64",
+        "failure_rate": "double"
+      }
+    },
+    "metrics_summary.json": {
+      "sha256": "a26ee833dd54ddce080a1fcca480a422546be569f2578e7ae5e2dee9b1136aed",
+      "size_bytes": 1348
+    },
+    "violation_area_period.parquet": {
+      "sha256": "a32fdf4bda9e7d53451eaf31b3bc596a3c2e49ef9a3d84c7e75656a65f131f79",
+      "size_bytes": 1740151,
+      "rows": 280988,
+      "schema": {
+        "period_grain_cd": "string",
+        "period_start_dtm": "date32[day]",
+        "period_end_dtm": "date32[day]",
+        "covered_start_dtm": "date32[day]",
+        "covered_end_dtm": "date32[day]",
+        "partial_period_flag": "bool",
+        "community_area_match_status": "string",
+        "community_area_num": "int64",
+        "community_area_name": "string",
+        "boundary_version": "string",
+        "code_system_version": "string",
+        "era_covered_start_dtm": "date32[day]",
+        "era_covered_end_dtm": "date32[day]",
+        "violation_code": "string",
+        "violation_description_text": "string",
+        "description_variant_count": "int64",
+        "code_inspection_count": "int64",
+        "evaluated_count": "int64",
+        "violation_code_ready_count": "int64",
+        "code_recorded_rate": "double",
+        "code_recorded_among_ready_rate": "double"
+      }
+    },
+    "violation_coverage_area_period.parquet": {
+      "sha256": "d1665b2a8eb20dc100eba5cc928eda5af4f0e586127ca51e9937a851e55f7c5b",
+      "size_bytes": 124049,
+      "rows": 17901,
+      "schema": {
+        "period_grain_cd": "string",
+        "period_start_dtm": "date32[day]",
+        "period_end_dtm": "date32[day]",
+        "covered_start_dtm": "date32[day]",
+        "covered_end_dtm": "date32[day]",
+        "partial_period_flag": "bool",
+        "community_area_match_status": "string",
+        "community_area_num": "int64",
+        "community_area_name": "string",
+        "boundary_version": "string",
+        "code_system_version": "string",
+        "era_covered_start_dtm": "date32[day]",
+        "era_covered_end_dtm": "date32[day]",
+        "evaluated_count": "int64",
+        "violation_recorded_count": "int64",
+        "violation_missing_count": "int64",
+        "violation_code_ready_count": "int64",
+        "violation_parsed_count": "int64",
+        "violation_partial_count": "int64",
+        "violation_unrecognized_count": "int64",
+        "violation_recorded_rate": "double"
+      }
+    }
+  }
+}

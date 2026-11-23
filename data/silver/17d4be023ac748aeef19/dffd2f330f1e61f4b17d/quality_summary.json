@@ -1,0 +1,90 @@
+{
+  "inspection": {
+    "inspection_count": 318627,
+    "assigned_count": 317238,
+    "evaluated_count": 273488,
+    "failed_count": 61344,
+    "evaluation_status": {
+      "EVALUATED": 273488,
+      "NOT_EVALUATED": 45139
+    },
+    "date_range": {
+      "min": "2010-01-04",
+      "max": "2026-11-18"
+    }
+  },
+  "spatial": {
+    "rows": 318627,
+    "missing_coordinates": 1065,
+    "invalid_coordinates": 0,
+    "invalid_or_missing_coordinates": 1065,
+    "outside_boundary": 324,
+    "multiple_boundaries": 0,
+    "unique_area": 317238,
+    "unique_area_on_boundary": 0,
+    "unique_valid_coordinate_pairs": 18995,
+    "boundary": {
+      "rows": 77,
+      "valid_polygon_rows": 77,
+      "sha256": "405268297b6791db1982d06d729e531178e958fdd24c631adc0b45d6f5a93ef2",
+      "source_file": "export.csv",
+      "official_dataset_id": "igwz-8jzy",
+      "map_id": "cauq-8yn6",
+      "official_dataset_url": "https://data.cityofchicago.org/d/igwz-8jzy",
+      "local_extract_url": null,
+      "local_crs": null,
+      "axis_assumption": "WKT x/y treated as longitude/latitude in decimal degrees",
+      "bounds_xy": [
+        -87.9401140825235,
+        41.644543121506054,
+        -87.52413710389523,
+        42.023038586147585
+      ],
+      "area_length_units": null,
+      "business_effective_period": null
+    },
+    "predicate": "intersects includes the polygon boundary; within identifies interior points"
+  },
+  "violations": {
+    "inspection_rows": 318627,
+    "observation_status_counts": {
+      "raw_missing": 90022,
+      "parsed": 228605,
+      "partial": 0,
+      "unrecognized": 0
+    },
+    "token_rows": 1031073,
+    "token_parse_status_counts": {
+      "parsed": 1031073,
+      "unrecognized": 0,
+      "empty_segment": 0
+    },
+    "parsed_tokens_without_comment_text": 1792,
+    "raw_present_without_code_system_version": 0,
+    "inspection_rows_eligible_for_code_occurrence": 228605,
+    "parsed_tokens_without_eligible_inspection": 0,
+    "repeated_code_tokens_within_eligible_inspection": 65667,
+    "code_occurrence_rows": 965406,
+    "code_occurrence_rows_by_version": {
+      "pre_2018_07_01": 515680,
+      "from_2018_07_01": 449726
+    },
+    "distinct_observed_codes_by_version": {
+      "pre_2018_07_01": 46,
+      "from_2018_07_01": 64
+    },
+    "procedure_change_date": "2018-07-01",
+    "procedure_source_url": "https://catalog.data.gov/dataset/food-inspections",
+    "description_provenance": "Text observed in the portal extract for each token"
+  },
+  "field_issues": {
+    "reason_cd": {
+      "SENTINEL_LICENSE_NUMBER": 841,
+      "CODE_REVIEW": 90,
+      "CODE_MISSING": 88
+    },
+    "source_dataset": {
+      "food_inspections": 1019
+    }
+  }
+}

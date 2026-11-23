@@ -4,3 +4,16 @@
 /data/00_origin/SHA256SUMS text eol=lf
 *.parquet binary
 /data/01_bronze/04_license/*.parquet.part-* binary
+
+# Domain 05 manifests verify exact bytes, including line endings.
+/data/01_bronze/05_geospatial/a133aa6e46265a68d7e2/** -text
+/data/02_silver/05_geospatial/a133aa6e46265a68d7e2/c0f77dc4efaff980259f/** -text
+/data/03_gold/05_geospatial/a133aa6e46265a68d7e2/533771c3a9c0ff8b69b6/** -text
+/data/ai_ready/05_geospatial/a133aa6e46265a68d7e2/a97a5ff9c5f1cb0daa75/** -text
+/data/bronze/17d4be023ac748aeef19/** -text
+/data/silver/17d4be023ac748aeef19/dffd2f330f1e61f4b17d/** -text
+/data/gold/17d4be023ac748aeef19/ab84941786ea83342e13/** -text
+/data/ai_ready/17d4be023ac748aeef19/77c8f72a9e0e64cd24c3/** -text
+/data/02_silver/05_geospatial/a133aa6e46265a68d7e2/c0f77dc4efaff980259f/code_coverage.csv whitespace=cr-at-eol
+/data/silver/17d4be023ac748aeef19/dffd2f330f1e61f4b17d/code_coverage.csv whitespace=cr-at-eol
+/data/02_silver/05_geospatial/snapshot_parts/**/*.parquet.part-* binary
