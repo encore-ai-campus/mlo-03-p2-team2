@@ -16,6 +16,7 @@ import pyarrow.parquet as pq
 
 from src.bronze.load_bronze import BATCH_SIZE, sha256, source_rows, utc_now
 from src.ingestion import restore_origin
+from src.silver.shared_dictionary import PRIMARY_KEYS, load_shared_columns
 
 
 DOMAINS = Path(__file__).resolve().parents[1]
@@ -81,9 +82,9 @@ def inspection_silver(bronze, silver, quality):
 
 
 def license_silver(bronze, silver):
-    from normalization import load_dictionary, normalize_batch, silver_schema
+    from normalization import normalize_batch, shared_license_fields, silver_schema
 
-    fields = load_dictionary(DOMAINS / "04_license/데이터 사전.csv")["business_licenses"]
+    fields = shared_license_fields()
     schema = silver_schema(fields)
     with pq.ParquetFile(bronze) as source, pq.ParquetWriter(silver, schema) as writer:
         for batch in source.iter_batches():
@@ -92,12 +93,15 @@ def license_silver(bronze, silver):
 
 def area_silver(bronze, silver):
     table = pq.read_table(bronze)
-    areas = pa.table({
-        "community_area_num": pc.cast(table["area_numbe"], pa.int64()),
-        "community_area_name": pc.utf8_trim_whitespace(table["community"]),
-        "geometry": table["geometry"],
-        "source_row_num": table["source_row_num"],
-    })
+    transforms = {
+        "area_integer": lambda values: pc.cast(values, pa.int64()),
+        "trim_whitespace": pc.utf8_trim_whitespace,
+        "preserve": lambda values: values,
+    }
+    fields = load_shared_columns(ROOT)["community_areas"]
+    columns = {field["target_column"]: transforms[field["transform"]](table[field["source_column"]])
+               for field in fields}
+    areas = pa.table({**columns, "source_row_num": table["source_row_num"]})
     pq.write_table(areas, silver)
 
 
@@ -134,8 +138,6 @@ def build(origin, output):
         quality = stage / "inspection_rule_flags.parquet"
         load_time = utc_now()
         summary = {"status": "PASS", "loaded_at": load_time, "datasets": {}}
-        silver_keys = {"food_inspections": "inspection_key", "business_licenses": "license_event_key",
-                       "community_areas": "community_area_num"}
         for name, (kind, rows, raw_key) in SOURCES.items():
             source = SimpleNamespace(path=verified / f"{name}.{kind}", format=kind)
             bronze = bronze_dir / f"{name}.parquet"
@@ -147,7 +149,7 @@ def build(origin, output):
                 license_silver(bronze, silver)
             else:
                 area_silver(bronze, silver)
-            validate_silver(silver, rows, silver_keys[name])
+            validate_silver(silver, rows, PRIMARY_KEYS[name])
             summary["datasets"][name] = {
                 "rows_per_stage": rows, "origin_sha256": origin_hash,
                 "bronze_sha256": sha256(bronze), "silver_sha256": sha256(silver),

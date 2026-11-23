@@ -23,7 +23,7 @@ Bronze와 Silver에서는 원천별 행 수와 순번을 보존합니다. 기간
 | `LICENSE TERM START DATE` / `LICENSE TERM EXPIRATION DATE` | `term_start_dtm` / `term_end_dtm` · `date32` | 해당 인허가의 시작일과 만료일 |
 | `Results` / `APPLICATION TYPE` / `LICENSE STATUS` | `result_cd` / `application_cd` / `recorded_status_cd` · `string` | 결과와 상태를 각각 표준 코드로 표현 |
 
-숫자처럼 보이는 식별자는 문자열로 보관합니다. 원천 날짜의 `MM/DD/YYYY` 형식을 달력 날짜로 바꾸고, 문서에는 `YYYY-MM-DD`로 표시합니다. [04번 데이터 사전](../../src/domains/04_license/%EB%8D%B0%EC%9D%B4%ED%84%B0%20%EC%82%AC%EC%A0%84.csv) · [공용 코드표 초안](../../metadata/data_dictionary/shared_code_map.csv)
+숫자처럼 보이는 식별자는 문자열로 보관합니다. 원천 날짜의 `MM/DD/YYYY` 형식을 달력 날짜로 바꾸고, 문서에는 `YYYY-MM-DD`로 표시합니다. [공용 데이터 사전](../../metadata/data_dictionary/README.md) · [공용 코드표 초안](../../metadata/data_dictionary/shared_code_map.csv)
 
 ## 연결 방식과 다른 관점에 제공할 컬럼
 

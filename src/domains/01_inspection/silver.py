@@ -1,22 +1,20 @@
 """Standardize inspection values and record row-level rule flags."""
 
-import csv
-
 import pandas as pd
 import pyarrow as pa
 
-from common import BRONZE, CODE_MAP, COLUMNS, ROOT, RULE_FLAGS, SILVER, TABLE, write_table
+from common import BRONZE, COLUMNS, INSPECTION_FIELDS, ROOT, RULE_FLAGS, SILVER, TABLE, TRANSFORMS, write_table
+from src.silver.shared_dictionary import load_shared_codes
 
 
 def standardize(raw):
     silver = raw.rename(columns=COLUMNS).copy()
-    for name in COLUMNS.values():
+    for name, transform in TRANSFORMS.items():
         values = silver[name]
         trimmed = values.str.strip()
-        silver[name] = (values if name == "violations_text" else trimmed).mask(trimmed.eq(""))
-    silver["license_number_key"] = silver["license_number_key"].replace(
-        {"0": None, "9999999": None}
-    )
+        silver[name] = (values if transform == "nonblank_original" else trimmed).mask(trimmed.eq(""))
+        if transform == "inspection_license_sentinels":
+            silver[name] = silver[name].replace({"0": None, "9999999": None})
     exact = raw[list(COLUMNS)].duplicated()
     conflicts = silver["inspection_key"].where(~exact)
     issues = {
@@ -26,23 +24,25 @@ def standardize(raw):
         ),
         "invalid_inspection_key": ~silver["inspection_key"].str.fullmatch(r"[0-9]+", na=False),
     }
-    dates = pd.to_datetime(silver["inspection_dtm"], format="%m/%d/%Y", errors="coerce")
-    issues["invalid_inspection_date"] = dates.isna()
-    silver["inspection_dtm"] = dates.astype(pd.ArrowDtype(pa.date32()))
-    for name in ("latitude", "longitude"):
-        parsed = pd.to_numeric(silver[name], errors="coerce")
-        issues[f"invalid_{name}"] = silver[name].notna() & parsed.isna()
-        silver[name] = parsed.astype("Float64")
-    with (ROOT / CODE_MAP).open(encoding="utf-8-sig", newline="") as file:
-        mappings = [row for row in csv.DictReader(file) if row["dataset"] == "food_inspections"]
-    for name in ("result_cd", "risk_level_cd"):
-        entries = [row for row in mappings if row["target_column"] == name]
-        lookup = {row["source_value"]: row["standard_code"] for row in entries}
+    for name, transform in TRANSFORMS.items():
+        if transform == "inspection_date":
+            dates = pd.to_datetime(silver[name], format="%m/%d/%Y", errors="coerce")
+            issues["invalid_inspection_date"] = dates.isna()
+            silver[name] = dates.astype(pd.ArrowDtype(pa.date32()))
+        elif transform == "coordinate":
+            parsed = pd.to_numeric(silver[name], errors="coerce")
+            issues[f"invalid_{name}"] = silver[name].notna() & parsed.isna()
+            silver[name] = parsed.astype("Float64")
+    maps = load_shared_codes(ROOT, {"food_inspections": INSPECTION_FIELDS})
+    by_target = {target: entries for (_, _, target), entries in maps.items()}
+    # Keep flag columns in the published order.
+    for name, entries in sorted(by_target.items()):
+        lookup = {source: row["standard_code"] for source, row in entries.items()}
         values = silver[name]
         silver[name] = values.map(lookup).astype("string")
         issues[f"missing_{name}"] = values.isna()
         issues[f"unmapped_{name}"] = values.notna() & silver[name].isna()
-        review = {row["source_value"] for row in entries if row["mapping_status"] == "review"}
+        review = {source for source, row in entries.items() if row["mapping_status"] == "review"}
         if review:
             issues[f"review_{name}"] = values.isin(review)
     for name in ("facility_type", "inspection_type"):
