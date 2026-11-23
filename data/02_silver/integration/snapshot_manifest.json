@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "loaded_at": "2026-11-23T00:29:09Z",
+  "origin": {
+    "food_inspections": {
+      "sha256": "B43BEB7FAE834A8698CA162004CAF2929CB2ECA7FF75C27B4DB6BF07AA103C98",
+      "rows": 318627
+    },
+    "business_licenses": {
+      "sha256": "783354424BEBE4D367BD3A0F9CDC63A846FAE28D50580B9CCF89590D10CC61BB",
+      "rows": 1212132
+    },
+    "community_areas": {
+      "sha256": "C4B9C42ADC19BACA0A9C6EE3E84B302D40073D3AD99EE3D8B101D5D8217B0D16",
+      "rows": 77
+    }
+  },
+  "artifacts": {
+    "data/02_silver/integration/inspection_rule_flags.parquet": {
+      "sha256": "CB326B63B4883D263536172D816074CA2FFD1D5EA5BAA563F40A8FF2E5605ADB",
+      "bytes": 1600060
+    },
+    "data/01_bronze/integration/food_inspections.parquet": {
+      "sha256": "EAF40B247E8F8C173A29436D7791F95D9B465EFD41B86B83A635D110B6F39FC1",
+      "bytes": 65954210
+    },
+    "data/02_silver/integration/food_inspections.parquet": {
+      "sha256": "6DFF32955EAC688DC1211E85FCF1663A2C17D0E34B1C341A0DFFCBCDBF9AE3AD",
+      "bytes": 102642189,
+      "parts": {
+        "data/02_silver/integration/food_inspections.parquet.part-001": "F1552BDE4B02074D896A22891885B2924DEA8FAF5374418D9F251EA201201FA8",
+        "data/02_silver/integration/food_inspections.parquet.part-002": "4BD2F5ED862C9391438E15FB94762BA1FCF6BF0CB91945EB830C85322757D956"
+      }
+    },
+    "data/01_bronze/integration/business_licenses.parquet": {
+      "sha256": "82B497E3FA75C8A76EE04E3EE03490A8EB2F8D13FC9738A5B26EF3D00F642E0C",
+      "bytes": 108380967,
+      "parts": {
+        "data/01_bronze/integration/business_licenses.parquet.part-001": "394C491612E105058C70484C3D57C44BC2B51E8F7B3CB30C40F453760A2DD76A",
+        "data/01_bronze/integration/business_licenses.parquet.part-002": "1593882F8219F94894D8294B7D833846306024636B6AB82EE486B99003746148"
+      }
+    },
+    "data/02_silver/integration/business_licenses.parquet": {
+      "sha256": "9BB8376D7DB4F0EE321A6D422443DFA880B9F9E3FD3EEB5A53B572CDB75083EB",
+      "bytes": 92434868
+    },
+    "data/01_bronze/integration/community_areas.parquet": {
+      "sha256": "5E7CF4F47838C512524771E4CD3D8DDAD49C6796FD5FF5202EF88DA50D41B0C5",
+      "bytes": 629960
+    },
+    "data/02_silver/integration/community_areas.parquet": {
+      "sha256": "EB45D80691726079DF7A85B3D55F37A37B85A4EE48AEEBE5D4F966E6ED7C1865",
+      "bytes": 1163073
+    }
+  }
+}
