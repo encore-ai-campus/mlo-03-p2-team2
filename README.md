@@ -40,9 +40,9 @@
 
 | 용도 | 기술 |
 | --- | --- |
-| 처리·저장 | ![Python 3.14](https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white) ![pandas](https://img.shields.io/badge/pandas-150458?logo=pandas&logoColor=white) ![PyArrow](https://img.shields.io/badge/PyArrow-2463A0) ![Apache Parquet](https://img.shields.io/badge/Apache-Parquet-168B89) |
+| 처리·저장 | ![Python 3.14](https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white) ![pandas](https://img.shields.io/badge/pandas-150458?logo=pandas&logoColor=white) ![Apache Parquet](https://img.shields.io/badge/Apache-Parquet-168B89) |
 | 공간 연산 | ![Shapely](https://img.shields.io/badge/Shapely-1F766E) ![GeoJSON](https://img.shields.io/badge/GeoJSON-3A6B35) |
-| 검증·협업 | ![pytest](https://img.shields.io/badge/pytest-0A9EDC?logo=pytest&logoColor=white) ![SHA-256](https://img.shields.io/badge/SHA--256-475569) ![GitHub PR·Wiki](https://img.shields.io/badge/GitHub-PR%20%2B%20Wiki-181717?logo=github&logoColor=white) ![draw.io](https://img.shields.io/badge/draw.io-F08705?logo=diagramsdotnet&logoColor=white) |
+| 검증·설계 | ![pytest](https://img.shields.io/badge/pytest-0A9EDC?logo=pytest&logoColor=white) ![draw.io](https://img.shields.io/badge/draw.io-F08705?logo=diagramsdotnet&logoColor=white) |
 
 ## 4. WBS
 
