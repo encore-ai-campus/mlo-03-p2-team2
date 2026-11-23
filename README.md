@@ -6,13 +6,13 @@
 
 **치카치카**
 
-| 관점 | 팀원 | GitHub |
-| --- | :---: | --- |
-| 01 점검 성과 | 이하영 | [@coffeewoouuu](https://github.com/coffeewoouuu) |
-| 02 위반 유형 | 이자연 | [@naturedevworks](https://github.com/naturedevworks) |
-| 03 반복 위반·재검사 | 김한울 | [@hannyeee](https://github.com/hannyeee) |
-| 04 사업체 인허가 | 노진산 | [@jinsan02](https://github.com/jinsan02) |
-| 05 지역 분석 | 오정민 | [@OZAM0415](https://github.com/OZAM0415) |
+| 팀원 | 담당 관점 | 대표 Fact | GitHub |
+| --- | --- | --- | --- |
+| 이하영 | 01 점검 성과 | `01_fact_inspection` | [@coffeewoouuu](https://github.com/coffeewoouuu) |
+| 이자연 | 02 위반 유형 | `02_fact_inspection_violation` | [@naturedevworks](https://github.com/naturedevworks) |
+| 김한울 | 03 반복 위반·재검사 | `03_fact_repeat_violation` | [@hannyeee](https://github.com/hannyeee) |
+| 노진산 | 04 사업체 인허가 | `04_fact_inspection_license_match` | [@jinsan02](https://github.com/jinsan02) |
+| 오정민 | 05 지역 분석 | `05_fact_inspection_area_period` | [@OZAM0415](https://github.com/OZAM0415) |
 
 ## 2. 프로젝트 개요
 
@@ -87,13 +87,21 @@
 01 점검 팩트는 **점검 ID 하나에 한 행**입니다. <br>
 02 위반 조각과 03 기준·후속 점검은 이 점검 ID를 참조합니다.  <br>01·04는 공용 날짜 차원을, 05의 지역 집계는 공용 지역 차원을 사용합니다.
 
-| 관점 | 한 행의 의미 | 주요 지표 |
-| --- | --- | --- |
-| 01 점검 성과 | 점검 1건 | 점검·판정·불합격 건수 |
-| 02 위반 유형 | 정상 파싱된 위반 조각 1개 | 위반 조각 수, 위반이 기록된 고유 점검 수 |
-| 03 반복 위반·재검사 | 기준 점검의 고유 위반 코드 1개 / 기준 불합격 점검 1건 | 재관측 여부 / 재검사 연결 여부와 소요일 |
-| 04 사업체 인허가 | 인허가 이력 1건 / 점검별 인허가 매칭 1건 | 이력 수 / 유효기간 후보 수 |
-| 05 지역 분석 | 지역·기간 / 지역·기간·코드 버전 / 지역·기간·코드 버전·위반 코드 | 점검 결과 / 위반 관측 범위 / 코드별 고유 점검 수 |
+### 공용 Gold Fact 9개
+
+| 관점 | Fact 테이블 | 한 행의 의미 | 주요 지표 |
+| --- | --- | --- | --- |
+| 01 | `01_fact_inspection` | 점검 1건 | 점검·평가 완료·불합격 건수 |
+| 02 | `02_fact_inspection_violation` | 정상으로 분류된 위반 조각 1개 | 위반 조각 수, 위반이 기록된 고유 점검 수 |
+| 03 | `03_fact_repeat_violation` | 기준 점검에서 관측된 위반 코드 버전과 코드 조합 1개 | 다음 비교 점검에서 같은 코드가 다시 기록됐는지 |
+| 03 | `03_fact_reinspection` | 기준 불합격 점검 1건 | 후속 점검 연결 여부, 경과일, 결과 |
+| 04 | `04_fact_inspection_license_match` | 면허 연결을 시도한 점검 1건 | 유효기간 후보 수와 매칭 상태 |
+| 04 | `04_fact_license_event` | 발급·갱신 등 인허가 이력 1건 | 인허가 이력 건수 |
+| 05 | `05_fact_inspection_area_period` | 기간 단위·시작일과 지역 배정 결과의 조합 1개 | 점검·평가 완료·불합격 건수 |
+| 05 | `05_fact_violation_coverage_area_period` | 지역·기간 집계와 위반 코드 버전의 조합 1개 | 관측·파싱 상태별 점검 수 |
+| 05 | `05_fact_violation_area_period` | 위반 관측 범위와 위반 코드의 조합 1개 | 해당 코드가 기록된 고유 점검 수 |
+
+[공용 Fact 산출물](data/03_gold/facts) · [Gold 생성·검증 코드](src/gold/build_dimensions.py)
 
 ## 7. 주요 프로시저
 
@@ -103,6 +111,22 @@
 2. **관점별 Gold** · `06_integration` 공용 입력으로 01~05 팩트와 집계를 일괄 생성합니다. [팀 일괄 실행](docs/domains/06_integration.md#관점별-비교-실행)
 3. **공용 Gold** · 관점별 결과를 연결해 공용 차원과 팩트를 생성하고, 키와 참조 관계를 확인합니다.
 4. **AI Ready** · 점검 Silver와 02 위반 기록, 03 후속 점검 결과에서 기준일 전 365일 이력과 과제별 정답을 만듭니다. [학습 데이터 생성과 검증](docs/ai_ready/inspection_training.md)
+
+### 공용 Bronze에서 Silver로 바뀐 실제 점검
+
+점검 `2646979`를 공용 Bronze와 Silver Parquet에서 각각 조회했습니다. 날짜·결과 표기가 바뀌어도 원천 행 번호 `4`로 같은 점검을 추적할 수 있습니다.
+
+| 항목 | 공용 Bronze 컬럼과 값 | 공용 Silver 컬럼과 값 |
+| --- | --- | --- |
+| 점검 번호 | `Inspection ID` = `"2646979"` | `inspection_key` = `"2646979"` |
+| 면허번호 | `License #` = `"2398495"` | `license_number_key` = `"2398495"` |
+| 점검 날짜 | `Inspection Date` = `"11/18/2026"` (문자열) | `inspection_dtm` = `2026-11-18` (날짜형) |
+| 점검 결과 | `Results` = `"Fail"` | `result_cd` = `"FAIL"` |
+| 원천 행 번호 | `source_row_num` = `4` | `source_row_num` = `4` |
+| 원천 파일명 | `_SRC_FILE` = `food_inspections.csv` | 컬럼 제거 |
+| 적재 시각 | `_LOAD_DTM` = `2026-11-23T00:29:09Z` | 컬럼 제거 |
+
+[공용 Bronze](data/01_bronze/06_integration) · [공용 Silver](data/02_silver/06_integration) · [점검 표준화 코드](src/domains/01_inspection/silver.py#L11) · [공용 Silver 생성 코드](src/domains/06_integration/build.py#L72)
 
 ## 8. 수행 결과
 
