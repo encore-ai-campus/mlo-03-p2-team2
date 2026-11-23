@@ -1,0 +1,116 @@
+{
+  "layer": "gold",
+  "batch_id": "a133aa6e46265a68d7e2",
+  "gold_id": "533771c3a9c0ff8b69b6",
+  "rules_signature": "533771c3a9c0ff8b69b6577090f7cced721f9d67dc4875d8dc54a2927a4c11c2",
+  "built_at_utc": "2026-11-20T07:24:41.545000+00:00",
+  "silver_rules_id": "c0f77dc4efaff980259f",
+  "silver_manifest_sha256": "55e17c6841fece02b8af862529d53585dc5c0891578672697af162db6ed16363",
+  "silver_rules_signature": "c0f77dc4efaff980259f2010e53c3a715ef4630bacdae4e091763aea8c76ba17",
+  "gold_source_code_sha256": {
+    "geographic_gold.py": "4ea545f276baefbe9a8a2d9758360764c2c6b36977265e2e661adcfb7847d20d",
+    "geographic_integration.py": "314898487d8bf2ec968a80c623c97329173682c3e34d410cc8f29f25119ee034",
+    "geographic_medallion.py": "48e9589b1ec5c9053d14b66d1bb6aac4c1b35d41af3950817352281406e1bd17",
+    "silver_violations.py": "92866f5912ec3d6f48daf2a2a7e92d96676b43a67c43ca76cc425f26ca1fcccd"
+  },
+  "source_mode": "local",
+  "shared_inputs": {},
+  "runtime": {
+    "python": "3.14.7",
+    "pandas": "3.1.1",
+    "pyarrow": "26.0.1"
+  },
+  "scope": {
+    "start_date": null,
+    "end_date": null,
+    "facility_type": null,
+    "inspection_type": null,
+    "risk_level_cd": null,
+    "community_area_num": null
+  },
+  "artifacts": {
+    "inspection_area_period.parquet": {
+      "sha256": "c01465fe659115bb570e1e144e164708076824dc3e45da26a758a06c6479aa1c",
+      "size_bytes": 99325,
+      "rows": 17820,
+      "schema": {
+        "period_grain_cd": "string",
+        "period_start_dtm": "date32[day]",
+        "period_end_dtm": "date32[day]",
+        "covered_start_dtm": "date32[day]",
+        "covered_end_dtm": "date32[day]",
+        "partial_period_flag": "bool",
+        "community_area_match_status": "string",
+        "community_area_num": "int64",
+        "community_area_name": "string",
+        "boundary_version": "string",
+        "inspection_count": "int64",
+        "evaluated_count": "int64",
+        "failed_count": "int64",
+        "not_evaluated_count": "int64",
+        "unknown_result_count": "int64",
+        "failure_rate": "double"
+      }
+    },
+    "metrics_summary.json": {
+      "sha256": "a26ee833dd54ddce080a1fcca480a422546be569f2578e7ae5e2dee9b1136aed",
+      "size_bytes": 1348
+    },
+    "violation_area_period.parquet": {
+      "sha256": "1ee86d4924fdcd6091b2eb6988afd54b7747b7612d7e17d71887f989235a0d5b",
+      "size_bytes": 1740101,
+      "rows": 280988,
+      "schema": {
+        "period_grain_cd": "string",
+        "period_start_dtm": "date32[day]",
+        "period_end_dtm": "date32[day]",
+        "covered_start_dtm": "date32[day]",
+        "covered_end_dtm": "date32[day]",
+        "partial_period_flag": "bool",
+        "community_area_match_status": "string",
+        "community_area_num": "int64",
+        "community_area_name": "string",
+        "boundary_version": "string",
+        "code_system_version": "string",
+        "era_covered_start_dtm": "date32[day]",
+        "era_covered_end_dtm": "date32[day]",
+        "violation_cd": "string",
+        "violation_description_text": "string",
+        "description_variant_count": "int64",
+        "code_inspection_count": "int64",
+        "evaluated_count": "int64",
+        "violation_code_ready_count": "int64",
+        "code_recorded_rate": "double",
+        "code_recorded_among_ready_rate": "double"
+      }
+    },
+    "violation_coverage_area_period.parquet": {
+      "sha256": "d1665b2a8eb20dc100eba5cc928eda5af4f0e586127ca51e9937a851e55f7c5b",
+      "size_bytes": 124049,
+      "rows": 17901,
+      "schema": {
+        "period_grain_cd": "string",
+        "period_start_dtm": "date32[day]",
+        "period_end_dtm": "date32[day]",
+        "covered_start_dtm": "date32[day]",
+        "covered_end_dtm": "date32[day]",
+        "partial_period_flag": "bool",
+        "community_area_match_status": "string",
+        "community_area_num": "int64",
+        "community_area_name": "string",
+        "boundary_version": "string",
+        "code_system_version": "string",
+        "era_covered_start_dtm": "date32[day]",
+        "era_covered_end_dtm": "date32[day]",
+        "evaluated_count": "int64",
+        "violation_recorded_count": "int64",
+        "violation_missing_count": "int64",
+        "violation_code_ready_count": "int64",
+        "violation_parsed_count": "int64",
+        "violation_partial_count": "int64",
+        "violation_unrecognized_count": "int64",
+        "violation_recorded_rate": "double"
+      }
+    }
+  }
+}

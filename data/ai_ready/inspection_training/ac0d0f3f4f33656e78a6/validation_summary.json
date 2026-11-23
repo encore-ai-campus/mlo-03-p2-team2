@@ -1,0 +1,66 @@
+{
+  "datasets": {
+    "next_inspection_violation_recurrence": {
+      "history_status_counts": {
+        "no_prior_inspection_in_window": 113360,
+        "observed_earlier_inspection": 174175
+      },
+      "rows": 287535,
+      "splits": {
+        "test": {
+          "negative": 27664,
+          "positive": 19808
+        },
+        "train": {
+          "negative": 107795,
+          "positive": 72169
+        },
+        "validation": {
+          "negative": 35402,
+          "positive": 24697
+        }
+      }
+    },
+    "preinspection_failure": {
+      "history_status_counts": {
+        "missing_license": 745,
+        "no_prior_inspection_in_window": 96264,
+        "observed_earlier_inspection": 176479
+      },
+      "rows": 273488,
+      "splits": {
+        "test": {
+          "negative": 22181,
+          "positive": 5980
+        },
+        "train": {
+          "negative": 165871,
+          "positive": 48048
+        },
+        "validation": {
+          "negative": 24092,
+          "positive": 7316
+        }
+      }
+    }
+  },
+  "inspection_results": {
+    "BUSINESS NOT LOCATED": 96,
+    "FAIL": 61344,
+    "NO ENTRY": 14339,
+    "NOT READY": 4663,
+    "OUT OF BUSINESS": 26041,
+    "PASS": 164981,
+    "PASS W/ CONDITIONS": 47163
+  },
+  "recurrence_input_status_counts": {
+    "ambiguous_same_day": 1206,
+    "base_violations_unconfirmed": 4153,
+    "comparable": 333856,
+    "excluded_cross_split_label": 46321,
+    "followup_violations_unconfirmed": 45634,
+    "no_followup": 59919
+  },
+  "source_inspection_rows": 318627,
+  "source_observation_end": "2026-11-18"
+}

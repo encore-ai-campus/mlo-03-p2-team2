@@ -1,0 +1,38 @@
+{
+  "table_rows": {
+    "ai_inspection_metrics.parquet": 17820,
+    "ai_violation_coverage.parquet": 17901,
+    "ai_violation_metrics.parquet": 983826
+  },
+  "observed_code_domain_size_by_era": {
+    "from_2018_07_01": 64,
+    "pre_2018_07_01": 46
+  },
+  "code_observation_status_rows": {
+    "NO_RECORDED_CODE": 622258,
+    "RECORDED": 280988,
+    "NO_EVALUATED_INSPECTIONS": 73632,
+    "NO_CODE_READY_INSPECTIONS": 6948
+  },
+  "inspection_and_violation_totals_by_grain": {
+    "MONTH": {
+      "inspection_count": 318627,
+      "evaluated_count": 273488,
+      "failed_count": 61344,
+      "failure_rate": 0.22430234598958637,
+      "evaluated_with_violation_record_count": 227696,
+      "evaluated_missing_violation_record_count": 45792,
+      "evaluated_code_observation_count": 960643
+    },
+    "YEAR": {
+      "inspection_count": 318627,
+      "evaluated_count": 273488,
+      "failed_count": 61344,
+      "failure_rate": 0.22430234598958637,
+      "evaluated_with_violation_record_count": 227696,
+      "evaluated_missing_violation_record_count": 45792,
+      "evaluated_code_observation_count": 960643
+    }
+  },
+  "validated_against_gold": true
+}

@@ -82,3 +82,7 @@ Thumbs.db
 !/data/03_gold/02_violation/02_fact_inspection_violation.parquet.part-00[12]
 /data/01_bronze/04_license/04_business_licenses.parquet
 !/data/01_bronze/04_license/04_business_licenses.parquet.part-00[12]
+
+# Reassembled Domain 05 Silver snapshot files.
+/data/02_silver/05_geospatial/a133aa6e46265a68d7e2/c0f77dc4efaff980259f/inspection_violation_tokens.parquet
+/data/silver/17d4be023ac748aeef19/dffd2f330f1e61f4b17d/inspection_violation_tokens.parquet

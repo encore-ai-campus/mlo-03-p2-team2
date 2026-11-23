@@ -1,0 +1,28 @@
+{
+  "data/02_silver/05_geospatial/a133aa6e46265a68d7e2/c0f77dc4efaff980259f/inspection_violation_tokens.parquet": {
+    "sha256": "ce474672dc43e9583f490b582d29e4fa6ac12fb5cbfd59009532f610e6d30383",
+    "parts": [
+      {
+        "path": "data/02_silver/05_geospatial/snapshot_parts/a133aa6e46265a68d7e2/c0f77dc4efaff980259f/inspection_violation_tokens.parquet.part-001",
+        "sha256": "2ddaf7e825299f9bf9e0922a4008f652cd99e4ba003ae968e9c349407d9ac6f5"
+      },
+      {
+        "path": "data/02_silver/05_geospatial/snapshot_parts/a133aa6e46265a68d7e2/c0f77dc4efaff980259f/inspection_violation_tokens.parquet.part-002",
+        "sha256": "d833b846248df2b850e8848ec3c5b30363f08a4390794a83011680c0750bb422"
+      }
+    ]
+  },
+  "data/silver/17d4be023ac748aeef19/dffd2f330f1e61f4b17d/inspection_violation_tokens.parquet": {
+    "sha256": "6b4b397af18bee7ee6d500f2ef8ecd886d3152566690150c5ee6243d9f843250",
+    "parts": [
+      {
+        "path": "data/02_silver/05_geospatial/snapshot_parts/17d4be023ac748aeef19/dffd2f330f1e61f4b17d/inspection_violation_tokens.parquet.part-001",
+        "sha256": "a836de569417f0295589c148a22268ba3c78036ffdfb473e954bfdaaa227f219"
+      },
+      {
+        "path": "data/02_silver/05_geospatial/snapshot_parts/17d4be023ac748aeef19/dffd2f330f1e61f4b17d/inspection_violation_tokens.parquet.part-002",
+        "sha256": "1a9ea8cad91c393679e92841267056d0651209053c9c2b6ee3e9971db0778e61"
+      }
+    ]
+  }
+}

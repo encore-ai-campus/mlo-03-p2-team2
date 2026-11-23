@@ -1,0 +1,195 @@
+{
+  "layer": "silver",
+  "batch_id": "17d4be023ac748aeef19",
+  "rules_id": "dffd2f330f1e61f4b17d",
+  "rules_signature": "dffd2f330f1e61f4b17d8c57e492bdd1b0bd0fbbfdc91591eec7da8e19ab6c2f",
+  "bronze_manifest_sha256": "cb01baa9a734de2d13ae6d74a8f5f649caf2d4132f37083aa67d32b1362be1d3",
+  "built_at_utc": "2026-11-20T06:52:50.001000+00:00",
+  "contract_version": "1.1-geographic-draft",
+  "mapping_version": "1.0-geographic-draft",
+  "inputs_sha256": {
+    "metadata/data_dictionary/05_geospatial/column_contract.json": "a657762f987b6b4ebb2bb6dfc3a62630efb46705b08cefe339dfe6c352e6ced6",
+    "metadata/data_dictionary/05_geospatial/shared_code_map.csv": "beafac9ee20b2487eb80eea63818000eda0463019b8062c4a5a01678fac0f340",
+    "metadata/source_catalog/05_geospatial/official_metadata_snapshot.json": "b7670e5580803b0c965ef0f4e0cc4adb99199466898c78528169d5ca84eac7a4",
+    "src/domains/05_geospatial/geographic_medallion.py": "eea13fc1a84303b29187419aa02720848cc9aca9764becd039b37a3ba66a050d",
+    "src/domains/05_geospatial/silver_spatial.py": "6bd8f70ff5a5170a186efb3528a9114d50ed00dc6b3b10bd0e2d63feb64ba969",
+    "src/domains/05_geospatial/silver_violations.py": "234802a0f6fdb97c63406d5b2c9bff7c765f0c661b22aac1745d728eeebcfd6e"
+  },
+  "runtime": {
+    "pyarrow": "26.0.1",
+    "pandas": "3.1.1",
+    "shapely": "2.2.0",
+    "geos": "3.14.1"
+  },
+  "artifacts": {
+    "code_coverage.csv": {
+      "sha256": "bb6604af80dc119cce8f3cd8130de01d0104c175d0babba3c03db11c0d55724d",
+      "size_bytes": 543
+    },
+    "community_areas.parquet": {
+      "sha256": "58e128275a5c73b540e4d157fee22ff3d80c2257797792d0d43d0d0f2eafe1b1",
+      "size_bytes": 624744,
+      "rows": 77,
+      "schema": {
+        "geometry": "string",
+        "community_area_num": "int64",
+        "community_area_name": "string",
+        "community_area_code_raw": "string",
+        "shape_area_num": "double",
+        "shape_length_num": "double",
+        "source_row_num": "int64",
+        "batch_id": "string",
+        "quality_status_cd": "string",
+        "boundary_version": "string"
+      }
+    },
+    "food_inspections.parquet": {
+      "sha256": "053f529d21628f13da8efb38999f1f468a84fcef4c1aa2c661754d215f245e95",
+      "size_bytes": 67995393,
+      "rows": 318627,
+      "schema": {
+        "inspection_key": "string",
+        "dba_name": "string",
+        "aka_name": "string",
+        "license_number_key": "string",
+        "facility_type": "string",
+        "risk_level_cd": "string",
+        "risk_level_cd_raw": "string",
+        "risk_level_cd_mapping_status": "string",
+        "address": "string",
+        "city": "string",
+        "state_cd": "string",
+        "zip_code": "string",
+        "inspection_dtm": "date32[day]",
+        "inspection_type": "string",
+        "result_cd": "string",
+        "result_cd_raw": "string",
+        "result_cd_mapping_status": "string",
+        "violations_text": "string",
+        "latitude": "double",
+        "longitude": "double",
+        "location_text": "string",
+        "coordinate_invalid_flag": "bool",
+        "source_row_num": "int64",
+        "batch_id": "string",
+        "quality_status_cd": "string"
+      }
+    },
+    "inspection_community_areas.parquet": {
+      "sha256": "cc210667eb895c5ce28b9e2462c196e2ac7d6004526d9913815f394a026a2960",
+      "size_bytes": 2085715,
+      "rows": 318627,
+      "schema": {
+        "inspection_key": "string",
+        "community_area_num": "int64",
+        "community_area_match_status": "string",
+        "community_area_candidate_count": "int64",
+        "community_area_candidate_nums": "list<element: int64>",
+        "community_area_on_boundary": "bool",
+        "boundary_version": "string"
+      }
+    },
+    "inspection_geography.parquet": {
+      "sha256": "e3bfc1a9f81ca4701119d3e054f79bb19b019e2ea699ebb81fea231e3804ec24",
+      "size_bytes": 4222685,
+      "rows": 318627,
+      "schema": {
+        "inspection_key": "string",
+        "inspection_dtm": "date32[day]",
+        "source_row_num": "int64",
+        "batch_id": "string",
+        "result_cd": "string",
+        "facility_type": "string",
+        "inspection_type": "string",
+        "risk_level_cd": "string",
+        "community_area_num": "int64",
+        "community_area_match_status": "string",
+        "community_area_candidate_count": "int64",
+        "community_area_candidate_nums": "list<element: int64>",
+        "community_area_on_boundary": "bool",
+        "boundary_version": "string",
+        "code_system_version": "string",
+        "violation_observation_status": "string",
+        "violation_token_count": "int64",
+        "parsed_violation_token_count": "int64",
+        "unrecognized_violation_token_count": "int64",
+        "distinct_parsed_violation_code_count": "int64",
+        "violation_code_occurrence_ready": "bool",
+        "evaluated_flag": "bool",
+        "failed_flag": "bool",
+        "evaluation_status_cd": "string"
+      }
+    },
+    "inspection_violation_codes.parquet": {
+      "sha256": "3e0bab8a1dbf9114acc72514415048ac44465cbc2be0c612dc1491d9b9110bf8",
+      "size_bytes": 4495069,
+      "rows": 965406,
+      "schema": {
+        "inspection_key": "string",
+        "source_row_num": "int64",
+        "batch_id": "string",
+        "inspection_dtm": "date32[day]",
+        "code_system_version": "string",
+        "violation_code": "string",
+        "first_violation_sequence": "int64",
+        "violation_token_count": "int64",
+        "description_text": "string",
+        "violation_observation_status": "string"
+      }
+    },
+    "inspection_violation_observations.parquet": {
+      "sha256": "c900f9437d2ed03e197ab0337940e42bc6cee2e73e884c86d3f128573e4b1aa2",
+      "size_bytes": 52917581,
+      "rows": 318627,
+      "schema": {
+        "inspection_key": "string",
+        "source_row_num": "int64",
+        "batch_id": "string",
+        "inspection_dtm": "date32[day]",
+        "code_system_version": "string",
+        "violations_text": "string",
+        "violation_observation_status": "string",
+        "violation_token_count": "int64",
+        "parsed_violation_token_count": "int64",
+        "unrecognized_violation_token_count": "int64",
+        "distinct_parsed_violation_code_count": "int64",
+        "violation_code_occurrence_ready": "bool"
+      }
+    },
+    "inspection_violation_tokens.parquet": {
+      "sha256": "6b4b397af18bee7ee6d500f2ef8ecd886d3152566690150c5ee6243d9f843250",
+      "size_bytes": 102590138,
+      "rows": 1031073,
+      "schema": {
+        "inspection_key": "string",
+        "source_row_num": "int64",
+        "batch_id": "string",
+        "inspection_dtm": "date32[day]",
+        "code_system_version": "string",
+        "violation_sequence": "int64",
+        "raw_segment": "string",
+        "violation_code": "string",
+        "description_text": "string",
+        "comment_text": "string",
+        "parse_status": "string"
+      }
+    },
+    "quality_issues.parquet": {
+      "sha256": "bfb0d5fed409da0f03418e3c2fa86c512dabbc5d30f1c4687b621b1f9ee7c6cf",
+      "size_bytes": 5760,
+      "rows": 1019,
+      "schema": {
+        "source_dataset": "string",
+        "batch_id": "string",
+        "source_row_num": "int64",
+        "standard_column": "string",
+        "reason_cd": "string",
+        "raw_value": "string"
+      }
+    },
+    "quality_summary.json": {
+      "sha256": "f8ce65142887a5b77f159972a964296c039dcc4b432c97cd07ebcbd076bc2965",
+      "size_bytes": 2688
+    }
+  }
+}

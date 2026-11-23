@@ -1,0 +1,13 @@
+﻿source_column,raw_value,standard_code,mapping_status,row_count
+Results,Business Not Located,BUSINESS NOT LOCATED,proposed,96
+Results,Fail,FAIL,proposed,61344
+Results,No Entry,NO ENTRY,proposed,14339
+Results,Not Ready,NOT READY,proposed,4663
+Results,Out of Business,OUT OF BUSINESS,proposed,26041
+Results,Pass,PASS,proposed,164981
+Results,Pass w/ Conditions,PASS W/ CONDITIONS,proposed,47163
+Risk,,,missing,88
+Risk,All,ALL,review,90
+Risk,Risk 1 (High),RISK_1,proposed,237341
+Risk,Risk 2 (Medium),RISK_2,proposed,56428
+Risk,Risk 3 (Low),RISK_3,proposed,24680

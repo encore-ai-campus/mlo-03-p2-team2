@@ -44,7 +44,7 @@ gold_dir="${gold##*: }"
 python "$domain/geographic_ai_ready.py" build --gold-dir "$gold_dir"
 ```
 
-관점별 결과는 `data/01_bronze/05_geospatial/`, `data/02_silver/05_geospatial/`, `data/03_gold/05_geospatial/`, `data/ai_ready/05_geospatial/` 아래의 버전 경로에 저장된다. 같은 입력과 규칙으로 재실행하면 해당 버전의 산출물을 검사한다. 원천 파일과 생성 Parquet·매니페스트는 Git 제외 경로에서 관리한다.
+관점별 결과는 `data/01_bronze/05_geospatial/`, `data/02_silver/05_geospatial/`, `data/03_gold/05_geospatial/`, `data/ai_ready/05_geospatial/` 아래의 버전 경로에 저장된다. 같은 입력과 규칙으로 재실행하면 해당 버전의 산출물을 검사한다. 공유 스냅샷은 체크섬을 포함해 Git으로 관리한다.
 
 ## 검증
 
@@ -78,6 +78,42 @@ python "$domain/geographic_ai_ready.py" build --gold-dir "${gold##*: }"
 ```
 
 로컬 독립 검증에는 위 Bronze·Silver 출력 경로 및 `--source-dir origin/05_geospatial`을 전달한다. Gold는 기간, 시설 유형, 점검 유형, 위험 등급, 지역 번호 필터를 지원한다. 조건별 릴리스의 검증에는 구축과 동일한 옵션을 사용한다.
+
+## 공유 스냅샷의 분할 Parquet 복원
+
+공유된 두 로컬 비교 배치의 `inspection_violation_tokens.parquet`는 각각 100 MB를 넘으므로 바이트 단위로 분할했다. 분할본은 `data/02_silver/05_geospatial/snapshot_parts/`에 있다. 아래 명령은 저장소 루트에서 분할본과 원본의 SHA-256을 확인하고, 복원본이 없으면 Silver 매니페스트가 참조하는 위치에 생성한다. [분할·원본 체크섬](../../../reports/05_geospatial/split_snapshot_parts.json)
+
+```bash
+python - <<'PY'
+import json
+from pathlib import Path
+from shutil import copyfileobj
+from tempfile import TemporaryDirectory
+
+from src.ingestion.restore_origin import checksum
+
+index = Path("reports/05_geospatial/split_snapshot_parts.json")
+for relative, spec in json.loads(index.read_text(encoding="ascii")).items():
+    target = Path(relative)
+    parts = [Path(part["path"]) for part in spec["parts"]]
+    for part, info in zip(parts, spec["parts"], strict=True):
+        if checksum(part) != info["sha256"]:
+            raise ValueError(f"SHA-256 mismatch: {part}")
+    if target.exists():
+        if checksum(target) != spec["sha256"]:
+            raise ValueError(f"SHA-256 mismatch: {target}")
+        continue
+    with TemporaryDirectory(dir=target.parent.parent) as pending:
+        restored = Path(pending) / target.name
+        with restored.open("wb") as output:
+            for part in parts:
+                with part.open("rb") as source:
+                    copyfileobj(source, output, length=1024 * 1024)
+        if checksum(restored) != spec["sha256"]:
+            raise ValueError(f"Restored SHA-256 mismatch: {target}")
+        target.hardlink_to(restored)
+PY
+```
 
 ## Python 파일별 역할
 
