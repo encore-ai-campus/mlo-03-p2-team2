@@ -8,11 +8,9 @@ import shutil
 from tempfile import TemporaryDirectory
 
 from src.bronze.load_bronze import sha256
-from src.domains.integration.build import ROOT, SOURCES
+from .build import BRONZE, ROOT, SILVER, SOURCES
 
 
-BRONZE = Path("data/01_bronze/integration")
-SILVER = Path("data/02_silver/integration")
 MANIFEST = SILVER / "snapshot_manifest.json"
 GIT_FILE_LIMIT = 100_000_000
 BLOCK = 1024 * 1024
@@ -94,6 +92,13 @@ def publish(run, root):
             install(source, root / relative, digest)
 
 
+def verify_artifact(root, relative, manifest):
+    path = root / relative
+    entry = manifest["artifacts"][relative.as_posix()]
+    if path.stat().st_size != entry["bytes"] or sha256(path) != entry["sha256"]:
+        raise ValueError(f"Invalid published artifact: {relative}")
+
+
 def restore(root):
     manifest = json.loads((root / MANIFEST).read_text(encoding="utf-8"))
     with TemporaryDirectory(dir=root) as directory:
@@ -112,8 +117,7 @@ def restore(root):
                 if sha256(materialized) != entry["sha256"]:
                     raise ValueError(f"Invalid reconstructed artifact: {relative}")
                 install(materialized, target, entry["sha256"])
-            if sha256(target) != entry["sha256"]:
-                raise ValueError(f"Invalid published artifact: {relative}")
+            verify_artifact(root, Path(relative), manifest)
 
 
 if __name__ == "__main__":

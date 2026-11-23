@@ -1,6 +1,7 @@
 """Build isolated shared Bronze and Silver from the tracked team snapshot."""
 
 import argparse
+from contextlib import contextmanager
 from itertools import batched, zip_longest
 import json
 from pathlib import Path
@@ -20,6 +21,8 @@ from src.ingestion import restore_origin
 DOMAINS = Path(__file__).resolve().parents[1]
 ROOT = DOMAINS.parents[1]
 CATALOG = ROOT / "metadata/source_catalog/verification/download_manifest.csv"
+BRONZE = Path("data/01_bronze/06_integration")
+SILVER = Path("data/02_silver/06_integration")
 SOURCES = {
     "food_inspections": ("csv", 318_627, "Inspection ID"),
     "business_licenses": ("csv", 1_212_132, "LICENSE ID"),
@@ -42,9 +45,20 @@ def build_bronze(source, output, load_time, expected_rows, key):
                             source_row_num=start * BATCH_SIZE + index)
                        for index, (_, row) in enumerate(items, 1)]
             writer.write_table(pa.Table.from_pylist(records, schema=schema))
+    verify_bronze(source, output, load_time, expected_rows, key, source_hash)
+    return source_hash
+
+
+def verify_bronze(source, output, load_time, expected_rows, key, source_hash):
+    columns, _ = next(source_rows(source))
     source_records = (row for _, row in source_rows(source) if row is not None)
     keys = set()
     with pq.ParquetFile(output) as parquet:
+        schema = parquet.schema_arrow
+        expected = pa.schema([(name, pa.string()) for name in [*columns, "_SRC_FILE", "_LOAD_DTM"]]
+                             + [("source_row_num", pa.int64())])
+        if not schema.equals(expected) or (schema.metadata or {}).get(b"source_sha256") != source_hash.encode("ascii"):
+            raise ValueError(f"{source.path.name}: Bronze schema or source SHA-256 differs")
         stored_records = (row for batch in parquet.iter_batches() for row in batch.to_pylist())
         for number, (raw, stored) in enumerate(zip_longest(source_records, stored_records), 1):
             expected = dict(raw or {}, _SRC_FILE=source.path.name, _LOAD_DTM=load_time, source_row_num=number)
@@ -53,7 +67,6 @@ def build_bronze(source, output, load_time, expected_rows, key):
             keys.add(stored[key])
     if len(keys) != expected_rows or sha256(source.path) != source_hash:
         raise ValueError(f"{source.path.name}: unexpected row count or source changed")
-    return source_hash
 
 
 def inspection_silver(bronze, silver, quality):
@@ -95,22 +108,27 @@ def validate_silver(path, rows, key):
         raise ValueError(f"{path.name}: invalid Silver row count, key or lineage")
 
 
+@contextmanager
+def verified_origin(origin, parent):
+    with TemporaryDirectory(dir=parent) as temporary:
+        verified = Path(temporary)
+        for name in [*restore_origin.SMALL_FILES, "SHA256SUMS",
+                     *(part for csv_name in restore_origin.LARGE_FILES for part in restore_origin.parts(csv_name))]:
+            shutil.copyfile(origin / name, verified / name)
+        restore_origin.run(verified, CATALOG, True)
+        yield verified
+
+
 def build(origin, output):
     if output.exists():
         raise FileExistsError(output)
     output.parent.mkdir(parents=True, exist_ok=True)
     for domain in ("01_inspection", "04_license"):
         sys.path.append(str(DOMAINS / domain))
-    with TemporaryDirectory(dir=output.parent) as temporary:
+    with TemporaryDirectory(dir=output.parent) as temporary, verified_origin(origin, output.parent) as verified:
         stage = Path(temporary) / "run"
-        verified = Path(temporary) / "origin"
-        verified.mkdir()
-        for name in [*restore_origin.SMALL_FILES, "SHA256SUMS",
-                     *(part for csv_name in restore_origin.LARGE_FILES for part in restore_origin.parts(csv_name))]:
-            shutil.copyfile(origin / name, verified / name)
-        restore_origin.run(verified, CATALOG, True)
-        bronze_dir = stage / "data/01_bronze/integration"
-        silver_dir = stage / "data/02_silver/integration"
+        bronze_dir = stage / BRONZE
+        silver_dir = stage / SILVER
         bronze_dir.mkdir(parents=True)
         silver_dir.mkdir(parents=True)
         quality = stage / "inspection_rule_flags.parquet"
