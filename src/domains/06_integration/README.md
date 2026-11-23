@@ -1,6 +1,6 @@
 # 공용 Bronze·Silver 통합
 
-워크트리 `C:\mlo-03-p2-team2`, 브랜치 `codex/shared-bronze-silver-integration`.
+워크트리 `C:\mlo-03-p2-team2`, 브랜치 `codex/06-integration-structure`.
 
 팀 Git 원천의 체크섬을 확인하고 임시 경로에 CSV를 복원한다. 점검, 인허가, 지역 경계를 각자 한 테이블로 적재한다. 통합 결과는 새 실행 경로에 게시하며 기존 01~05 파이프라인의 입력 경로 전환은 후속 작업이다.
 
@@ -20,18 +20,18 @@
 
 ```powershell
 python -m pip install -r src/domains/05_geospatial/requirements.txt -r src/domains/04_license/requirements.txt
-python -m src.domains.integration.build --output reports/runs/integration/shared-bronze-silver
+python -m src.domains.06_integration.build --output reports/runs/06_integration/shared-bronze-silver
 ```
 
-출력에는 `data/01_bronze/integration/`과 `data/02_silver/integration/`이 생긴다. 다시 실행할 때는 새 출력 경로를 지정한다. 동일 원천의 Bronze 원천 값과 순서는 같고 적재 시각은 실행별로 기록된다.
+출력에는 `data/01_bronze/06_integration/`과 `data/02_silver/06_integration/`이 생긴다. 다시 실행할 때는 새 출력 경로를 지정한다. 동일 원천의 Bronze 원천 값과 순서는 같고 적재 시각은 실행별로 기록된다.
 
 ## 팀 공유 경로를 정할 때
 
 | 방식 | 예시 | 운영 방식 |
 | --- | --- | --- |
-| 고정 경로 | `data/02_silver/integration/food_inspections.parquet` | 팀원이 항상 같은 경로를 읽는다. 배포 시 기존 버전을 보관하고 체크섬이 담긴 게시 기록을 남긴다. |
-| 버전별 경로 | `data/02_silver/integration/<snapshot_id>/food_inspections.parquet` | 분석별로 사용한 파일 버전을 고정할 수 있다. 최신 버전이 필요하면 매니페스트에 게시된 버전을 읽는다. |
-| 검증용 실행 경로 | `reports/runs/integration/<run_id>/` | 로컬에서 서로의 경로를 덮어쓰지 않고 검증한다. |
+| 고정 경로 | `data/02_silver/06_integration/food_inspections.parquet` | 팀원이 항상 같은 경로를 읽는다. 배포 시 기존 버전을 보관하고 체크섬이 담긴 게시 기록을 남긴다. |
+| 버전별 경로 | `data/02_silver/06_integration/<snapshot_id>/food_inspections.parquet` | 분석별로 사용한 파일 버전을 고정할 수 있다. 최신 버전이 필요하면 매니페스트에 게시된 버전을 읽는다. |
+| 검증용 실행 경로 | `reports/runs/06_integration/<run_id>/` | 로컬에서 서로의 경로를 덮어쓰지 않고 검증한다. |
 
 Bronze와 Silver를 함께 배포할 때는 한 매니페스트에 각 데이터셋의 원천 SHA-256, 단계별 경로와 체크섬을 기록한다. 공용 경로 적용 전에 관점별 입력 규격과 기존 집계 비교 결과를 확인한다.
 
@@ -39,16 +39,35 @@ Bronze와 Silver를 함께 배포할 때는 한 매니페스트에 각 데이터
 
 ```powershell
 # 검증을 마친 실행 결과를 고정 경로에 게시한다.
-python -m src.domains.integration.publish --run reports/runs/integration/shared-bronze-silver
+python -m src.domains.06_integration.publish --run reports/runs/06_integration/shared-bronze-silver
 # 공유 파일을 받은 뒤 분할 파일을 복원하고 전체 체크섬을 검증한다.
-python -m src.domains.integration.publish --restore
+python -m src.domains.06_integration.publish --restore
 ```
 
-게시 매니페스트는 `data/02_silver/integration/snapshot_manifest.json`이다. 동일한 결과는 다시 게시할 수 있으며, 경로에 다른 내용이 있으면 게시를 중단한다. 100 MB를 초과한 인허가 Bronze와 점검 Silver는 분할본을 공유하고, 복원본은 로컬에서 사용한다. 소비자 경로 적용 시 02 원천 해시 메타데이터와 04 점검 키 타입은 아래의 관점별 규격을 확인한다.
+게시 매니페스트는 `data/02_silver/06_integration/snapshot_manifest.json`이다. 동일한 결과는 다시 게시할 수 있으며, 경로에 다른 내용이 있으면 게시를 중단한다. 100 MB를 초과한 인허가 Bronze와 점검 Silver는 분할본을 공유하고, 복원본은 로컬에서 사용한다. 소비자 경로 적용 시 02 원천 해시 메타데이터와 04 점검 키 타입은 아래의 관점별 규격을 확인한다.
+
+## 요구사항별 검증
+
+배포 파일을 복원한 뒤 저장소 루트에서 실행한다.
+
+```powershell
+python -m src.bronze.check_integration_bronze
+python -m src.silver.validate_integration_silver
+```
+
+| ID | 요구사항 | 검증 코드 |
+| --- | --- | --- |
+| B-01 | 원천과 Bronze의 논리 행 수, 순서 및 원문 값 확인 | [check_integration_bronze.py](../../bronze/check_integration_bronze.py) |
+| B-02 | 원천 파일명 `_SRC_FILE`, UTC 적재 시각 `_LOAD_DTM`, 원천 순번 확인 | [check_integration_bronze.py](../../bronze/check_integration_bronze.py) |
+| S-01 | Silver 컬럼명을 01 표준 매핑, 04 사전, 지역 경계 규칙과 대조 | [validate_integration_silver.py](../../silver/validate_integration_silver.py) |
+| S-02 | 점검·인허가 달력 날짜의 Parquet `date32` 검증. 문서 표기는 `YYYY-MM-DD` | [validate_integration_silver.py](../../silver/validate_integration_silver.py) |
+| S-03 | 관점별 기본 키 중복 검사와 점검의 완전 중복·키 충돌 플래그 집계 | [validate_integration_silver.py](../../silver/validate_integration_silver.py) |
+
+Silver는 원천 행을 모두 보존한다. 점검 품질 플래그는 원천 순번으로 확인한다. 같은 면허번호의 여러 발급·갱신 기록은 인허가 이력으로 보존한다. 이전 검증 산출물은 실행 당시 경로를 유지한다.
 
 ## 관점별 비교 실행
 
-검증 산출물은 로컬 `reports/runs/integration/consumer-check/`에 저장했다. 비교 시 Parquet 메타데이터의 실행·입력 지문 차이는 제외하고 컬럼과 값을 대조했다.
+경로 개편 전 검증 산출물은 로컬 `reports/runs/integration/consumer-check/`에 저장했다. 비교 시 Parquet 메타데이터의 실행·입력 지문 차이는 제외하고 컬럼과 값을 대조했다.
 
 | 관점 | 공급한 입력 | 비교 결과 |
 | --- | --- | --- |
