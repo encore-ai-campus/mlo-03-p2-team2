@@ -171,26 +171,26 @@ flowchart TD
 
 같은 점검 ID를 따라 원천 날짜·결과와 Gold의 집계 값을 대조했다. Silver의 `inspection_dtm`은 `date32`이고, Gold의 평가 완료와 불합격 지표는 각각 `0` 또는 `1`이다.
 
-| 단계 · 파일 | 점검 `2646979` | 점검 `2609905` |
-| --- | --- | --- |
+| 단계 · 파일 | 점검&nbsp;`2646979` | 점검&nbsp;`2609905` |
+| --- | :---: | :---: |
 | [Origin CSV](data/00_origin/) | `11/18/2026` · `Fail` | `01/02/2025` · `Pass` |
-| [04 Bronze Parquet](data/01_bronze/04_license/04_food_inspections.parquet) | 원문 보존 · 원천 순번 `4` | 원문 보존 · 원천 순번 `33448` |
+| [04 Bronze Parquet](data/01_bronze/04_license/04_food_inspections.parquet) | 원문 보존<br>원천 순번 `4` | 원문 보존<br>원천 순번 `33448` |
 | [04 Silver Parquet](data/02_silver/04_license/04_food_inspections.parquet) | `2026-11-18` · `FAIL` | `2025-01-02` · `PASS` |
-| [01 Gold 점검 Fact](data/03_gold/facts/01_fact_inspection.parquet) | 평가 완료 `1` · 불합격 `1` | 평가 완료 `1` · 불합격 `0` |
+| [01 Gold 점검 Fact](data/03_gold/facts/01_fact_inspection.parquet) | 평가 완료 `1`<br>불합격 `1` | 평가 완료 `1`<br>불합격 `0` |
 
 **04 인허가 매칭.** Bronze와 Silver에서 점검 **318,627행**과 인허가 **1,212,132행**을 유지했다. 점검일에 유효한 후보가 한 건인 점검은 **232,383건**, 여러 건인 점검은 **1,401건**, 후보가 없는 점검은 **84,843건**이었다. 04 단계별 검사 **39개**가 통과했다. [04 검증 보고서](reports/04_license/README.md) · [관점별 결과](https://github.com/encore-ai-campus/mlo-03-p2-team2/wiki/Project-Details#수행-결과)
 
 **05 지역 집계.** 로컬 비교 배치에서 2025년 West Town의 불합격률은 **27.24%**(평가 완료 903건 중 246건)였다. 같은 분모에서 코드 `47` 기록률은 **31.45%**(284건)다. 지역이나 기간을 합칠 때도 분자와 분모를 각각 합산해 비율을 구한다. [지역별 조회 예시](docs/domains/05_geospatial.md#결과-조회-예시) · [지표 산정](docs/domains/05_geospatial/model.md#지표-산정)
 
-| 예측 과제 | 한 행의 의미 | 전체 행 수 | 실제 양성 | 최종 평가용 행 수 |
+| 예측&nbsp;과제 | 한&nbsp;행의&nbsp;의미 | 전체&nbsp;행&nbsp;수 | 실제&nbsp;양성 | 최종&nbsp;평가용<br>행&nbsp;수 |
 | --- | --- | ---: | ---: | ---: |
-| 점검 직전 불합격 | 점검 1건 | 273,488 | 불합격 61,344건 · 22.43% | 28,161 |
-| 다음 점검의 위반 재발 | 기준 점검의 고유 위반 코드 1개 | 287,535 | 재관측 116,674건 · 40.58% | 47,472 |
+| 점검 직전 불합격 | 점검 1건 | 273,488 | 불합격 61,344건<br>22.43% | 28,161 |
+| 다음 점검의 위반 재발 | 기준 점검의 고유 위반 코드 1개 | 287,535 | 재관측 116,674건<br>40.58% | 47,472 |
 
-| 예측 과제 | 한 행과 정답 | 행 수 |
+| 예측&nbsp;과제 | 한&nbsp;행과&nbsp;정답 | 행&nbsp;수 |
 | --- | --- | ---: |
-| 점검 직전 불합격 예측 | 점검 1건. 해당 점검 결과가 `FAIL`이면 양성. | 273,488 |
-| 점검 직후 위반 재관측 예측 | 기준 점검의 고유 위반 코드 1개. 다음 비교 점검에서 같은 체계의 동일 코드가 기록되면 양성. | 287,535 |
+| 점검 직전 불합격 예측 | 점검 1건.<br>해당 점검 결과가 `FAIL`이면 양성. | 273,488 |
+| 점검 직후 위반 재관측 예측 | 기준 점검의 고유 위반 코드 1개.<br>다음 비교 점검에서 같은 체계의 동일 코드가 기록되면 양성. | 287,535 |
 
 - **01 불합격.** 점검 `2646979`의 입력은 직전 365일 점검 1건, 불합격 0건이다. 이후 해당 점검의 실제 결과가 `FAIL`로 기록돼 정답 `label_fail_flag`는 `true`다. [01 학습 Parquet](data/ai_ready/inspection_training/ac0d0f3f4f33656e78a6/01_preinspection_failure.parquet)
 - **03 위반 재관측.** 점검 `2609905`의 직전 365일 이력에서 코드 `38`이 기록된 점검은 0건이었다. 기준 점검과 03 Gold가 연결한 `2025-06-03` 후속 점검 `2618455`에는 모두 코드 `38`이 있어 `label_repeat_flag`는 `true`다. 두 점검의 코드는 02 Gold에서 확인했다. [02 위반 상세](data/03_gold/02_violation/02_violations_analysis_mart.parquet) · [03 비교 결과](data/03_gold/03_repeat_inspection/03_repeat_violation_mart.parquet) · [03 학습 Parquet](data/ai_ready/inspection_training/ac0d0f3f4f33656e78a6/03_next_inspection_violation_recurrence.parquet)
