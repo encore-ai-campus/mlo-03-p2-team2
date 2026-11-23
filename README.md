@@ -38,13 +38,11 @@
 
 ## 3. 기술 스택
 
-![Python 3.14](https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white) ![Apache Parquet](https://img.shields.io/badge/Apache-Parquet-168B89) ![pytest](https://img.shields.io/badge/Tests-pytest-0A9EDC?logo=pytest&logoColor=white) ![draw.io](https://img.shields.io/badge/ERD-draw.io-F08705?logo=diagramsdotnet&logoColor=white)
-
 | 용도 | 기술 |
 | --- | --- |
-| 처리·저장 | Python, pandas, PyArrow, Apache Parquet |
+| 처리·저장 | ![Python 3.14](https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white) ![Apache Parquet](https://img.shields.io/badge/Apache-Parquet-168B89) · pandas · PyArrow |
 | 공간 연산 | Shapely, GeoJSON |
-| 검증·협업 | pytest, SHA-256, GitHub PR·Wiki, draw.io |
+| 검증·협업 | ![pytest](https://img.shields.io/badge/Tests-pytest-0A9EDC?logo=pytest&logoColor=white) ![draw.io](https://img.shields.io/badge/ERD-draw.io-F08705?logo=diagramsdotnet&logoColor=white) · SHA-256 · GitHub PR·Wiki |
 
 ## 4. WBS
 
