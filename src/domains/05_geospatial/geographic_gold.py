@@ -14,7 +14,10 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from geographic_integration import load_shared_inputs, shared_files, shared_fingerprints
+from geographic_integration import (
+    AREA_FIELDS, SHARED_SILVER_ARTIFACTS, load_shared_inputs, read_shared_geography, read_shared_violation_codes,
+    read_typed, shared_files, shared_fingerprints,
+)
 from geographic_medallion import (
     BRONZE_DIR, BRONZE_FORMAT_VERSION, GOLD_DIR, LOCAL_SOURCE_DIR, PROJECT, SILVER_ARTIFACTS, SILVER_DIR,
     SOURCE_DIR, check, contract_and_codes,
@@ -130,9 +133,7 @@ def era_catalog(periods):
     return pd.DataFrame.from_records(rows, columns=PERIOD_KEYS + [name for name, _ in ERA_SCHEMA])
 
 
-def area_catalog(silver_dir, inspections, area_filter):
-    fields = ["community_area_num", "community_area_name", "boundary_version"]
-    areas = read_named_parquet(silver_dir, "community_areas.parquet", fields)
+def area_catalog(areas, inspections, area_filter):
     check(len(areas) == 77 and set(areas["community_area_num"]) == set(range(1, 78)),
           "Community Area reference must contain every area 1–77")
     versions = areas["boundary_version"].unique()
@@ -162,11 +163,11 @@ def area_catalog(silver_dir, inspections, area_filter):
     return areas
 
 
-def prepare_inspections(silver_dir, inspections, scope):
+def prepare_inspections(areas, inspections, scope):
     inspections["community_area_num"] = inspections["community_area_num"].astype("Int64")
     check(bool(inspections["inspection_key"].notna().all()) and not inspections["inspection_key"].duplicated().any(),
           "Silver inspection keys must be present and unique")
-    areas = area_catalog(silver_dir, inspections, scope["community_area_num"])
+    areas = area_catalog(areas, inspections, scope["community_area_num"])
 
     status = inspections["evaluation_status_cd"]
     evaluated = inspections["evaluated_flag"]
@@ -358,13 +359,22 @@ def write_output(path, frame, fields, keys):
 
 
 def build(directory, silver_dir, source, settings, signature, shared_inputs):
-    geography = read_named_parquet(silver_dir, "inspection_geography.parquet", INSPECTION_COLUMNS)
-    if shared_inputs:
-        geography, violation_codes = load_shared_inputs(silver_dir, geography, shared_inputs)
+    if source["source_mode"] == "shared":
+        geography = read_shared_geography(silver_dir, shared_inputs, INSPECTION_COLUMNS)
+        areas = read_typed(shared_inputs["area_silver"], AREA_FIELDS).to_pandas()
+        areas["boundary_version"] = source["origin_sha256"]["community_areas"]
+        violation_codes = read_shared_violation_codes(shared_inputs["violation_codes"])
+        silver_artifacts = SHARED_SILVER_ARTIFACTS
     else:
-        violation_codes = read_named_parquet(silver_dir, "inspection_violation_codes.parquet",
-                                            ["inspection_key", *ERA_KEYS, "violation_cd", "description_text"])
-    inspection, areas, periods, disposition = prepare_inspections(silver_dir, geography, settings)
+        geography = read_named_parquet(silver_dir, "inspection_geography.parquet", INSPECTION_COLUMNS)
+        areas = read_named_parquet(silver_dir, "community_areas.parquet", [*AREA_FIELDS, "boundary_version"])
+        silver_artifacts = SILVER_ARTIFACTS
+        if shared_inputs:
+            geography, violation_codes = load_shared_inputs(silver_dir, geography, shared_inputs)
+        else:
+            violation_codes = read_named_parquet(silver_dir, "inspection_violation_codes.parquet",
+                                                ["inspection_key", *ERA_KEYS, "violation_cd", "description_text"])
+    inspection, areas, periods, disposition = prepare_inspections(areas, geography, settings)
     inspection = inspection_measures(inspection)
     totals, coverage = rollup_inspections(inspection, areas, periods)
     codes, joined = rollup_codes(violation_codes, inspection, coverage)
@@ -393,11 +403,11 @@ def build(directory, silver_dir, source, settings, signature, shared_inputs):
         "area_catalog_rows": len(areas), "validated_against_selected_silver": True,
     }
     write_json(directory / "metrics_summary.json", summary)
-    verify_artifacts(silver_dir, "silver", source["silver_rules_signature"], SILVER_ARTIFACTS, source["batch_id"])
+    verify_artifacts(silver_dir, "silver", source["silver_rules_signature"], silver_artifacts, source["batch_id"])
     check(sha256_file(silver_dir / "manifest.json") == source["silver_manifest_sha256"],
           "Silver manifest changed while building Gold")
     check(source_code_hashes() == source["gold_source_code_sha256"], "Gold code changed while building")
-    check(shared_fingerprints(shared_inputs) == source["shared_inputs"], "01/02 inputs changed while building Gold")
+    check(shared_fingerprints(shared_inputs) == source["shared_inputs"], "Shared inputs changed while building Gold")
     return {
         "layer": "gold", "batch_id": source["batch_id"], "gold_id": signature[:20],
         "rules_signature": signature, "built_at_utc": utc_now().isoformat(), **source,
@@ -409,12 +419,13 @@ def run(action, silver_dir, data_dir, scope, shared_inputs):
     silver_hash = sha256_file(manifest_path)
     manifest = read_json(manifest_path)
     batch_id = manifest["batch_id"]
-    verify_artifacts(silver_dir, "silver", manifest["rules_signature"], SILVER_ARTIFACTS, batch_id)
+    source_mode = manifest.get("source_mode")
+    silver_artifacts = SHARED_SILVER_ARTIFACTS if source_mode == "shared" else SILVER_ARTIFACTS
+    verify_artifacts(silver_dir, "silver", manifest["rules_signature"], silver_artifacts, batch_id)
     check(sha256_file(manifest_path) == silver_hash, "Silver manifest changed during verification")
 
-    source_mode = manifest.get("source_mode")
-    check(source_mode in {"local", "team"}, "Build Silver with the current team integration contract first")
-    check(source_mode == "local" or shared_inputs,
+    check(source_mode in {"local", "team", "shared"}, "Build Silver with the current team integration contract first")
+    check(source_mode != "team" or shared_inputs,
           "Team Gold requires --inspection-silver and --shared-violations-dir")
     source = {
         "batch_id": batch_id, "silver_rules_id": manifest["rules_id"], "silver_manifest_sha256": silver_hash,
@@ -423,6 +434,9 @@ def run(action, silver_dir, data_dir, scope, shared_inputs):
         "runtime": {"python": platform.python_version(), "pandas": pd.__version__, "pyarrow": pa.__version__},
         "scope": {name: value.isoformat() if isinstance(value, date) else value for name, value in scope.items()},
     }
+    if source_mode == "shared":
+        check(source["shared_inputs"] == manifest["shared_inputs"], "Gold shared inputs differ from 05 Silver lineage")
+        source["origin_sha256"] = manifest["origin_sha256"]
     signature = digest_json(source)
     gold_dir = data_dir / GOLD_DIR / batch_id / signature[:20]
     if action == "verify":
@@ -433,6 +447,7 @@ def run(action, silver_dir, data_dir, scope, shared_inputs):
                                   lambda path: build(path, silver_dir, source, scope, signature, shared_inputs), batch_id)
     check(outcome["silver_manifest_sha256"] == silver_hash, "Gold links to a different Silver version")
     print(f"Gold {status}: {gold_dir}", flush=True)
+    return gold_dir
 
 
 def main():

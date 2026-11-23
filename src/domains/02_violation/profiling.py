@@ -174,17 +174,26 @@ def classify_fragment(fragment: str, unrecognized_separator: bool = False) -> di
     }
 
 
-def profile_violations(root: Path = PROJECT_ROOT, batch_size: int = 10_000) -> dict:
+def bronze_reference(root: Path, path: Path) -> str:
+    return (path.relative_to(root) if path.is_relative_to(root) else path).as_posix()
+
+
+def profile_violations(
+    root: Path = PROJECT_ROOT, batch_size: int = 10_000, *,
+    bronze_path: Path | None = None, origin_root: Path | None = None,
+) -> dict:
     """Stream Bronze and return row, separator, code and text-pattern metrics."""
     root = Path(root)
-    bronze_path = root / BRONZE_RELATIVE
-    origin = origin_snapshot(root)
+    checksum_key = b"source_sha256" if bronze_path is not None else b"origin_sha256"
+    bronze_path = Path(bronze_path) if bronze_path is not None else root / BRONZE_RELATIVE
+    origin = origin_snapshot(origin_root or root)
     if not bronze_path.is_file():
         raise FileNotFoundError(bronze_path)
     bronze_sha = sha256(bronze_path)
     parquet = pq.ParquetFile(bronze_path)
     metadata = parquet.schema_arrow.metadata or {}
-    if origin["catalog_verified"] and metadata.get(b"origin_sha256") != origin["source_sha256"].encode("ascii"):
+    if ((origin["catalog_verified"] or checksum_key == b"source_sha256")
+            and metadata.get(checksum_key, b"").lower() != origin["source_sha256"].encode("ascii")):
         raise ValueError("02 Bronze does not match the shared Origin checksum")
     missing = {FIELD_NAME, SOURCE_ROW_COLUMN} - set(parquet.schema_arrow.names)
     if missing:
@@ -305,7 +314,7 @@ def profile_violations(root: Path = PROJECT_ROOT, batch_size: int = 10_000) -> d
             "origin_sha256": origin["source_sha256"],
             "origin_storage_files": origin["storage_files"],
             "origin_guard_sha256": origin["guard_sha256"],
-            "bronze_file": str(BRONZE_RELATIVE.as_posix()),
+            "bronze_file": bronze_reference(root, bronze_path),
             "bronze_file_bytes": bronze_path.stat().st_size,
             "bronze_sha256": bronze_sha,
             "bronze_rows": parquet.metadata.num_rows,

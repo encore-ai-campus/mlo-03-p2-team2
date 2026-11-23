@@ -1,0 +1,239 @@
+{
+  "artifacts": {
+    "data/01_bronze/06_integration/business_licenses.parquet": "82b497e3fa75c8a76ee04e3ee03490a8eb2f8d13fc9738a5b26ef3d00f642e0c",
+    "data/01_bronze/06_integration/business_licenses.parquet.part-001": "394c491612e105058c70484c3d57c44bc2b51e8f7b3cb30c40f453760a2dd76a",
+    "data/01_bronze/06_integration/business_licenses.parquet.part-002": "1593882f8219f94894d8294b7d833846306024636b6ab82ee486b99003746148",
+    "data/01_bronze/06_integration/community_areas.parquet": "5e7cf4f47838c512524771e4cd3d8ddad49c6796fd5ff5202ef88da50d41b0c5",
+    "data/01_bronze/06_integration/food_inspections.parquet": "eaf40b247e8f8c173a29436d7791f95d9b465efd41b86b83a635d110b6f39fc1",
+    "data/02_silver/01_inspection/01_validated_inspections.parquet": "a03aa0429dc1ad5cc0fa074e7d786a2ea623c22beab1b812d6b27f68249bf2e4",
+    "data/02_silver/02_violation/02_inspection_violations.parquet": "7447f960920a8d33d23d9313f1e4d991f3827f6ff9521f0c3e4a9f4a33772d4a",
+    "data/02_silver/02_violation/02_inspection_violations_accepted.parquet": "7b3b5e82b8b3f923fc404ff1477ca5e25dcdad25866e2bbf328fb0264af435c9",
+    "data/02_silver/02_violation/02_inspection_violations_quarantine.parquet": "521fc4b44f7b25d4a30ac70d856e9cfaf154bc9877f39a2ac39dcafdc4921270",
+    "data/02_silver/02_violation/shared/inspection_violation_codes.parquet": "e4cb7b60d64ea074a44a209cfbde0741a19aef3386223c3c6af6bad4e221b034",
+    "data/02_silver/02_violation/shared/inspection_violation_observations.parquet": "36d6f58a977cd7b381a5a76c4d765961e4b92e34fee050e6332452e28459a6ae",
+    "data/02_silver/02_violation/shared/verification.json": "3beca20ac4a2b3e62279cbe54aad847879d46af27cbdac47cac5cf1235293daf",
+    "data/02_silver/03_repeat_inspection/03_inspection_history.parquet": "3b14334b2eb74985f6e138a7623ea5b09252af24189084be7634f9a8a9e7103d",
+    "data/02_silver/05_geospatial/44ce5cb6ad86d194ccf1/f16aa93b68954b18deb6/inspection_community_areas.parquet": "d5cb5761e464c32d600efae65b0f3612819c1d255d3c57a5eb27483269867db5",
+    "data/02_silver/05_geospatial/44ce5cb6ad86d194ccf1/f16aa93b68954b18deb6/inspection_geography.parquet": "c136747d96c4405c363ad09afab7b330d22c4b46abf44899c062b1b7c9de6913",
+    "data/02_silver/05_geospatial/44ce5cb6ad86d194ccf1/f16aa93b68954b18deb6/manifest.json": "7fd361e29880230ef0d7dbd4459dbc76d79d06429777d55347dad0afe048def7",
+    "data/02_silver/05_geospatial/44ce5cb6ad86d194ccf1/f16aa93b68954b18deb6/quality_summary.json": "1a0c21ffd9d8b8742d26b999cc89984d0a68ad8d812b7ce6548478470140ef46",
+    "data/02_silver/06_integration/business_licenses.parquet": "9bb8376d7db4f0ee321a6d422443dfa880b9f9e3fd3eeb5a53b572cdb75083eb",
+    "data/02_silver/06_integration/community_areas.parquet": "eb45d80691726079df7a85b3d55f37a37b85a4ee48aeebe5d4f966e6ed7c1865",
+    "data/02_silver/06_integration/food_inspections.parquet": "6dff32955eac688dc1211e85fcf1663a2c17d0e34b1c341a0dffcbcdbf9ae3ad",
+    "data/02_silver/06_integration/food_inspections.parquet.part-001": "f1552bde4b02074d896a22891885b2924dea8faf5374418d9f251ea201201fa8",
+    "data/02_silver/06_integration/food_inspections.parquet.part-002": "4bd2f5ed862c9391438e15fb94762ba1fcf6bf0cb91945eb830c85322757d956",
+    "data/02_silver/06_integration/inspection_rule_flags.parquet": "cb326b63b4883d263536172d816074ca2ffd1d5ea5baa563f40a8ff2e5605adb",
+    "data/02_silver/06_integration/snapshot_manifest.json": "4b06b1b0c6747820e49c1f3bc34ec71002c8749dd0bf8ba2f35c56cb43e9530b",
+    "data/03_gold/01_inspection/01_performance_detail.parquet": "a44c9fc461d052fb2827b73c86b1abaa8178c35ec45f7b28700e4484f3fe3977",
+    "data/03_gold/01_inspection/analysis/failure_ranking_by_facility.csv": "e5b09eab764bf486008ac92f3085e8a04e9e124aa2f571548c3eea5a5366643d",
+    "data/03_gold/01_inspection/analysis/failure_ranking_by_facility_inspection.csv": "c36910993dc9daeaf6847ab161068bdbf25a87bb8b1509aea166b0145c590461",
+    "data/03_gold/01_inspection/analysis/failure_ranking_by_inspection_type.csv": "97374fa21ce9782703a6920a315ecf28c24509315821518e0689084bddb2c986",
+    "data/03_gold/01_inspection/analysis/performance_by_facility.csv": "c3730b0137277904becb4cee2cfa1e2cf1f3590b9d00f0c33fb806eb17e0b039",
+    "data/03_gold/01_inspection/analysis/performance_by_facility_inspection.csv": "ffebcdcc7f48c976f645c75d4ddeb7738bc856c0bb5224d0b27ffe95bebdd9f7",
+    "data/03_gold/01_inspection/analysis/performance_by_inspection_type.csv": "3f12e9c240713b52c7a18bcc2769b4ec32c3fbc85a382a2c56d95d32b3fa8571",
+    "data/03_gold/01_inspection/analysis/performance_by_month.csv": "79f95e51ebd10ab26190c99c5c43b7a2214d156db0edb4be92afa927482b1416",
+    "data/03_gold/01_inspection/analysis/performance_by_month_facility_inspection_risk.csv": "2a6d9e9132fb628489ef8fdcd30afd76ada4811f6dec7946dd72a06b691597ca",
+    "data/03_gold/01_inspection/analysis/performance_by_risk.csv": "b24ca57470d324727662995b04dfb14bb334e14ca9d9f5274f938a937a0194ab",
+    "data/03_gold/01_inspection/analysis/performance_by_year.csv": "8bea60c359c9f6f20cfca6ce4003bac4d86a005cccdd4af6e59925e333f3bc1e",
+    "data/03_gold/01_inspection/analysis/star_schema/01_dim_date.parquet": "653da67e3e633fac2b2030d9611518c68dccf38561b25ff45fbd5159e8f98a53",
+    "data/03_gold/01_inspection/analysis/star_schema/01_dim_facility_type.parquet": "76ee9cd450b78ca806ec9a598513708085faef54d26a5a560a221ee7c3487b4e",
+    "data/03_gold/01_inspection/analysis/star_schema/01_dim_inspection_type.parquet": "d4653ac68861111c5a6a05e651a3f0e19f04d06ba078ff3f5a352c6210feb760",
+    "data/03_gold/01_inspection/analysis/star_schema/01_dim_result.parquet": "c6b3aba96fa44a38fb40c3c3417d69e49eb7fc128cbe5eeec4c57d0beb52a4dd",
+    "data/03_gold/01_inspection/analysis/star_schema/01_dim_risk_level.parquet": "20a93be7de76dc956229f25a12326fe7755ccf6a7dbbf3810f7ac59c3dd13311",
+    "data/03_gold/01_inspection/analysis/star_schema/01_fact_inspection.parquet": "195ee49d154ba86c66ced1081c6b6c5ab1f704e70b364e9edf6f65dadebf433b",
+    "data/03_gold/02_violation/02_dim_violation.parquet": "c733ae34d32d96015ee176f2bfd4846f85f3a23d60aed88f7f1dabd9f936fb9a",
+    "data/03_gold/02_violation/02_fact_inspection_violation.parquet": "a4470c6e30832a9a7a1040c1e797e25895bd53baf5c3a27eafab2ee8634b0290",
+    "data/03_gold/02_violation/02_violations_analysis_mart.parquet": "1f05abc4819cdbcdd43a26c2c024dd14ea5bfe2102e6cb48cd64fea2490eba46",
+    "data/03_gold/03_repeat_inspection/03_inspection_reinspection_mart.parquet": "613f5046a5e8ab8c4db8e73c69de702e1e6ea00dd5fc4c3103b999d70b38a1f7",
+    "data/03_gold/03_repeat_inspection/03_repeat_violation_mart.parquet": "5a966cfc6ae99137ca3014a413c2590233f5cc50fe28476408fe373a458375df",
+    "data/03_gold/04_license/04_dim_date.parquet": "c20f22d4f91e949735ec5c750b3f6ec46473c3f210d47d6dc85fb0b0c4537eba",
+    "data/03_gold/04_license/04_dim_establishment.parquet": "0b7eb6ced4d277099085aefa725a35f21d6868860b6a011f1f8e5260278b7667",
+    "data/03_gold/04_license/04_dim_license.parquet": "4efa5126d049bbb2b92ed7aed2fb3a656f46886a1d9ec071c0cbbbfcd67ebd26",
+    "data/03_gold/04_license/04_fact_inspection_license_match.parquet": "f4672aa290566401c8019094f0a4f57d53e3e6c978816554d81409bc8ac45fe7",
+    "data/03_gold/04_license/04_fact_license_event.parquet": "b2e79738cb26968cc0ae4c99a490c82fe7be26dd302225915b39bf491433ad60",
+    "data/03_gold/05_geospatial/44ce5cb6ad86d194ccf1/66479a50ef76bf1f2645/inspection_area_period.parquet": "68e91261cab27ea9f1f2c9a9ef7f3da1a82722093c3ff3692f451a96b389d1da",
+    "data/03_gold/05_geospatial/44ce5cb6ad86d194ccf1/66479a50ef76bf1f2645/manifest.json": "c175a838f5fb2c72670c2910e1416acfe64a641738dc74b33f166432dfc19c46",
+    "data/03_gold/05_geospatial/44ce5cb6ad86d194ccf1/66479a50ef76bf1f2645/metrics_summary.json": "871a2f722b9636920bbae5633b4716268621ec214133563e82253361bfc9d9f5",
+    "data/03_gold/05_geospatial/44ce5cb6ad86d194ccf1/66479a50ef76bf1f2645/violation_area_period.parquet": "af7722f10f6bd53de0d1d1bffd59139b30f24ff6e8c783a91aefda5192fe50d5",
+    "data/03_gold/05_geospatial/44ce5cb6ad86d194ccf1/66479a50ef76bf1f2645/violation_coverage_area_period.parquet": "6564e2ef4eaa37854600f6dd96300cdaae6b9e324b358d5cb2af87de42f85f47",
+    "data/03_gold/dimensions/dim_community_area.parquet": "43741a8198057a9db4d7f93de4ac8470bde276641933c2ddf840b21669769e87",
+    "data/03_gold/dimensions/dim_date.parquet": "8c408bfad2b4f6edbc6b16efb0995bdf0f1efa294a056197ca9f1b158706130f",
+    "data/03_gold/dimensions/dim_establishment.parquet": "890d2757c1a340b2f2ea1338384dd27392bed7d8e63a806ba6d4de62b6a120ff",
+    "data/03_gold/dimensions/dim_facility_type.parquet": "76ee9cd450b78ca806ec9a598513708085faef54d26a5a560a221ee7c3487b4e",
+    "data/03_gold/dimensions/dim_inspection_type.parquet": "d4653ac68861111c5a6a05e651a3f0e19f04d06ba078ff3f5a352c6210feb760",
+    "data/03_gold/dimensions/dim_license.parquet": "54cce3c4c2f3bd2a485157627bb151cb72d0ea3f4646dd404b367428e2f40018",
+    "data/03_gold/dimensions/dim_result.parquet": "c6b3aba96fa44a38fb40c3c3417d69e49eb7fc128cbe5eeec4c57d0beb52a4dd",
+    "data/03_gold/dimensions/dim_risk_level.parquet": "20a93be7de76dc956229f25a12326fe7755ccf6a7dbbf3810f7ac59c3dd13311",
+    "data/03_gold/dimensions/dim_violation.parquet": "61ff09b6436792589feeda08ecba8f68f9de290cce50da1db72525fc062f2427",
+    "data/03_gold/facts/01_fact_inspection.parquet": "195ee49d154ba86c66ced1081c6b6c5ab1f704e70b364e9edf6f65dadebf433b",
+    "data/03_gold/facts/02_fact_inspection_violation.parquet": "603c3f6d31ebd55b7816558be2956d8f31b0ea31d2e1f938ea85c543e543b696",
+    "data/03_gold/facts/02_fact_inspection_violation.parquet.sha256": "93d59f45334a4bcd2d1d1bfba77314f23f7edde267c5587aa35a4153983c83d4",
+    "data/03_gold/facts/03_fact_reinspection.parquet": "613f5046a5e8ab8c4db8e73c69de702e1e6ea00dd5fc4c3103b999d70b38a1f7",
+    "data/03_gold/facts/03_fact_repeat_violation.parquet": "5a966cfc6ae99137ca3014a413c2590233f5cc50fe28476408fe373a458375df",
+    "data/03_gold/facts/04_fact_inspection_license_match.parquet": "f4672aa290566401c8019094f0a4f57d53e3e6c978816554d81409bc8ac45fe7",
+    "data/03_gold/facts/04_fact_license_event.parquet": "b2e79738cb26968cc0ae4c99a490c82fe7be26dd302225915b39bf491433ad60",
+    "data/03_gold/facts/05_fact_inspection_area_period.parquet": "68e91261cab27ea9f1f2c9a9ef7f3da1a82722093c3ff3692f451a96b389d1da",
+    "data/03_gold/facts/05_fact_violation_area_period.parquet": "af7722f10f6bd53de0d1d1bffd59139b30f24ff6e8c783a91aefda5192fe50d5",
+    "data/03_gold/facts/05_fact_violation_coverage_area_period.parquet": "6564e2ef4eaa37854600f6dd96300cdaae6b9e324b358d5cb2af87de42f85f47",
+    "data/ai_ready/01_inspection/01_inspection_performance.parquet": "a44c9fc461d052fb2827b73c86b1abaa8178c35ec45f7b28700e4484f3fe3977",
+    "data/ai_ready/01_inspection/metadata/inspection_performance_contract.json": "2132249b29785e820cdbc9f06ee8f13782b72b081b24c01fc4efdbcf2dedb75e",
+    "data/ai_ready/05_geospatial/44ce5cb6ad86d194ccf1/157aafb5dff9c89a5bf2/ai_inspection_metrics.parquet": "c0f8ae0f5cb4eb969cf786681ba036062fe877fa80db13d951ddb9f315cff8ef",
+    "data/ai_ready/05_geospatial/44ce5cb6ad86d194ccf1/157aafb5dff9c89a5bf2/ai_violation_coverage.parquet": "91d121093f734bc1911b96cc8f2d2482fcdc9ce06f25ff644a9562bfdaf07fef",
+    "data/ai_ready/05_geospatial/44ce5cb6ad86d194ccf1/157aafb5dff9c89a5bf2/ai_violation_metrics.parquet": "de5631ebcc17e00937cdefa90a6b4d6c53b4ed918df0ea8ba985125b6be40910",
+    "data/ai_ready/05_geospatial/44ce5cb6ad86d194ccf1/157aafb5dff9c89a5bf2/manifest.json": "3951b4732c74ce35692c962b5413e515e7627bd0d118c102c91ffb9a6ced37ad",
+    "data/ai_ready/05_geospatial/44ce5cb6ad86d194ccf1/157aafb5dff9c89a5bf2/semantic_contract.json": "3c876c46e7186cb9bdda4fb789c94e4c2244c68d1131a1ef76146f15dde6986f",
+    "data/ai_ready/05_geospatial/44ce5cb6ad86d194ccf1/157aafb5dff9c89a5bf2/validation_summary.json": "7f0923649a57bac9d35c442ca746bfd159bcdeae1b7a53a7f513a811572e3640",
+    "data/ai_ready/inspection_training/702397fe73167b859fb3/01_preinspection_failure.parquet": "347daa64e1ed72df8cb06ad0b7f3afe5986f474bdf544df8ca2b484f6aefb3d0",
+    "data/ai_ready/inspection_training/702397fe73167b859fb3/03_next_inspection_violation_recurrence.parquet": "6ef5fe6bf00e5249c0edbc80cacefb42cded9e2c6f9b259579abc5b57833fd44",
+    "data/ai_ready/inspection_training/702397fe73167b859fb3/manifest.json": "e29331e05f82cd078f64f238e31c582587176fa21763bbc576be805f5905e96d",
+    "data/ai_ready/inspection_training/702397fe73167b859fb3/validation_summary.json": "ccb696e69bfef6ec1a4373c2b1790248eff1b1434f6487ddc6e5cad0106d6480",
+    "reports/01_inspection/inspection_quality_issues.csv": "aaf23e6cd1620f21b25c16d80562cc4ed60a481be24cbda10362da5cb9faa1a6",
+    "reports/01_inspection/inspection_quality_report.json": "dba6d33c76e3c37d3d0068b09f1a1981a718389aa1f8b2b3613e3c6ecfcbbf64",
+    "reports/02_violation/violations_analysis.html": "85ea44d15fa85e14a6130da9ca7041c696c2ee40bcfc847c8afc489b53bcf31b",
+    "reports/03_repeat_inspection/inspection_analysis.html": "72818a49736608e048f030b930dab24b6347281be144d5bc052528a4cd6f155c",
+    "reports/06_integration/inspection_silver_manifest.json": "b8c71fd3fad791b7bb0a82ca5038fa7aa4765944789d0467a22746544d01ab17",
+    "reports/runs/02_violation/run.json": "13d1ce7e01b3d13cf56b3ca738b725852bf57dc7b8fda0bfed99398de37c2ce2",
+    "reports/runs/02_violation/violations_profile.json": "e8e5d7cb2ad4631ce463851a2615bd838ee633a3102d85a28ba4a69e8abc615e",
+    "reports/runs/02_violation/violations_quality_report.csv": "e027589df49432ff444ec65938d2a8c89fa3ba59abf7d73a628d1d86a3c1a1e3",
+    "reports/runs/02_violation/violations_reconciliation.json": "79dd2a05c61273965191f45b6e54204ed71643529b4b40de969eb6cd8ef64248"
+  },
+  "comparisons": {
+    "data/02_silver/02_violation/02_inspection_violations_quarantine.parquet": {
+      "reference_sha256": "4329906441766ecdceb6bfd492f569ea9acf0a286c56fa6ca666a0c2388dbe23",
+      "rows": 1792,
+      "sha256": "521fc4b44f7b25d4a30ac70d856e9cfaf154bc9877f39a2ac39dcafdc4921270"
+    },
+    "data/02_silver/03_repeat_inspection/03_inspection_history.parquet": {
+      "reference_sha256": "171c5cff72b2ec331aae6b3653cc888fd5e61e6421d4a2c4c99d9f76f7e750e5",
+      "rows": 318627,
+      "sha256": "3b14334b2eb74985f6e138a7623ea5b09252af24189084be7634f9a8a9e7103d"
+    },
+    "data/03_gold/02_violation/02_violations_analysis_mart.parquet": {
+      "reference_sha256": "e6ad982b23de64cfd94da275ef38274a4340f628ed8ebf63b115291d63ddb70e",
+      "rows": 1029281,
+      "sha256": "1f05abc4819cdbcdd43a26c2c024dd14ea5bfe2102e6cb48cd64fea2490eba46"
+    },
+    "data/03_gold/dimensions/dim_community_area.parquet": {
+      "reference_sha256": "43741a8198057a9db4d7f93de4ac8470bde276641933c2ddf840b21669769e87",
+      "rows": 77,
+      "sha256": "43741a8198057a9db4d7f93de4ac8470bde276641933c2ddf840b21669769e87"
+    },
+    "data/03_gold/dimensions/dim_date.parquet": {
+      "reference_sha256": "8c408bfad2b4f6edbc6b16efb0995bdf0f1efa294a056197ca9f1b158706130f",
+      "rows": 8175,
+      "sha256": "8c408bfad2b4f6edbc6b16efb0995bdf0f1efa294a056197ca9f1b158706130f"
+    },
+    "data/03_gold/dimensions/dim_establishment.parquet": {
+      "reference_sha256": "890d2757c1a340b2f2ea1338384dd27392bed7d8e63a806ba6d4de62b6a120ff",
+      "rows": 283880,
+      "sha256": "890d2757c1a340b2f2ea1338384dd27392bed7d8e63a806ba6d4de62b6a120ff"
+    },
+    "data/03_gold/dimensions/dim_facility_type.parquet": {
+      "reference_sha256": "76ee9cd450b78ca806ec9a598513708085faef54d26a5a560a221ee7c3487b4e",
+      "rows": 528,
+      "sha256": "76ee9cd450b78ca806ec9a598513708085faef54d26a5a560a221ee7c3487b4e"
+    },
+    "data/03_gold/dimensions/dim_inspection_type.parquet": {
+      "reference_sha256": "d4653ac68861111c5a6a05e651a3f0e19f04d06ba078ff3f5a352c6210feb760",
+      "rows": 111,
+      "sha256": "d4653ac68861111c5a6a05e651a3f0e19f04d06ba078ff3f5a352c6210feb760"
+    },
+    "data/03_gold/dimensions/dim_license.parquet": {
+      "reference_sha256": "54cce3c4c2f3bd2a485157627bb151cb72d0ea3f4646dd404b367428e2f40018",
+      "rows": 350804,
+      "sha256": "54cce3c4c2f3bd2a485157627bb151cb72d0ea3f4646dd404b367428e2f40018"
+    },
+    "data/03_gold/dimensions/dim_result.parquet": {
+      "reference_sha256": "c6b3aba96fa44a38fb40c3c3417d69e49eb7fc128cbe5eeec4c57d0beb52a4dd",
+      "rows": 7,
+      "sha256": "c6b3aba96fa44a38fb40c3c3417d69e49eb7fc128cbe5eeec4c57d0beb52a4dd"
+    },
+    "data/03_gold/dimensions/dim_risk_level.parquet": {
+      "reference_sha256": "20a93be7de76dc956229f25a12326fe7755ccf6a7dbbf3810f7ac59c3dd13311",
+      "rows": 5,
+      "sha256": "20a93be7de76dc956229f25a12326fe7755ccf6a7dbbf3810f7ac59c3dd13311"
+    },
+    "data/03_gold/dimensions/dim_violation.parquet": {
+      "reference_sha256": "61ff09b6436792589feeda08ecba8f68f9de290cce50da1db72525fc062f2427",
+      "rows": 110,
+      "sha256": "61ff09b6436792589feeda08ecba8f68f9de290cce50da1db72525fc062f2427"
+    },
+    "data/03_gold/facts/01_fact_inspection.parquet": {
+      "reference_sha256": "122fa42416ab23fa4563980199fb47226312e54668d0ba3ec0b1da525cedb122",
+      "rows": 318627,
+      "sha256": "195ee49d154ba86c66ced1081c6b6c5ab1f704e70b364e9edf6f65dadebf433b"
+    },
+    "data/03_gold/facts/02_fact_inspection_violation.parquet": {
+      "reference_sha256": "603c3f6d31ebd55b7816558be2956d8f31b0ea31d2e1f938ea85c543e543b696",
+      "rows": 1029281,
+      "sha256": "603c3f6d31ebd55b7816558be2956d8f31b0ea31d2e1f938ea85c543e543b696"
+    },
+    "data/03_gold/facts/03_fact_reinspection.parquet": {
+      "reference_sha256": "c6129eb29512e546aa2ddb5d0f8e50b023a5cd17e455ca3ae589888a6190575e",
+      "rows": 61344,
+      "sha256": "613f5046a5e8ab8c4db8e73c69de702e1e6ea00dd5fc4c3103b999d70b38a1f7"
+    },
+    "data/03_gold/facts/03_fact_repeat_violation.parquet": {
+      "reference_sha256": "8351257df27bb199cac80194ff5d708fa3bd11e9388deb24ce3bb0b4047dd99e",
+      "rows": 444768,
+      "sha256": "5a966cfc6ae99137ca3014a413c2590233f5cc50fe28476408fe373a458375df"
+    },
+    "data/03_gold/facts/04_fact_inspection_license_match.parquet": {
+      "reference_sha256": "f4672aa290566401c8019094f0a4f57d53e3e6c978816554d81409bc8ac45fe7",
+      "rows": 318627,
+      "sha256": "f4672aa290566401c8019094f0a4f57d53e3e6c978816554d81409bc8ac45fe7"
+    },
+    "data/03_gold/facts/04_fact_license_event.parquet": {
+      "reference_sha256": "b2e79738cb26968cc0ae4c99a490c82fe7be26dd302225915b39bf491433ad60",
+      "rows": 1212132,
+      "sha256": "b2e79738cb26968cc0ae4c99a490c82fe7be26dd302225915b39bf491433ad60"
+    },
+    "data/03_gold/facts/05_fact_inspection_area_period.parquet": {
+      "reference_sha256": "68e91261cab27ea9f1f2c9a9ef7f3da1a82722093c3ff3692f451a96b389d1da",
+      "rows": 17820,
+      "sha256": "68e91261cab27ea9f1f2c9a9ef7f3da1a82722093c3ff3692f451a96b389d1da"
+    },
+    "data/03_gold/facts/05_fact_violation_area_period.parquet": {
+      "reference_sha256": "af7722f10f6bd53de0d1d1bffd59139b30f24ff6e8c783a91aefda5192fe50d5",
+      "rows": 280469,
+      "sha256": "af7722f10f6bd53de0d1d1bffd59139b30f24ff6e8c783a91aefda5192fe50d5"
+    },
+    "data/03_gold/facts/05_fact_violation_coverage_area_period.parquet": {
+      "reference_sha256": "6564e2ef4eaa37854600f6dd96300cdaae6b9e324b358d5cb2af87de42f85f47",
+      "rows": 17901,
+      "sha256": "6564e2ef4eaa37854600f6dd96300cdaae6b9e324b358d5cb2af87de42f85f47"
+    },
+    "data/ai_ready/01_inspection/01_inspection_performance.parquet": {
+      "reference_sha256": "9a818e3fe6d0208778a3fd7675016b52f1bba408814a830f057d7abf0b7091c6",
+      "rows": 25632,
+      "sha256": "a44c9fc461d052fb2827b73c86b1abaa8178c35ec45f7b28700e4484f3fe3977"
+    },
+    "data/ai_ready/inspection_training/702397fe73167b859fb3/01_preinspection_failure.parquet": {
+      "reference_sha256": "347daa64e1ed72df8cb06ad0b7f3afe5986f474bdf544df8ca2b484f6aefb3d0",
+      "rows": 273488,
+      "sha256": "347daa64e1ed72df8cb06ad0b7f3afe5986f474bdf544df8ca2b484f6aefb3d0"
+    },
+    "data/ai_ready/inspection_training/702397fe73167b859fb3/03_next_inspection_violation_recurrence.parquet": {
+      "reference_sha256": "6ef5fe6bf00e5249c0edbc80cacefb42cded9e2c6f9b259579abc5b57833fd44",
+      "rows": 287535,
+      "sha256": "6ef5fe6bf00e5249c0edbc80cacefb42cded9e2c6f9b259579abc5b57833fd44"
+    }
+  },
+  "shared_snapshot_sha256": "4b06b1b0c6747820e49c1f3bc34ec71002c8749dd0bf8ba2f35c56cb43e9530b",
+  "source_snapshot": {
+    "business_licenses": {
+      "rows": 1212132,
+      "sha256": "783354424BEBE4D367BD3A0F9CDC63A846FAE28D50580B9CCF89590D10CC61BB"
+    },
+    "community_areas": {
+      "rows": 77,
+      "sha256": "C4B9C42ADC19BACA0A9C6EE3E84B302D40073D3AD99EE3D8B101D5D8217B0D16"
+    },
+    "food_inspections": {
+      "rows": 318627,
+      "sha256": "B43BEB7FAE834A8698CA162004CAF2929CB2ECA7FF75C27B4DB6BF07AA103C98"
+    }
+  },
+  "status": "PASS",
+  "training_release": "data/ai_ready/inspection_training/702397fe73167b859fb3"
+}

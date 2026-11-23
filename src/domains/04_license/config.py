@@ -61,7 +61,8 @@ def directories_overlap(first, second):
 
 def settings(args):
     local_sources = PROJECT / "config" / "sources.local.yaml"
-    default = local_sources if local_sources.is_file() else PROJECT / "config" / "sources.example.yaml"
+    example_sources = PROJECT / "config" / "sources.example.yaml"
+    default = local_sources if local_sources.is_file() else example_sources
     source_config = args.sources_config.resolve() if args.sources_config else default
     doc = yaml.safe_load(source_config.read_text(encoding="utf-8-sig"))
     env_key = doc["raw_root_env"]
@@ -77,7 +78,12 @@ def settings(args):
     sources = {}
     for name in TABLES:
         spec = doc["sources"][name]
-        path = (raw / spec["file"]).resolve()
+        path = raw / spec["file"]
+        # The team Origin restoration writes the CSVs directly under the input directory.
+        flat_path = raw / path.name
+        if source_config == example_sources and not path.exists() and flat_path.is_file():
+            path = flat_path
+        path = path.resolve()
         if not path.is_relative_to(raw):
             raise ValueError(f"{name}: source path must be inside the raw directory.")
         kind = spec.get("format", path.suffix.removeprefix(".")).lower()

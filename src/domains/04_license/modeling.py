@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from itertools import islice
 
 import pyarrow as pa
+import pyarrow.parquet as pq
 
 from config import DOMAIN, parquet_name
 from pipeline_io import BATCH_SIZE, ROW, parquet_batches, write_parquet
@@ -37,11 +38,19 @@ SCHEMAS = {
         counts=("candidate_count_num", ROW),
     ),
 }
-LICENSE_FIELDS = (
-    "license_event_key", "license_number_key", "account_key", "site_key", "issued_dtm",
-    "application_cd", "recorded_status_cd", "term_start_dtm", "term_end_dtm", "status_change_dtm", ROW,
-)
-INSPECTION_FIELDS = ("inspection_key", "license_number_key", "inspection_dtm", "result_cd", ROW)
+LICENSE_SILVER_SCHEMA = pa.schema([
+    ("license_event_key", pa.string()), ("license_number_key", pa.string()),
+    ("account_key", pa.string()), ("site_key", pa.string()), ("issued_dtm", pa.date32()),
+    ("application_cd", pa.string()), ("recorded_status_cd", pa.string()),
+    ("term_start_dtm", pa.date32()), ("term_end_dtm", pa.date32()),
+    ("status_change_dtm", pa.date32()), (ROW, pa.int64()),
+])
+INSPECTION_SILVER_SCHEMA = pa.schema([
+    ("inspection_key", pa.string()), ("license_number_key", pa.string()),
+    ("inspection_dtm", pa.date32()), ("result_cd", pa.string()), (ROW, pa.int64()),
+])
+LICENSE_FIELDS = tuple(LICENSE_SILVER_SCHEMA.names)
+INSPECTION_FIELDS = tuple(INSPECTION_SILVER_SCHEMA.names)
 
 
 @dataclass
@@ -175,8 +184,25 @@ def dimensions(root, indexes):
 
 
 def build_gold(config, root):
-    licenses = config.table("silver", "business_licenses")
-    inspections = config.table("silver", "food_inspections")
+    build_gold_from_silver(config.table("silver", "business_licenses"),
+                           config.table("silver", "food_inspections"), root)
+
+
+def validate_silver_fields(path, required):
+    actual = pq.read_schema(path)
+    for field in required:
+        indices = actual.get_all_field_indices(field.name)
+        if len(indices) != 1:
+            raise ValueError(f"{path}: expected exactly one Silver column named {field.name}.")
+        dtype = actual.field(indices[0]).type
+        if dtype != field.type and not (pa.types.is_string(field.type) and pa.types.is_large_string(dtype)):
+            raise ValueError(f"{path}: {field.name} must be {field.type}, got {dtype}.")
+
+
+def build_gold_from_silver(licenses, inspections, root):
+    """Build Domain 04 Gold from normalized Silver Parquet at explicit paths."""
+    validate_silver_fields(licenses, LICENSE_SILVER_SCHEMA)
+    validate_silver_fields(inspections, INSPECTION_SILVER_SCHEMA)
     numbers = inspection_license_numbers(inspections)
     indexes = Indexes()
     write_parquet(gold_path(root, EVENT), SCHEMAS[EVENT], license_events(licenses, indexes, numbers))

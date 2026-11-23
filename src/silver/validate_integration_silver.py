@@ -20,7 +20,7 @@ def verify_schema(path, fields, date_columns):
         raise ValueError(f"{path.name}: source_row_num must be int64")
 
 
-def main():
+def verify_snapshot(root):
     build = import_module("src.domains.06_integration.build")
     publish = import_module("src.domains.06_integration.publish")
     # Import the existing 01 mapping without running that domain's pipeline.
@@ -33,7 +33,6 @@ def main():
                               {row["target_column"] for row in license_fields if row["type"] == "date"}),
         "community_areas": ("community_area_num", ["community_area_num", "community_area_name", "geometry"], set()),
     }
-    root = build.ROOT
     manifest = json.loads((root / publish.MANIFEST).read_text(encoding="utf-8"))
     for name, (key, columns, dates) in mappings.items():
         relative = build.SILVER / f"{name}.parquet"
@@ -54,6 +53,10 @@ def main():
         raise ValueError("Inspection quality flags differ from Silver row lineage")
     for rule in ("exact_duplicate", "conflicting_inspection_key"):
         print(f"{rule}: {pc.sum(flags[rule]).as_py()} flagged rows")
+
+
+def main():
+    verify_snapshot(import_module("src.domains.06_integration.build").ROOT)
 
 
 if __name__ == "__main__":

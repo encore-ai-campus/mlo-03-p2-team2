@@ -38,3 +38,7 @@ python -m pytest -q tests/ai_ready
 ```
 
 출력은 `data/ai_ready/inspection_training/<release_id>/`에 생성합니다. 공유 릴리스는 Parquet 두 개, `manifest.json`, `validation_summary.json`을 함께 버전 관리합니다. 매니페스트에는 원천·입력·코드·결과 체크섬과 PyArrow 버전이 들어가고, 검증 결과에는 분할별 행 수와 정답 분포, 제외 사유가 들어갑니다. 같은 입력·코드·PyArrow 버전으로 재실행하면 해당 릴리스를 검증합니다. `--output-dir`로 출력 상위 폴더를 지정할 수 있습니다. [생성 코드](../../src/ai_ready/build_inspection_training.py) · [실행 결과](../../reports/ai_ready/inspection_training/README.md)
+
+### 공용 입력부터 일괄 실행
+
+팀 통합 실행은 `06_integration`의 점검 Silver와 이번 실행에서 만든 02 위반·격리 및 03 반복 위반 결과를 같은 학습 생성 코드에 전달합니다. 두 Parquet의 스키마와 행별 값, 분할별 행 수와 정답 분포를 게시 릴리스와 대조합니다. 실행 폴더의 매니페스트는 새 입력의 체크섬을 기록합니다. [팀 통합 실행과 검증](../domains/06_integration.md#관점별-비교-실행)

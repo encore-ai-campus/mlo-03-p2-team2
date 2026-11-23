@@ -33,7 +33,7 @@ class TeamIntegrationTests(unittest.TestCase):
     def test_csv_skips_empty_records_and_preserves_quoted_line_breaks(self):
         with TemporaryDirectory() as directory:
             path = Path(directory) / "food_inspections.csv"
-            path.write_text('ID,Text\n1,"first\nsecond"\n\n,\n2, \n', encoding="utf-8")
+            path.write_text('ID,Text\n1,"first\nsecond"\n\n,\n2, \n', encoding="utf-8", newline="\n")
             stats = Counter()
             rows = list(medallion.source_records(path, ["ID", "Text"], stats))
         self.assertEqual(rows, [["1", "first\nsecond"], ["2", " "]])

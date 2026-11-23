@@ -20,6 +20,7 @@ import pyarrow.parquet as pq
 from src.bronze.paths import PROJECT_ROOT
 from .profiling import (
     BRONZE_RELATIVE,
+    bronze_reference,
     CODE_HEADER,
     FRAGMENT_SEPARATOR,
     ORIGIN_RELATIVE,
@@ -130,7 +131,9 @@ def _add_rule(
     })
 
 
-def _mapping_validation(path: Path, expected_counts: dict[str, int]) -> tuple[list[dict], dict]:
+def _mapping_validation(
+    path: Path, expected_counts: dict[str, int], bronze_file: str,
+) -> tuple[list[dict], dict]:
     with path.open(encoding="utf-8-sig", newline="") as stream:
         rows = list(csv.DictReader(stream))
     counts = Counter(row["target_column"] for row in rows)
@@ -143,7 +146,7 @@ def _mapping_validation(path: Path, expected_counts: dict[str, int]) -> tuple[li
         expected_identity = {
             "source_dataset": "food_inspections",
             "source_origin_file": ORIGIN_RELATIVE.as_posix(),
-            "source_bronze_file": BRONZE_RELATIVE.as_posix(),
+            "source_bronze_file": bronze_file,
             "source_column": "Violations",
             "target_file": SILVER_RELATIVE.as_posix(),
         }
@@ -210,11 +213,16 @@ def _append_log(path: Path, record: dict) -> None:
         stream.write(json.dumps(record, ensure_ascii=False) + "\n")
 
 
-def run(root: Path = PROJECT_ROOT) -> dict:
+def run(
+    root: Path = PROJECT_ROOT, *,
+    bronze_path: Path | None = None, origin_root: Path | None = None,
+) -> dict:
     """Recompute Bronze expectations and compare them with Silver and its Mapping."""
     root = Path(root)
-    origin_before_snapshot = origin_snapshot(root)
-    bronze_path = root / BRONZE_RELATIVE
+    origin_root = origin_root or root
+    origin_before_snapshot = origin_snapshot(origin_root)
+    bronze_path = Path(bronze_path) if bronze_path is not None else root / BRONZE_RELATIVE
+    bronze_file = bronze_reference(root, bronze_path)
     silver_path = root / SILVER_RELATIVE
     profile_path = root / PROFILE_RELATIVE
     mapping_path = root / MAPPING_RELATIVE
@@ -401,7 +409,7 @@ def run(root: Path = PROJECT_ROOT) -> dict:
             "no child record": source_counts["null_cells"] + source_counts["empty_cells"] + source_counts["whitespace_cells"],
             "multiple violation records": source_counts["multiple_violation_cells"],
         }
-        mapping_mismatches, mapping_meta = _mapping_validation(mapping_path, mapping_expected)
+        mapping_mismatches, mapping_meta = _mapping_validation(mapping_path, mapping_expected, bronze_file)
         mapping_issues = (
             len(mapping_mismatches)
             + mapping_meta["duplicate_target_rows"]
@@ -520,7 +528,7 @@ def run(root: Path = PROJECT_ROOT) -> dict:
                 f"Silver readback rows={output_rows}, metadata={silver.metadata.num_rows}.",
             )
 
-        origin_after_snapshot = origin_snapshot(root)
+        origin_after_snapshot = origin_snapshot(origin_root)
         origin_after = origin_after_snapshot["source_sha256"]
         bronze_after = sha256(bronze_path)
         silver_after = sha256(silver_path)
@@ -550,7 +558,7 @@ def run(root: Path = PROJECT_ROOT) -> dict:
             "finished_at_utc": utc_now(),
             "status": overall_status,
             "origin_file": ORIGIN_RELATIVE.as_posix(),
-            "bronze_file": BRONZE_RELATIVE.as_posix(),
+            "bronze_file": bronze_file,
             "silver_file": SILVER_RELATIVE.as_posix(),
             "mapping_file": MAPPING_RELATIVE.as_posix(),
             "report_file": REPORT_RELATIVE.as_posix(),

@@ -15,10 +15,10 @@
 
 ## 1. 팀 소개
 
-**치카치카 · Encore AI Campus MLO 03 Team 2**
+**치카치카**
 
 | 관점 | 팀원 | GitHub |
-| --- | --- | --- |
+| --- | :---: | --- |
 | 01 점검 성과 | 이하영 | [@coffeewoouuu](https://github.com/coffeewoouuu) |
 | 02 위반 유형 | 이자연 | [@naturedevworks](https://github.com/naturedevworks) |
 | 03 반복 위반·재검사 | 김한울 | [@hannyeee](https://github.com/hannyeee) |
@@ -70,7 +70,18 @@
 
 ## 4. WBS
 
-2026년 11월 20일 커밋·병합 기록. 시간은 KST 기준이다.
+| 작업 | 담당 | 기간&nbsp;(KST) | 핵심&nbsp;산출물 | 기록 |
+| --- | :---: | :---: | --- | --- |
+| 1. 공용 원천 스냅샷 반영 | 노&#8288;진&#8288;산 | 11/20 | 점검·인허가·지역 경계 원천, 분할본, 체크섬 | [원천 반영](https://github.com/encore-ai-campus/mlo-03-p2-team2/commit/69d1105) |
+| 2.1 점검 성과 분석 | 이&#8288;하&#8288;영 | 11/20~<br>11/23 | 업종·기간별 점검 건수와 불합격률 | [산출물 배포](https://github.com/encore-ai-campus/mlo-03-p2-team2/commit/328b3a6) |
+| 2.2 위반 유형 분석 | 이&#8288;자&#8288;연 | 11/20~<br>11/23 | 위반 Fact·Dimension, 정상·격리 데이터 | [PR #5](https://github.com/encore-ai-campus/mlo-03-p2-team2/pull/5) |
+| 2.3 재점검·반복 위반 분석 | 김&#8288;한&#8288;울 | 11/20 | 30일 이내 재점검과 동일 위반 반복 집계 | [PR #2](https://github.com/encore-ai-campus/mlo-03-p2-team2/pull/2) |
+| 2.4 사업체 인허가 분석 | 노&#8288;진&#8288;산 | 11/19~<br>11/20 | 인허가 이력과 점검일 기준 면허 매칭 | [PR #1](https://github.com/encore-ai-campus/mlo-03-p2-team2/pull/1) |
+| 2.5 지역별 위생 분석 | 오&#8288;정&#8288;민 | 11/20~<br>11/23 | 점검 위치의 지역 배정과 지역·기간별 위반 집계 | [PR #3](https://github.com/encore-ai-campus/mlo-03-p2-team2/pull/3) |
+| 3.1 공용 Bronze·Silver 통합 | 이&#8288;자&#8288;연 | 11/23 | 공용 Parquet 7개, 행 수 대조, 분할본 복원·체크섬 검증 | [PR #11](https://github.com/encore-ai-campus/mlo-03-p2-team2/pull/11) |
+| 3.2 공용 Gold 통합 | 김&#8288;한&#8288;울 | 11/23 | 공용 Dimension 9개, Fact 9개, 일괄 생성·검증 코드 | [Gold 일괄 생성](https://github.com/encore-ai-campus/mlo-03-p2-team2/commit/be9f8f1) |
+| 3.3 AI Ready 학습 데이터 구축 | 오&#8288;정&#8288;민 | 11/23 | 점검 불합격·동일 위반 재관측 예측용 데이터셋 2종 | [PR #16](https://github.com/encore-ai-campus/mlo-03-p2-team2/pull/16) |
+| 4. 프로젝트 문서·ERD 정리 | 노&#8288;진&#8288;산 | 11/23 | 프로젝트 README와 통합 스타 스키마 ERD | [PR #14](https://github.com/encore-ai-campus/mlo-03-p2-team2/pull/14) |
 
 | 작업 ID · 담당 | 작업 | 커밋·PR |
 | --- | --- | --- |
@@ -81,34 +92,23 @@
 | 1.4 노진산 | 인허가 기간 매칭, 검증, Parquet | [16:52 산출물](https://github.com/encore-ai-campus/mlo-03-p2-team2/commit/5e5e779) · [16:58 PR #1](https://github.com/encore-ai-campus/mlo-03-p2-team2/pull/1) |
 | 1.5 오정민 | 지역 배정, 집계, 공용 입력 검증 | [16:36 공간 처리](https://github.com/encore-ai-campus/mlo-03-p2-team2/commit/08e03e0) · [17:54 PR #3](https://github.com/encore-ai-campus/mlo-03-p2-team2/pull/3) |
 
-### 11월 23일 진행 상태
-
-| 범위 | 상태 |
-| --- | --- |
-| 공용 Bronze·Silver | 원천 3종의 스냅샷을 `06_integration`에 배포했다. [PR #11](https://github.com/encore-ai-campus/mlo-03-p2-team2/pull/11) · [통합 가이드](docs/domains/06_integration.md) |
-| 공용 Gold | 차원 9개와 Fact 9개를 검증했다. 점검과 인허가의 날짜 차원에서 겹치는 날짜 4,528개를 통합했다. [생성·검증 코드](src/gold/build_dimensions.py) |
-| 관점별 입력 전환 | 공용 입력을 넣어 기존 산출물과 대조했다. 02의 원천 해시 필드와 04의 점검 키 타입을 각 실행 경로에 적용하는 작업이 남았다. [관점별 비교](docs/domains/06_integration.md#관점별-비교-실행) |
-| 팀 공용 AI-Ready | 점검 직전 불합격과 다음 점검의 동일 위반 재관측을 예측하는 학습용 Parquet 두 개를 배포했다. [PR #16](https://github.com/encore-ai-campus/mlo-03-p2-team2/pull/16) |
-
 ## 5. 요구사항 명세
 
-| ID | 단계 | 검증 항목 | 코드·기준 | 결과 |
-| --- | --- | --- | --- | --- |
-| O-01 | Origin | 원천 조각과 복원본의 체크섬 | [`restore_origin.py`](src/ingestion/restore_origin.py) | 원천 6개·조각 4개 일치 |
-| B-01 | Bronze | 원천과 Bronze의 행 수·컬럼·값·순서 | [`validate_bronze.py`](src/domains/04_license/validate_bronze.py) | 04 점검·인허가 일치 |
-| B-02 | Bronze | 원천·Bronze 해시와 적재 기록 | [`validate_bronze.py`](src/domains/04_license/validate_bronze.py) | 04 매니페스트 일치 |
-| S-01 | Silver | 면허번호 문자열, 날짜 `date32`, 결과 표준 코드 | [`validate_silver.py`](src/domains/04_license/validate_silver.py) | 04 타입·값 일치 |
-| S-02 | Silver | Bronze 행 수와 `source_row_num` 보존 | [`validate_silver.py`](src/domains/04_license/validate_silver.py) | 04 두 테이블 일치 |
-| S-03 | 공용 적재·표준화 | 원천 3종 행 수 보존과 배포본 복원 | [`build.py`](src/domains/06_integration/build.py) · [`publish.py`](src/domains/06_integration/publish.py) | 배포본 7개 대조 완료 |
-| Q-01 | 품질 | 결측·파싱 실패·기간 역전 집계 | [`validate_quality.py`](src/domains/04_license/validate_quality.py) | 04 검사 3개 통과 |
-| Q-02 | 품질 | 위반 후보가 정상과 격리 조각의 합과 일치하는지 확인 | [`reconciliation.py`](src/domains/02_violation/reconciliation.py) | [02 원천 대사 통과](reports/02_violation/README.md) |
-| G-01 | Gold | 기본키 중복·공란과 필수 외래키 | [`validate_gold.py`](src/domains/04_license/validate_gold.py) | 04 키 검증 통과 |
-| G-02 | Gold | 면허·기간 조건과 유일 후보 확정 | [`validate_gold.py`](src/domains/04_license/validate_gold.py) | 04 기간 매칭 검증 통과 |
-| G-03 | Gold | 공용 차원 중복과 키별 속성 충돌 | [`build_dimensions.py`](src/gold/build_dimensions.py) | 차원 9개 검증, 중복 날짜 4,528개 통합 |
-| G-04 | Gold | 공용 Fact 키의 유일성과 참조 관계 | [`build_dimensions.py`](src/gold/build_dimensions.py) | Fact 9개 검증 통과 |
-| T-01 | 입력 전환 | 관점별 경로·타입·메타데이터 호환성 | [관점별 비교 기준](docs/domains/06_integration.md#관점별-비교-실행) | 비교 완료, 경로 전환 대기 |
-| A-01 | AI-Ready | 기준일 이전 입력과 기준일·정답 관측일의 시간순 분할 | [시점 검증 테스트](tests/ai_ready/test_inspection_training.py) | 데이터셋 2개의 시간 분할 위반 0건 |
-| A-02 | AI-Ready | 키 유일성, 정답 누락, 파일 체크섬 | [검증 코드](src/ai_ready/build_inspection_training.py) · [대조 결과](reports/ai_ready/inspection_training/README.md) | 키 중복·정답 누락 0건, 체크섬 일치 |
+| 단계 | 요구사항 | 검증 방법 | 검&#8288;증&nbsp;상&#8288;태 |
+| --- | --- | --- | :---: |
+| Origin | 분할 원천 복원 및 무결성 확인 | 배포 조각과 복원본의 SHA-256 대조 | ✅ 통과 |
+| Bronze | 원천 값·행 수·순서 보존 | 원천 CSV·GeoJSON과 Bronze 비교 | ✅ 통과 |
+| Bronze | 원천 파일명·적재 시각·행 번호 기록 | `_SRC_FILE`, `_LOAD_DTM`, `source_row_num` 검사 | ✅ 통과 |
+| Silver | 컬럼명·식별자·날짜·결과 코드 표준화 | 원천별 매핑과 Parquet 스키마 대조 | ✅ 통과 |
+| Silver | 기본 레코드의 원천 추적 유지 | Bronze·Silver의 행 수, 원천 순번, 키 유일성 비교 | ✅ 통과 |
+| 품질 검증 | 결측·중복·변환 예외 기록 | 점검 키 충돌, 날짜·범주 오류와 품질 플래그 대조 | ✅ 통과 |
+| 품질 검증 | 위반 파싱 결과를 정상·격리로 구분 | 전체 위반 후보와 정상·격리 조각 수의 합 대조 | ✅ 통과 |
+| Gold | 팩트의 행 단위와 조인 키 보존 | 팩트 키 중복, 공용 차원과 점검 참조 확인 | ✅ 통과 |
+| Gold | 기간 매칭과 공간 배정의 예외 구분 | 점검일의 면허 유효기간 대조, 좌표와 지역 경계 교차 검사 | ✅ 통과 |
+| Gold | 공용 차원 통합과 속성 충돌 검사 | 차원 키 유일성 검사, 01·04 날짜 비교 | ✅ 통과 |
+| 공용 입력 전환 | 공용 Bronze·Silver로 01~05 결과와 학습 데이터 재현 | [일괄 실행 및 결과 대조](docs/domains/06_integration.md#관점별-비교-실행) | ✅ 통과 |
+| AI Ready | 기준일 전 이력 사용 및 시간순 분할 | 입력 시점과 정답 관측일이 규칙에 맞는지 대조 | ✅ 통과 |
+| AI Ready | 학습 행의 키와 정답 검증 | 공개 산출물의 키·정답·체크섬 대조 | ✅ 통과 |
 
 02에서 분리한 위반 후보 **1,031,073조각**을 정상 **1,029,281조각**과 격리 **1,792조각**으로 대사했다. 정상과 격리 조각 모두 원천 점검을 추적할 수 있다. [Bronze 원천 검증](src/bronze/check_integration_bronze.py) · [Silver 스키마 검증](src/silver/validate_integration_silver.py)
 
@@ -160,23 +160,10 @@ flowchart TD
     G -->|05 지역 집계| Q["AI-Ready · 지역 질의용"]
 ```
 
-| 단계 | 처리와 검증 기준 | 코드 |
-| --- | --- | --- |
-| Origin | 공용 CSV를 복원하고 GeoJSON·설명 JSON과 함께 체크섬 대조 | [`restore_origin.py`](src/ingestion/restore_origin.py) |
-| Bronze | 원천 값과 순서 보존, `source_row_num`으로 추적 | [04 적재](src/domains/04_license/01_bronze.py) |
-| Silver 표준화 | 식별자·날짜·결과 코드 통일, 원천 행 수 유지 | [04 표준화](src/domains/04_license/02_normalize.py) |
-| 품질 검증 | 결측·파싱 실패·기간 예외 대조 | [04 품질 검사](src/domains/04_license/03_quality.py) |
-| Gold | 관점별 Fact·Dim·마트 구성. 공용 모델의 키와 참조 관계 검증 | [04 모델링](src/domains/04_license/04_modeling.py) · [공용 Gold](src/gold/build_dimensions.py) |
-| AI-Ready | 과제별 입력과 정답 구성, 시간 분할과 체크섬 검증 | [학습 데이터](docs/ai_ready/inspection_training.md#생성과-검증) · [지역 질의용 지표](docs/domains/05_geospatial/model.md#단계별-산출물) |
-
-원천과 공유 학습 데이터를 확인하려면 팀 환경을 준비한 뒤 저장소 루트에서 실행한다. [Conda 환경 설정](docs/project_setup_and_sharing.md#conda-환경)
-
-```sh
-python -m src.ingestion.restore_origin
-python -m src.ai_ready.build_inspection_training --verify
-```
-
-공용 Bronze·Silver의 생성·배포는 `06_integration` 가이드를 따른다. 04 인허가 파이프라인은 `run_pipeline.py`로 적재부터 검증까지 실행한다. [공용 데이터 실행 방법](docs/domains/06_integration.md#실행) · [04 실행 코드](src/domains/04_license/run_pipeline.py) · [재현 명령과 예외 처리](https://github.com/encore-ai-campus/mlo-03-p2-team2/wiki/Project-Details#시연)
+1. **공용 원천·Bronze·Silver** · 원천을 복원하고 `06_integration`에서 점검·인허가·지역 경계 세 테이블을 표준화합니다.
+2. **관점별 Gold** · `06_integration` 공용 입력으로 01~05 팩트와 집계를 일괄 생성합니다. [팀 일괄 실행](docs/domains/06_integration.md#관점별-비교-실행)
+3. **공용 Gold** · 관점별 결과를 연결해 공용 차원과 팩트를 생성하고, 키와 참조 관계를 확인합니다.
+4. **AI Ready** · 점검 Silver와 02 위반 기록, 03 후속 점검 결과에서 기준일 전 365일 이력과 과제별 정답을 만듭니다. [학습 데이터 생성과 검증](docs/ai_ready/inspection_training.md)
 
 ## 8. 수행 결과
 
@@ -215,7 +202,7 @@ python -m src.ai_ready.build_inspection_training --verify
 ## 9. 한 줄 회고
 
 | 팀원 | 한 줄 회고 |
-| --- | --- |
+| :---: | --- |
 | 이하영 | |
 | 이자연 | |
 | 김한울 | |

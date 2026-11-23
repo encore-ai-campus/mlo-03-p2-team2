@@ -130,12 +130,16 @@ h1,h2{{color:#16324f}} .cards{{display:flex;gap:16px;flex-wrap:wrap}} .card{{pad
 </body></html>"""
 
 
-def build(root: Path = PROJECT_ROOT, output_root: Path | None = None) -> dict:
+def build(
+    root: Path = PROJECT_ROOT, output_root: Path | None = None, *,
+    bronze_path: Path | None = None, origin_root: Path | None = None,
+) -> dict:
     root = Path(root)
     output_root = Path(output_root) if output_root is not None else root
-    origin_before = origin_snapshot(root)
+    origin_root = origin_root or root
+    origin_before = origin_snapshot(origin_root)
     paths = {
-        "bronze": root / BRONZE_RELATIVE,
+        "bronze": Path(bronze_path) if bronze_path is not None else root / BRONZE_RELATIVE,
         "silver": root / SILVER_RELATIVE, "accepted": root / ACCEPTED_RELATIVE,
         "quarantine": root / QUARANTINE_RELATIVE, "reconciliation": root / REPORT_RELATIVE,
         "dimension": root / DIM_RELATIVE, "fact": root / FACT_RELATIVE,
@@ -247,7 +251,7 @@ def build(root: Path = PROJECT_ROOT, output_root: Path | None = None) -> dict:
         for name, digest in protected.items():
             if sha256(paths[name]) != digest:
                 raise ValueError(f"Protected input changed: {paths[name]}")
-        origin_after = origin_snapshot(root)
+        origin_after = origin_snapshot(origin_root)
         if (origin_after["source_sha256"] != origin_before["source_sha256"]
                 or origin_after["guard_sha256"] != origin_before["guard_sha256"]):
             raise ValueError("Protected Origin inputs changed during analysis")

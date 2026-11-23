@@ -3,7 +3,7 @@ import hashlib
 import json
 import subprocess
 import sys
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 import pyarrow as pa
@@ -79,6 +79,72 @@ def execute(name, project, ok=True, extra=()):
 def snapshot(folder):
     return {p.relative_to(folder).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest()
             for p in folder.rglob("*") if p.is_file()}
+
+
+@pytest.fixture
+def shared_silver(tmp_path):
+    folder = tmp_path / "shared_silver"
+    folder.mkdir()
+    licenses = folder / "business_licenses.parquet"
+    inspections = folder / "food_inspections.parquet"
+    day = date(2024, 1, 10)
+    pq.write_table(pa.table({
+        "license_event_key": ["0001"], "license_number_key": ["0111"],
+        "account_key": ["010"], "site_key": ["01"], "issued_dtm": [day],
+        "application_cd": ["RENEW"], "recorded_status_cd": ["AAI"],
+        "term_start_dtm": [date(2024, 1, 1)], "term_end_dtm": [day],
+        "status_change_dtm": pa.array([None], type=pa.date32()), "source_row_num": [99],
+    }), licenses)
+    pq.write_table(pa.table({
+        "inspection_key": pa.array(["00101", "00102"], type=pa.large_string()),
+        "license_number_key": ["0111", "0111"], "inspection_dtm": [day, date(2024, 1, 11)],
+        "result_cd": ["PASS", "FAIL"], "source_row_num": [50, 51], "extra_column": [True, False],
+    }), inspections)
+    return licenses, inspections, tmp_path / "gold"
+
+
+def build_shared_gold(licenses, inspections, gold):
+    return subprocess.run(
+        [sys.executable, "-c", "from pathlib import Path; import sys; "
+         "from modeling import build_gold_from_silver; "
+         "build_gold_from_silver(*map(Path, sys.argv[1:]))",
+         str(licenses), str(inspections), str(gold)],
+        cwd=SCRIPTS, capture_output=True, encoding="utf-8", errors="replace",
+    )
+
+
+def test_gold_from_shared_silver_keeps_string_keys_and_match_semantics(shared_silver):
+    before = snapshot(shared_silver[0].parent)
+    result = build_shared_gold(*shared_silver)
+    assert result.returncode == 0, result.stderr
+    gold = shared_silver[2] / "04_license"
+    fact = pq.read_table(gold / "04_fact_inspection_license_match.parquet")
+    assert fact.schema.field("inspection_key").type == pa.string()
+    assert fact.select(["inspection_key", "source_license_number", "matched_license_event_id",
+                        "match_status_cd", "source_row_num"]).to_pylist() == [
+        {"inspection_key": "00101", "source_license_number": "0111", "matched_license_event_id": "0001",
+         "match_status_cd": "UNIQUE_MATCH", "source_row_num": 50},
+        {"inspection_key": "00102", "source_license_number": "0111", "matched_license_event_id": None,
+         "match_status_cd": "NO_VALID_PERIOD", "source_row_num": 51},
+    ]
+    assert len(list(gold.glob("04_*.parquet"))) == 5
+    assert snapshot(shared_silver[0].parent) == before
+
+
+@pytest.mark.parametrize("invalid_type", (None, pa.int64()))
+def test_gold_rejects_invalid_shared_inspection_dates_before_writing(shared_silver, invalid_type):
+    licenses, inspections, gold = shared_silver
+    table = pq.read_table(inspections)
+    if invalid_type is None:
+        table = table.drop(["inspection_dtm"])
+    else:
+        table = table.set_column(table.schema.get_field_index("inspection_dtm"), "inspection_dtm",
+                                 pa.array([1, 2], type=invalid_type))
+    pq.write_table(table, inspections)
+    result = build_shared_gold(licenses, inspections, gold)
+    assert result.returncode != 0
+    assert "food_inspections.parquet" in result.stderr and "inspection_dtm" in result.stderr
+    assert not gold.exists()
 
 
 @pytest.mark.parametrize("stage", ("01_bronze", "02_silver", "03_gold"))

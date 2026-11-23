@@ -1,8 +1,6 @@
 # 공용 Bronze·Silver 통합
 
-워크트리 `C:\mlo-03-p2-team2`, 브랜치 `codex/06-integration-structure`.
-
-팀 Git 원천의 체크섬을 확인하고 임시 경로에 CSV를 복원한다. 점검, 인허가, 지역 경계를 각자 한 테이블로 적재한다. 통합 결과는 새 실행 경로에 게시하며 기존 01~05 파이프라인의 입력 경로 전환은 후속 작업이다.
+팀 Git 원천의 체크섬을 확인하고 점검, 인허가, 지역 경계를 각각 한 테이블로 적재한다. 팀 일괄 실행은 게시된 `06_integration` Bronze·Silver를 공용 입력으로 사용해 01~05 Gold와 AI-ready를 생성한다. 관점별 기존 스냅샷은 결과를 비교할 때 사용한다.
 
 | 원천 | 한 행의 의미 | Silver 키 | 스냅샷 행 수 |
 | --- | --- | --- | ---: |
@@ -44,7 +42,7 @@ python -m src.domains.06_integration.publish --run reports/runs/06_integration/s
 python -m src.domains.06_integration.publish --restore
 ```
 
-게시 매니페스트는 `data/02_silver/06_integration/snapshot_manifest.json`이다. 동일한 결과는 다시 게시할 수 있으며, 경로에 다른 내용이 있으면 게시를 중단한다. 100 MB를 초과한 인허가 Bronze와 점검 Silver는 분할본을 공유하고, 복원본은 로컬에서 사용한다. 소비자 경로 적용 시 02 원천 해시 메타데이터와 04 점검 키 타입은 아래의 관점별 규격을 확인한다.
+게시 매니페스트는 `data/02_silver/06_integration/snapshot_manifest.json`이다. 동일한 결과는 다시 게시할 수 있으며, 경로에 다른 내용이 있으면 게시를 중단한다. 100 MB를 초과한 인허가 Bronze와 점검 Silver는 분할본을 공유하고, 일괄 코드에서 실행 경로에 복원한다.
 
 ## 요구사항별 검증
 
@@ -67,12 +65,23 @@ Silver는 원천 행을 모두 보존한다. 점검 품질 플래그는 원천 �
 
 ## 관점별 비교 실행
 
-경로 개편 전 검증 산출물은 로컬 `reports/runs/06_integration/consumer-check/`에서 확인할 수 있다. 비교 시 Parquet 메타데이터의 실행·입력 지문 차이는 제외하고 컬럼과 값을 대조했다.
+게시 스냅샷을 사용하는 일괄 실행이다. 저장소 루트에서 실행하며, 이전 실행과 별도로 비교할 때는 새 `--output` 경로를 지정한다.
 
-| 관점 | 공급한 입력 | 비교 결과 |
+```powershell
+python -m src.domains.06_integration.run_pipeline
+python -m src.domains.06_integration.run_pipeline --verify
+python -m pytest -q
+```
+
+| 관점 | 공용 입력 | 생성 결과 |
 | --- | --- | --- |
-| 01 | 공용 점검 Silver와 품질 플래그를 기존 파일명으로 배치 | Gold Parquet 7개 및 집계 CSV 10개 일치 |
-| 02 | 공용 점검 Bronze를 02 파일명으로 배치하고 원천 해시를 `origin_sha256` 필드에도 제공 | 위반 Silver, 정상·격리, Gold 차원·Fact·mart 일치. 정상·Fact·mart 각 1,029,281행 |
-| 03 | 공용 점검 Silver와 검증 매니페스트, 기존 02 위반 결과 | 점검 이력·재점검·반복 위반 Parquet 일치. HTML은 점검 Silver 출처 표시만 변경 |
-| 04 | 공용 인허가 Silver와 공용 점검 Silver의 기존 04 규격 5개 컬럼 | 원본 공용 점검 파일은 `inspection_key`의 `large_string` 타입이 기존 `string`과 달라 검사 실패. 임시 호환 입력으로 전체 검사 23개 통과, Fact 2개·차원 3개 일치 |
-| 05 | 공용 점검 Silver, 기존 05 공간 배정 및 02 공유 파일 | Gold 집계 3개 일치. 공용 경계의 지역 키, 지역명, 원천 순번, 도형 77개가 05와 일치. Gold 실행 시 Windows 파일 핸들은 검증 프로세스에서 정리 |
+| 01 점검 | 점검 Silver와 품질 플래그 | 적격 점검, 점검 Fact·차원, 성과 집계와 질의용 AI-ready |
+| 02 위반 | 점검 Bronze와 원천 해시 | 위반 파싱·격리·대사, 위반 Fact·차원과 05 공유용 코드·관측 상태 |
+| 03 재점검 | 점검 Silver와 이번 실행의 02 파싱 결과 | 점검 이력, 재점검·반복 위반 Gold |
+| 04 인허가 | 인허가·점검 Silver | 인허가 이벤트와 점검일의 기간 매칭. 문자열 키는 Arrow `string`과 `large_string`을 모두 지원 |
+| 05 지역 | 점검·지역 경계 Silver, 품질 플래그, 이번 실행의 02 코드·관측 상태 | 점검별 지역 배정, 지역·기간 집계와 질의용 AI-ready |
+| 팀 학습용 | 점검 Silver, 이번 실행의 02 위반·격리와 03 반복 위반 Gold | 점검 직전 불합격, 동일 위반 재관측 Parquet 2종 |
+
+실행 결과는 `reports/runs/06_integration/end-to-end/` 아래에 저장한다. 관점별 산출물과 공용 Gold의 `dimensions/`, `facts/` 경로는 기존 구조를 따른다. 팀 학습용 Parquet은 `data/ai_ready/inspection_training/<release_id>/`에 생성되며, 각 단계 경로는 실행 폴더 기준이다. [일괄 실행 코드](../../src/domains/06_integration/run_pipeline.py) · [결과 비교 및 검증 코드](../../src/domains/06_integration/validate_pipeline.py)
+
+실행 폴더의 `verification.json`에 사용한 원천 해시, 비교한 테이블의 행 수, 실행 결과 파일의 SHA-256이 기록된다. 비교에서는 행과 컬럼의 값을 대조하고, 실행 버전에 따라 달라지는 Parquet 메타데이터는 별도로 식별한다. 학습 데이터는 기존 릴리스의 분할별 행 수와 정답 분포도 대조한다. [팀 스냅샷 검증 기록](../../reports/quality/team_integration_verification.json)

@@ -19,6 +19,11 @@ GEOGRAPHIC_CRS = {
 }
 
 
+def geojson_wkt(geometry):
+    # 공간 배정에서 원천 좌표 정밀도를 유지하도록 반올림 없이 WKT로 변환한다.
+    return shapely.to_wkt(shape(geometry), rounding_precision=-1)
+
+
 def boundary_records(path):
     collection = json.loads(path.read_text(encoding="utf-8-sig"))
     if collection.get("type") != "FeatureCollection":
@@ -30,9 +35,7 @@ def boundary_records(path):
         if feature.get("type") != "Feature":
             raise ValueError(f"{path.name}: unexpected GeoJSON member")
         properties = {name.casefold(): value for name, value in feature["properties"].items()}
-        geometry = shape(feature["geometry"])
-        # 공간 배정에서 원천 좌표 정밀도를 유지하도록 반올림 없이 WKT로 변환한다.
-        yield [shapely.to_wkt(geometry, rounding_precision=-1)] + [
+        yield [geojson_wkt(feature["geometry"])] + [
             "" if properties[field.lower()] is None else str(properties[field.lower()])
             for field in BOUNDARY_FIELDS[1:]
         ]
