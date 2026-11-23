@@ -25,7 +25,7 @@ def run(args):
     elif args.combined_raw_dir:
         raise ValueError("--combined-raw-dir requires --delta-dir.")
 
-    switches = ("raw_dir", "data_dir", "report_dir", "sources_config", "dictionary")
+    switches = ("raw_dir", "data_dir", "report_dir", "sources_config", "dictionary", "inspection_silver")
     options = [value for name in switches if getattr(args, name) is not None
                for value in ("--" + name.replace("_", "-"), str(getattr(args, name)))]
     start = list(STEPS).index(args.start_at)

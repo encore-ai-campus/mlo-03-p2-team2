@@ -1,5 +1,6 @@
 from config import DOMAIN, TABLES, parquet_name
 from normalization import load_dictionary, normalize_batch, silver_schema
+from shared_inspections import FLAGS_OUTPUT, shared_inspections
 from pipeline_io import cli, parquet_batches, staging, write_parquet
 
 
@@ -10,7 +11,12 @@ def run(config):
             source = config.table("bronze", table)
             fields = mapping[table]
             schema = silver_schema(fields)
-            batches = (normalize_batch(batch, fields, schema) for batch in parquet_batches(source))
+            if table == "food_inspections" and config.inspection_silver:
+                shared, flags = shared_inspections(config, schema)
+                write_parquet(target / FLAGS_OUTPUT, flags.schema, flags.to_batches())
+                batches = shared.to_batches()
+            else:
+                batches = (normalize_batch(batch, fields, schema) for batch in parquet_batches(source))
             write_parquet(target / parquet_name(table), schema, batches)
     print("Silver: 2 tables standardized with row lineage preserved.")
 
