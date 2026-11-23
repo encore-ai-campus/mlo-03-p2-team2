@@ -4,11 +4,11 @@
 
 [프로젝트 상세 Wiki](https://github.com/encore-ai-campus/mlo-03-p2-team2/wiki/Project-Details) · [저장소 구조](https://github.com/encore-ai-campus/mlo-03-p2-team2/wiki/Repository-Structure) · [로컬 실행 환경](docs/project_setup_and_sharing.md)
 
-[원천과 AS-IS](#2-프로젝트-개요) · [요구사항](#5-요구사항-명세) · [ERD](#6-erd) · [수행 결과](#8-수행-결과)
+[원천과 AS-IS](#2-프로젝트-개요) · [요구사항](#5-요구사항-명세) · [ERD](#6-erd) · [수행 결과](#8-수행-결과) · [학습 데이터](#학습용-ai-ready-데이터)
 
 ## 1. 팀 소개
 
-**Encore AI Campus MLO 03 · Team 2**
+**치카치카**
 
 | 관점 | 팀원 | GitHub |
 | --- | --- | --- |
@@ -75,7 +75,7 @@
 - **공용 Bronze·Silver · 배포 완료**　원천 3종의 스냅샷을 `06_integration`에 배치했습니다. [PR #11](https://github.com/encore-ai-campus/mlo-03-p2-team2/pull/11) · [통합 가이드](docs/domains/06_integration.md)
 - **공용 Gold · 검증 통과**　기존 관점별 Gold로 차원 9개와 Fact 9개를 재생성하고, 공통 날짜 4,528개를 통합했습니다. [Gold 생성·검증 코드](src/gold/build_dimensions.py)
 - **관점별 입력 전환 · 비교 완료**　02번 해시 필드와 04번 점검 키 타입을 맞춰 각 실행 경로에 적용하는 작업이 남았습니다. [관점별 비교 기준](docs/domains/06_integration.md#관점별-비교-실행)
-- **팀 공용 AI-Ready · 역할 분담 완료**　01번 질의용 집계와 02번 피처 초안을 바탕으로 학습용 정답·시점·분할 기준을 정할 차례입니다. [02번 피처 초안](docs/domains/02_violation/ai_ready_feature_draft.md)
+- **팀 공용 AI-Ready · 학습용 2종 생성·검증 완료**　점검 직전 불합격과 다음 점검의 동일 위반 재관측을 예측하는 Parquet을 배포했습니다. [PR #16](https://github.com/encore-ai-campus/mlo-03-p2-team2/pull/16)
 
 ## 5. 요구사항 명세
 
@@ -96,7 +96,8 @@
 | G-03 | Gold | 동일 차원 행 통합, 같은 키의 속성 충돌 검사 | [`build_dimensions.py`](src/gold/build_dimensions.py) | ✅ 차원 9개 · 날짜 중복 4,528개 제거 |
 | G-04 | Gold | 공용 Fact의 행 단위 유일성과 참조 키 보존 | [`build_dimensions.py`](src/gold/build_dimensions.py) | ✅ Fact 9개 검증 |
 | T-01 | 입력 전환 | 관점별 경로·타입·메타데이터를 공용 규격에 맞춤 | [관점별 비교 기준](docs/domains/06_integration.md#관점별-비교-실행) | ⏳ 비교 완료 · 전환 대기 |
-| A-01 | AI-Ready | 기준일 전 입력·이후 정답 분리, 시간순 분할 | 시점·분할 검증 코드 예정 | ⏳ 역할 분담 완료 |
+| A-01 | AI-Ready | 기준일 전의 이력을 사용하고 기준일·정답 관측일을 시간순으로 분할 | [`test_inspection_training.py`](https://github.com/encore-ai-campus/mlo-03-p2-team2/blob/main/tests/ai_ready/test_inspection_training.py) | ✅ 2종 시간 분할 위반 0건 |
+| A-02 | AI-Ready | 한 행의 키를 유일하게 유지하고 정답 누락과 파일 변경 여부를 확인 | [`build_inspection_training.py --verify`](https://github.com/encore-ai-campus/mlo-03-p2-team2/blob/main/src/ai_ready/build_inspection_training.py) · [대조 결과](https://github.com/encore-ai-campus/mlo-03-p2-team2/blob/main/reports/ai_ready/inspection_training/README.md) | ✅ 키 중복·정답 누락 0건, 체크섬 일치 |
 
 공용 Bronze·Silver는 [Bronze 원천 검증](src/bronze/check_integration_bronze.py)과 [Silver 스키마 검증](src/silver/validate_integration_silver.py)으로도 확인합니다. 02번은 정상 **1,029,281조각**과 격리 **1,792조각**을 합쳐 후보 **1,031,073조각**과 대조했습니다.
 
@@ -143,19 +144,47 @@
 3. **Silver 표준화**　식별자·날짜·결과 코드를 표준화합니다. 04 [`02_normalize.py`](src/domains/04_license/02_normalize.py)
 4. **품질 검증**　Bronze와 Silver의 결측·파싱·기간 예외를 대조합니다. 04 [`03_quality.py`](src/domains/04_license/03_quality.py)
 5. **Gold**　관점별 Fact·Dim·마트를 만든 뒤 공용 차원·Fact를 구성합니다. 04 [`04_modeling.py`](src/domains/04_license/04_modeling.py) · 공용 [`build_dimensions.py`](src/gold/build_dimensions.py)
-6. **AI-Ready · 계획**　공용 Gold에서 기준일 이전 입력과 이후 정답을 분리할 예정입니다. 역할 분담을 마쳤습니다.
+6. **AI-Ready**　04의 Silver 점검본에 02의 위반 기록과 03의 후속 점검 비교 결과를 연결합니다. 과제별 기준일과 정답을 정하고 학습·검증·테스트를 시간순으로 나눕니다. [생성·검증 방법](https://github.com/encore-ai-campus/mlo-03-p2-team2/blob/main/docs/ai_ready/inspection_training.md#생성과-검증)
 
 팀 공용 Bronze·Silver의 생성과 배포 검증은 [`build.py`](src/domains/06_integration/build.py)와 [`publish.py`](src/domains/06_integration/publish.py)를 사용합니다. 04번 전체 실행과 재검증은 [`run_pipeline.py`](src/domains/04_license/run_pipeline.py)를 사용합니다. [재현 명령과 예외 처리](https://github.com/encore-ai-campus/mlo-03-p2-team2/wiki/Project-Details#시연)
 
 ## 8. 수행 결과
 
-| 단계 | 전후 비교 |
-| --- | --- |
-| Origin → Bronze | 04 점검 318,627행과 인허가 1,212,132행을 그대로 보존하고 원천 순번 추가 |
-| Bronze → Silver | 행 수 유지. 예시 점검일 `11/18/2026` → `2026-11-18`, 결과 `Fail` → `FAIL` |
-| Silver → Gold | 04 점검 318,627건 중 **232,383건**의 기간 후보가 1개, **1,401건**은 여러 개, **84,843건**은 0개 |
+### 실제 점검 2건의 단계별 변화
 
-04번 단계 검증 **39개 통과**. [검증 보고서](reports/04_license/README.md) · [관점별 결과](https://github.com/encore-ai-campus/mlo-03-p2-team2/wiki/Project-Details#수행-결과) · [실제 점검 1건 시연](https://github.com/encore-ai-campus/mlo-03-p2-team2/wiki/Project-Details#시연)
+```mermaid
+flowchart TD
+    O["Origin · 점검 CSV"] --> B["Bronze · 원문 보존"]
+    B --> S["Silver · 컬럼과 타입 표준화"]
+    S --> G["Gold · 점검 집계와 위반 분석"]
+    G --> A["AI-ready 01 · 점검당 1행"]
+    G --> R["AI-ready 03 · 점검과 위반 코드당 1행"]
+```
+
+같은 점검 ID를 따라가며 단계별 파일에서 확인한 값입니다. Silver의 `inspection_dtm`은 `date32`이고, Gold에서는 판정·불합격 건수를 집계할 수 있도록 행마다 0 또는 1을 기록합니다.
+
+| 단계 · 파일 | 점검 `2646979` | 점검 `2609905` |
+| --- | --- | --- |
+| [Origin CSV](https://github.com/encore-ai-campus/mlo-03-p2-team2/tree/main/data/00_origin) | `11/18/2026` · `Fail` | `01/02/2025` · `Pass` |
+| [04 Bronze Parquet](https://github.com/encore-ai-campus/mlo-03-p2-team2/blob/main/data/01_bronze/04_license/04_food_inspections.parquet) | 원문 보존 · 원천 순번 `4` | 원문 보존 · 원천 순번 `33448` |
+| [04 Silver Parquet](https://github.com/encore-ai-campus/mlo-03-p2-team2/blob/main/data/02_silver/04_license/04_food_inspections.parquet) | `2026-11-18` · `FAIL` | `2025-01-02` · `PASS` |
+| [01 Gold 점검 Fact](https://github.com/encore-ai-campus/mlo-03-p2-team2/blob/main/data/03_gold/facts/01_fact_inspection.parquet) | 판정 `1` · 불합격 `1` | 판정 `1` · 불합격 `0` |
+
+04 Bronze와 Silver는 점검 **318,627행**과 인허가 **1,212,132행**을 각각 유지했습니다. 04 Gold에서 점검일에 유효한 인허가 후보가 1개인 점검은 **232,383건**, 여러 개인 점검은 **1,401건**, 0개인 점검은 **84,843건**입니다. 04 단계 검증은 **39개 통과**했습니다. [04 검증 보고서](reports/04_license/README.md) · [관점별 결과](https://github.com/encore-ai-campus/mlo-03-p2-team2/wiki/Project-Details#수행-결과)
+
+### 학습용 AI-ready 데이터
+
+| 예측 과제 | 한 행과 정답 | 행 수 |
+| --- | --- | ---: |
+| 점검 직전 불합격 예측 | 점검 1건. 해당 점검이 `FAIL`이면 양성 | 273,488 |
+| 기준 점검 결과 확인 직후 위반 재관측 예측 | 기준 점검의 고유 위반 코드 1개. 비교 가능한 다음 점검에서 같은 버전의 코드가 관측되면 양성 | 287,535 |
+
+- **01 불합격 예시**　점검 `2646979`의 입력에는 직전 365일 점검 `1건`, 불합격 `0건`이 들어갑니다. 당일 실제 결과가 `FAIL`이어서 정답 `label_fail_flag`는 `true`입니다. [01 학습 Parquet](https://github.com/encore-ai-campus/mlo-03-p2-team2/blob/main/data/ai_ready/inspection_training/ac0d0f3f4f33656e78a6/01_preinspection_failure.parquet)
+- **03 위반 재관측 예시**　02 Gold에는 점검 `2609905`와 `2618455`에 코드 `38`이 각각 한 행씩 있습니다. 03 Gold가 두 점검을 연결합니다. 학습 행은 `2609905`의 코드 `38` 한 건으로, 기준일 전 같은 코드의 관측 횟수는 `0`입니다. `2025-06-03` 후속 점검에서 코드 `38`이 관측돼 정답 `label_repeat_flag`는 `true`입니다. [02 위반 Parquet](https://github.com/encore-ai-campus/mlo-03-p2-team2/blob/main/data/03_gold/02_violation/02_violations_analysis_mart.parquet) · [03 비교 Parquet](https://github.com/encore-ai-campus/mlo-03-p2-team2/blob/main/data/03_gold/03_repeat_inspection/03_repeat_violation_mart.parquet) · [03 학습 Parquet](https://github.com/encore-ai-campus/mlo-03-p2-team2/blob/main/data/ai_ready/inspection_training/ac0d0f3f4f33656e78a6/03_next_inspection_violation_recurrence.parquet)
+
+두 데이터셋의 과거 이력은 같은 면허번호의 기준일 전 365일에서 계산합니다. 위반 재관측 데이터는 후속 위반을 비교할 수 있는 사례를 사용합니다. 기준일과 정답 관측일이 같은 구간에 속하도록 2023년과 2025년의 시작일을 기준으로 학습·검증·테스트를 나눴습니다.
+
+[과제별 입력과 정답](https://github.com/encore-ai-campus/mlo-03-p2-team2/blob/main/docs/ai_ready/inspection_training.md) · [시간순 분할과 검증 결과](https://github.com/encore-ai-campus/mlo-03-p2-team2/blob/main/reports/ai_ready/inspection_training/README.md)
 
 ## 9. 한 줄 회고
 
