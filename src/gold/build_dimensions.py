@@ -2,6 +2,7 @@
 
 from argparse import ArgumentParser
 from filecmp import cmp
+from hashlib import file_digest
 from pathlib import Path
 from shutil import copyfile, copyfileobj
 from tempfile import NamedTemporaryFile, TemporaryDirectory
@@ -22,6 +23,7 @@ INSPECTION_KEYS = {
     "result": "result_cd_key",
 }
 LICENSE_KEYS = {"license": "license_number_key", "establishment": "establishment_key"}
+VIOLATION_FACT = "02_fact_inspection_violation"
 REPEAT_FACTS = {
     "03_fact_reinspection": "03_inspection_reinspection_mart",
     "03_fact_repeat_violation": "03_repeat_violation_mart",
@@ -90,7 +92,7 @@ def verify_fact(path, grain, references, nullable=()):
 
 
 def violation_fact(gold, scratch):
-    fact = gold / "02_violation/02_fact_inspection_violation.parquet"
+    fact = gold / "02_violation" / f"{VIOLATION_FACT}.parquet"
     if fact.is_file():
         return fact
     restored = scratch / fact.name
@@ -99,6 +101,17 @@ def violation_fact(gold, scratch):
             with fact.with_suffix(f".parquet{suffix}").open("rb") as source:
                 copyfileobj(source, output, length=1024 * 1024)
     return restored
+
+
+def compact_violation_fact(source, target):
+    # Preserve the source rows and schema while storing the shared fact as one Parquet.
+    dictionary_columns = ["source_row_num", "item_sequence_num", "inspection_id", "violation_key"]
+    with pq.ParquetFile(source) as original, pq.ParquetWriter(
+        target, original.schema_arrow, compression="zstd", compression_level=9,
+        use_dictionary=dictionary_columns,
+    ) as writer:
+        for batch in original.iter_batches(batch_size=100_000):
+            writer.write_batch(batch)
 
 
 def build_dimensions(gold, inspection_star, regional):
@@ -157,7 +170,7 @@ def validate_facts(facts, dimensions, regional):
         **{key: dimensions[name][key] for name, key in INSPECTION_KEYS.items()},
     })
     inspection_ids = inspection["inspection_key"]
-    verify_fact(facts["02_fact_inspection_violation"], ("source_row_num", "item_sequence_num"), {
+    verify_fact(facts[VIOLATION_FACT], ("source_row_num", "item_sequence_num"), {
         "inspection_id": inspection_ids,
         "violation_key": dimensions["violation"]["violation_key"],
     })
@@ -223,9 +236,17 @@ def publish(target, *, table=None, source=None, link=False):
 def build(gold, inspection_star, regional, output):
     dimensions, overlap = build_dimensions(gold, inspection_star, regional)
     with TemporaryDirectory() as directory:
+        scratch = Path(directory)
+        compact = scratch / "compact" / f"{VIOLATION_FACT}.parquet"
+        compact.parent.mkdir()
+        compact_violation_fact(violation_fact(gold, scratch), compact)
+        with compact.open("rb") as stream:
+            digest = file_digest(stream, "sha256").hexdigest()
+        checksum = compact.with_suffix(".parquet.sha256")
+        checksum.write_text(f"{digest}  {compact.name}\n", encoding="ascii", newline="\n")
         facts = {
             "01_fact_inspection": inspection_star / "01_fact_inspection.parquet",
-            "02_fact_inspection_violation": violation_fact(gold, Path(directory)),
+            VIOLATION_FACT: compact,
             **{name: gold / "03_repeat_inspection" / f"{source}.parquet" for name, source in REPEAT_FACTS.items()},
             **{f"04_{name}": gold / "04_license" / f"04_{name}.parquet"
                for name in ("fact_license_event", "fact_inspection_license_match")},
@@ -239,6 +260,7 @@ def build(gold, inspection_star, regional, output):
             publish(output / "facts" / f"{name}.parquet", source=source, link=name.startswith(("03_", "05_")))
             with pq.ParquetFile(source) as parquet:
                 print(f"{name}.parquet: {parquet.metadata.num_rows:,} rows")
+        publish(output / "facts" / checksum.name, source=checksum)
     print(f"Published {len(dimensions)} dimensions and {len(facts)} facts under {output}")
     print(f"Shared calendar dates collapsed: {overlap:,}")
 
