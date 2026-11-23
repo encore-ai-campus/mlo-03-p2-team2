@@ -12,7 +12,7 @@
 
 - Bronze는 원천 CSV 문자열과 GeoJSON 경계를 보존한다. `_SRC_FILE`, `_LOAD_DTM`을 기록하고 각 원천의 논리 레코드에 1부터 순번을 붙인다. 적재 뒤 원천 값, 순서, 키 중복 및 행 수를 대조한다.
 - Silver는 기존 01 점검 표준화와 04 인허가 사전 변환을 사용한다. 지역 번호는 정수로 저장하고, 지역명 양끝 공백을 제거하며 경계 JSON은 보존한다. Silver 세 테이블에서 원천 순번을 유지하고 키 유일성과 행 수를 검사한다.
-- 점검 품질 플래그는 `inspection_rule_flags.parquet`에 행별로 기록한다. `verification.json`에는 원천·단계별 체크섬과 점검 품질 플래그 수가 들어간다. 인허가 기간 대조 및 지역 배정 품질은 해당 관점에서 검증한다.
+- 점검 품질 플래그는 [inspection_rule_flags.parquet](../../data/02_silver/06_integration/inspection_rule_flags.parquet)에 행별로 기록한다. `verification.json`에는 원천·단계별 체크섬과 점검 품질 플래그 수가 들어간다. 인허가 기간 대조 및 지역 배정 품질은 해당 관점에서 검증한다.
 
 ## 실행
 
@@ -23,7 +23,7 @@ python -m pip install -r src/domains/05_geospatial/requirements.txt -r src/domai
 python -m src.domains.06_integration.build --output reports/runs/06_integration/shared-bronze-silver
 ```
 
-출력에는 `data/01_bronze/06_integration/`과 `data/02_silver/06_integration/`이 생긴다. 다시 실행할 때는 새 출력 경로를 지정한다. 동일 원천의 Bronze 원천 값과 순서는 같고 적재 시각은 실행별로 기록된다.
+출력에는 `data/01_bronze/06_integration/`과 `data/02_silver/06_integration/`이 생긴다. 실행 중 생성한 점검 품질 플래그는 배포 시 Silver 폴더에 함께 둔다. 다시 실행할 때는 새 출력 경로를 지정한다. 동일 원천의 Bronze 원천 값과 순서는 같고 적재 시각은 실행별로 기록된다.
 
 ## 팀 공유 경로를 정할 때
 
@@ -57,17 +57,17 @@ python -m src.silver.validate_integration_silver
 
 | ID | 요구사항 | 검증 코드 |
 | --- | --- | --- |
-| B-01 | 원천과 Bronze의 논리 행 수, 순서 및 원문 값 확인 | [check_integration_bronze.py](../../bronze/check_integration_bronze.py) |
-| B-02 | 원천 파일명 `_SRC_FILE`, UTC 적재 시각 `_LOAD_DTM`, 원천 순번 확인 | [check_integration_bronze.py](../../bronze/check_integration_bronze.py) |
-| S-01 | Silver 컬럼명을 01 표준 매핑, 04 사전, 지역 경계 규칙과 대조 | [validate_integration_silver.py](../../silver/validate_integration_silver.py) |
-| S-02 | 점검·인허가 달력 날짜의 Parquet `date32` 검증. 문서 표기는 `YYYY-MM-DD` | [validate_integration_silver.py](../../silver/validate_integration_silver.py) |
-| S-03 | 관점별 기본 키 중복 검사와 점검의 완전 중복·키 충돌 플래그 집계 | [validate_integration_silver.py](../../silver/validate_integration_silver.py) |
+| B-01 | 원천과 Bronze의 논리 행 수, 순서 및 원문 값 확인 | [check_integration_bronze.py](../../src/bronze/check_integration_bronze.py) |
+| B-02 | 원천 파일명 `_SRC_FILE`, UTC 적재 시각 `_LOAD_DTM`, 원천 순번 확인 | [check_integration_bronze.py](../../src/bronze/check_integration_bronze.py) |
+| S-01 | Silver 컬럼명을 01 표준 매핑, 04 사전, 지역 경계 규칙과 대조 | [validate_integration_silver.py](../../src/silver/validate_integration_silver.py) |
+| S-02 | 점검·인허가 달력 날짜의 Parquet `date32` 검증. 문서 표기는 `YYYY-MM-DD` | [validate_integration_silver.py](../../src/silver/validate_integration_silver.py) |
+| S-03 | 관점별 기본 키 중복 검사와 점검의 완전 중복·키 충돌 플래그 집계 | [validate_integration_silver.py](../../src/silver/validate_integration_silver.py) |
 
 Silver는 원천 행을 모두 보존한다. 점검 품질 플래그는 원천 순번으로 확인한다. 같은 면허번호의 여러 발급·갱신 기록은 인허가 이력으로 보존한다. 이전 검증 산출물은 실행 당시 경로를 유지한다.
 
 ## 관점별 비교 실행
 
-경로 개편 전 검증 산출물은 로컬 `reports/runs/integration/consumer-check/`에 저장했다. 비교 시 Parquet 메타데이터의 실행·입력 지문 차이는 제외하고 컬럼과 값을 대조했다.
+경로 개편 전 검증 산출물은 로컬 `reports/runs/06_integration/consumer-check/`에서 확인할 수 있다. 비교 시 Parquet 메타데이터의 실행·입력 지문 차이는 제외하고 컬럼과 값을 대조했다.
 
 | 관점 | 공급한 입력 | 비교 결과 |
 | --- | --- | --- |
