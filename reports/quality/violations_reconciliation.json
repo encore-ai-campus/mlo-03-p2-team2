@@ -1,0 +1,72 @@
+{
+  "status": "PASS",
+  "source_bronze": "data/01_bronze/food_inspections/food_inspections.parquet",
+  "source_bronze_sha256": "8bce236e42751111b74742fbe55081ee0d800e1da48fe7c12b8d3604c8f6d682",
+  "origin_sha256": "b43beb7fae834a8698ca162004caf2929cb2eca7ff75c27b4db6bf07aa103c98",
+  "accepted_file": "data/02_silver/food_inspections/violations/inspection_violations_accepted.parquet",
+  "quarantine_file": "data/quarantine/food_inspections/violations/inspection_violations_quarantine.parquet",
+  "counts": {
+    "bronze_inspections": 318627,
+    "nonblank_inspections": 228605,
+    "candidate_fragments": 1031073,
+    "accepted": 1029281,
+    "empty_inspections": 90022,
+    "empty_strings": 90022,
+    "quarantined": 1792
+  },
+  "quarantine_reasons": {
+    "MISSING_COMMENTS_MARKER": 1792
+  },
+  "unexpected_quarantine_reasons": {},
+  "unexpected_quarantine_count": 0,
+  "issues": {
+    "duplicate_grain": 0,
+    "misclassified_accepted": 0,
+    "misclassified_quarantine": 0,
+    "inspection_reconciliation": 0,
+    "fragment_reconciliation": 0,
+    "accepted_count": 0,
+    "quarantine_count": 0,
+    "unexpected_accepted_status": 0,
+    "quarantine_reason_count": 0,
+    "bronze_metadata_count": 0,
+    "lineage_or_missing_fragment": 0,
+    "input_hash_changed": 0
+  },
+  "accepted_schema": "inspection_id: string\nbronze_row_number: int64 not null\nitem_sequence_num: int32 not null\n_SRC_FILE: string\n_LOAD_DTM: string\nsource_violations_fragment: string not null\nviolation_code: string\nviolation_description: string\nviolation_comments: string\nparsing_status: string not null",
+  "quarantine_schema": "inspection_id: string\nbronze_row_number: int64 not null\nitem_sequence_num: int32 not null\n_SRC_FILE: string\n_LOAD_DTM: string\nsource_violations_fragment: string not null\nviolation_code: string\nviolation_description: string\nviolation_comments: string\nparsing_status: string not null\nrejection_reason: string not null",
+  "accepted_content_sha256": "e75ab3f09292bf953fecc740de7445e466f7ebd3564057e4c41b7dffdae26412",
+  "quarantine_content_sha256": "2b1fe7885f78fa6c408f5c5b82b545548737452842aa0da163d06ba6f972dda6",
+  "accepted_statuses": {
+    "PARSED": 1029281
+  },
+  "quarantine_statuses": {
+    "MISSING_COMMENTS_MARKER": 1792
+  },
+  "accepted_nulls": {
+    "inspection_id": 0,
+    "bronze_row_number": 0,
+    "item_sequence_num": 0,
+    "_SRC_FILE": 0,
+    "_LOAD_DTM": 0,
+    "source_violations_fragment": 0,
+    "violation_code": 0,
+    "violation_description": 0,
+    "violation_comments": 0,
+    "parsing_status": 0
+  },
+  "quarantine_nulls": {
+    "inspection_id": 0,
+    "bronze_row_number": 0,
+    "item_sequence_num": 0,
+    "_SRC_FILE": 0,
+    "_LOAD_DTM": 0,
+    "source_violations_fragment": 0,
+    "violation_code": 0,
+    "violation_description": 1792,
+    "violation_comments": 1792,
+    "parsing_status": 0,
+    "rejection_reason": 0
+  },
+  "lineage_sha256": "d598f6d04cc9a99e7e316484095da2b4bcca850bd38389a368499fb9018693f4"
+}

@@ -1,0 +1,138 @@
+{
+  "4ijn-s7e5": {
+    "id": "4ijn-s7e5",
+    "name": "Food Inspections",
+    "assetType": "dataset",
+    "description": "This information is derived from inspections of restaurants and other food establishments in Chicago from January 1, 2010 to the present. Inspections are performed by staff from the Chicago Department of Public Health’s Food Protection Program using a standardized procedure. The results of the inspection are inputted into a database, then reviewed and approved by a State of Illinois Licensed Environmental Health Practitioner (LEHP). For descriptions of the data elements included in this set, please click <a href=\"https://data.cityofchicago.org/api/assets/BAD5301B-681A-4202-9D25-51B2CAE672FF\">here</a>.\n\nNote about 7/1/2018 change to food inspection procedures that affects the data in this dataset: http://bit.ly/2yWd2JB\n\nDisclaimer: Attempts have been made to minimize any and all duplicate inspection reports. However, the dataset may still contain such duplicates and the appropriate precautions should be exercised when viewing or analyzing these data. The result of the inspections (pass, pass with conditions or fail) as well as the violations noted are based on the findings identified and reported by the inspector at the time of the inspection, and may not reflect the findings noted at other times. For more information about Food Inspections, go to https://www.chicago.gov/city/en/depts/cdph/provdrs/food_safety.html.",
+    "rowsUpdatedAt": 1795082999,
+    "viewLastModified": 1733402523,
+    "columns": [
+      {
+        "name": "Inspection ID",
+        "fieldName": "inspection_id",
+        "dataTypeName": "number"
+      },
+      {
+        "name": "DBA Name",
+        "fieldName": "dba_name",
+        "dataTypeName": "text"
+      },
+      {
+        "name": "AKA Name",
+        "fieldName": "aka_name",
+        "dataTypeName": "text"
+      },
+      {
+        "name": "License #",
+        "fieldName": "license_",
+        "dataTypeName": "number"
+      },
+      {
+        "name": "Facility Type",
+        "fieldName": "facility_type",
+        "dataTypeName": "text"
+      },
+      {
+        "name": "Risk",
+        "fieldName": "risk",
+        "dataTypeName": "text"
+      },
+      {
+        "name": "Address",
+        "fieldName": "address",
+        "dataTypeName": "text"
+      },
+      {
+        "name": "City",
+        "fieldName": "city",
+        "dataTypeName": "text"
+      },
+      {
+        "name": "State",
+        "fieldName": "state",
+        "dataTypeName": "text"
+      },
+      {
+        "name": "Zip",
+        "fieldName": "zip",
+        "dataTypeName": "number"
+      },
+      {
+        "name": "Inspection Date",
+        "fieldName": "inspection_date",
+        "dataTypeName": "calendar_date"
+      },
+      {
+        "name": "Inspection Type",
+        "fieldName": "inspection_type",
+        "dataTypeName": "text"
+      },
+      {
+        "name": "Results",
+        "fieldName": "results",
+        "dataTypeName": "text"
+      },
+      {
+        "name": "Violations",
+        "fieldName": "violations",
+        "dataTypeName": "text"
+      },
+      {
+        "name": "Latitude",
+        "fieldName": "latitude",
+        "dataTypeName": "number"
+      },
+      {
+        "name": "Longitude",
+        "fieldName": "longitude",
+        "dataTypeName": "number"
+      },
+      {
+        "name": "Location",
+        "fieldName": "location",
+        "dataTypeName": "location"
+      },
+      {
+        "name": "Historical Wards 2003-2015",
+        "fieldName": ":@computed_region_awaf_s7ux",
+        "dataTypeName": "number"
+      },
+      {
+        "name": "Zip Codes",
+        "fieldName": ":@computed_region_6mkv_f3dw",
+        "dataTypeName": "number"
+      },
+      {
+        "name": "Community Areas",
+        "fieldName": ":@computed_region_vrxf_vc4k",
+        "dataTypeName": "number"
+      },
+      {
+        "name": "Census Tracts",
+        "fieldName": ":@computed_region_bdys_3d7i",
+        "dataTypeName": "number"
+      },
+      {
+        "name": "Wards",
+        "fieldName": ":@computed_region_43wa_7qmu",
+        "dataTypeName": "number"
+      }
+    ]
+  },
+  "cauq-8yn6": {
+    "id": "cauq-8yn6",
+    "name": "Boundaries - Community Areas - Map",
+    "assetType": "map",
+    "description": "Map of Chicago community areas.",
+    "rowsUpdatedAt": 1745363197,
+    "viewLastModified": 1745362969,
+    "columns": []
+  },
+  "local_boundary_reference": {
+    "file": "export.csv",
+    "portal_dataset_candidate": "igwz-8jzy",
+    "portal_map": "cauq-8yn6",
+    "download_url": null,
+    "crs": null
+  }
+}

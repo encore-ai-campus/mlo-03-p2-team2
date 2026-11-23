@@ -47,6 +47,7 @@ download_manifest.csv
 !/data/**/*.duckdb
 !/data/**/*.sha256
 /reports/runs/
+/logs/
 
 # Temporary and editor files
 *.part
@@ -62,6 +63,7 @@ Thumbs.db
 
 # The team tracks one shared Origin snapshot. Restored CSV files remain local.
 /data/00_origin/*
+!/data/00_origin/.gitkeep
 !/data/00_origin/SHA256SUMS
 !/data/00_origin/food_inspections.csv.gz.part-00[12]
 !/data/00_origin/business_licenses.csv.gz.part-00[12]
@@ -70,6 +72,12 @@ Thumbs.db
 !/data/00_origin/food_columns.json
 !/data/00_origin/license_columns.json
 
-# Published Domain 04 snapshot. The reassembled Bronze file stays local.
+# Published Parquet parts. Reassembled copies stay local.
+/data/02_silver/02_violation/02_inspection_violations.parquet
+/data/02_silver/02_violation/02_inspection_violations_accepted.parquet
+/data/03_gold/02_violation/02_fact_inspection_violation.parquet
+!/data/02_silver/02_violation/02_inspection_violations.parquet.part-00[12]
+!/data/02_silver/02_violation/02_inspection_violations_accepted.parquet.part-00[12]
+!/data/03_gold/02_violation/02_fact_inspection_violation.parquet.part-00[12]
 /data/01_bronze/04_license/04_business_licenses.parquet
 !/data/01_bronze/04_license/04_business_licenses.parquet.part-00[12]

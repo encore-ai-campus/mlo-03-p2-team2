@@ -1,0 +1,26 @@
+﻿source_dataset,source_column,raw_value,mapped_code,mapping_status,observed_rows,registration_scope,review_note
+food_inspections,Results,Business Not Located,,review,96,제공된 4개 문서만 확인,전체 공용 코드표 미제공; 코드와 의미 확인 필요
+food_inspections,Results,Fail,,review,61328,제공된 4개 문서만 확인,전체 공용 코드표 미제공; 코드와 의미 확인 필요
+food_inspections,Results,No Entry,,review,14334,제공된 4개 문서만 확인,전체 공용 코드표 미제공; 코드와 의미 확인 필요
+food_inspections,Results,Not Ready,,review,4663,제공된 4개 문서만 확인,전체 공용 코드표 미제공; 코드와 의미 확인 필요
+food_inspections,Results,Out of Business,,review,26035,제공된 4개 문서만 확인,전체 공용 코드표 미제공; 코드와 의미 확인 필요
+food_inspections,Results,Pass,,review,164940,제공된 4개 문서만 확인,전체 공용 코드표 미제공; 코드와 의미 확인 필요
+food_inspections,Results,Pass w/ Conditions,PASS W/ CONDITIONS,review,47156,제공된 4개 문서만 확인,팀 문서의 명시적 예시; 의미/승인은 재검토
+food_inspections,Risk,,,missing_raw,88,제공된 4개 문서만 확인,원천 공란; 코드 미등록과 구분
+food_inspections,Risk,All,ALL,review,90,제공된 4개 문서만 확인,팀 문서의 명시적 예시; 의미/승인은 재검토
+food_inspections,Risk,Risk 1 (High),RISK_1,review,237276,제공된 4개 문서만 확인,팀 문서의 명시적 예시; 의미/승인은 재검토
+food_inspections,Risk,Risk 2 (Medium),,review,56416,제공된 4개 문서만 확인,전체 공용 코드표 미제공; 코드와 의미 확인 필요
+food_inspections,Risk,Risk 3 (Low),,review,24682,제공된 4개 문서만 확인,전체 공용 코드표 미제공; 코드와 의미 확인 필요
+business_licenses,APPLICATION TYPE,C_CAPA,,review,519,제공된 4개 문서만 확인,전체 공용 코드표 미제공; 코드와 의미 확인 필요
+business_licenses,APPLICATION TYPE,C_EXPA,,review,944,제공된 4개 문서만 확인,전체 공용 코드표 미제공; 코드와 의미 확인 필요
+business_licenses,APPLICATION TYPE,C_LOC,,review,16447,제공된 4개 문서만 확인,전체 공용 코드표 미제공; 코드와 의미 확인 필요
+business_licenses,APPLICATION TYPE,C_SBA,,review,801,제공된 4개 문서만 확인,전체 공용 코드표 미제공; 코드와 의미 확인 필요
+business_licenses,APPLICATION TYPE,ISSUE,,review,271210,제공된 4개 문서만 확인,전체 공용 코드표 미제공; 코드와 의미 확인 필요
+business_licenses,APPLICATION TYPE,RENEW,RENEW,review,922211,제공된 4개 문서만 확인,팀 문서의 명시적 예시; 의미/승인은 재검토
+business_licenses,LICENSE STATUS,AAC,,review,79169,제공된 4개 문서만 확인,전체 공용 코드표 미제공; 코드와 의미 확인 필요
+business_licenses,LICENSE STATUS,AAI,AAI,review,1131478,제공된 4개 문서만 확인,팀 문서의 명시적 예시; 의미/승인은 재검토
+business_licenses,LICENSE STATUS,INQ,INQ,review,1,제공된 4개 문서만 확인,팀 문서의 명시적 예시; 의미/승인은 재검토
+business_licenses,LICENSE STATUS,REA,,review,13,제공된 4개 문서만 확인,전체 공용 코드표 미제공; 코드와 의미 확인 필요
+business_licenses,LICENSE STATUS,REV,,review,1471,제공된 4개 문서만 확인,전체 공용 코드표 미제공; 코드와 의미 확인 필요
+business_licenses,CONDITIONAL APPROVAL,N,,review,1207129,제공된 4개 문서만 확인,전체 공용 코드표 미제공; 코드와 의미 확인 필요
+business_licenses,CONDITIONAL APPROVAL,Y,Y,review,5003,제공된 4개 문서만 확인,팀 문서의 명시적 예시; 의미/승인은 재검토
