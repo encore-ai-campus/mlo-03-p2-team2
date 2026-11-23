@@ -15,6 +15,7 @@ from modeling import (EVENT, MATCH, SCHEMAS, UNKNOWN, Indexes, gold_path,
 from normalization import load_dictionary, normalize_batch, silver_schema
 from pipeline_io import ROW, bronze_batches, sha256, staging
 from quality import compare, render_reports
+from shared_inspections import FLAGS_OUTPUT, shared_inspections
 
 
 @dataclass(frozen=True)
@@ -78,9 +79,17 @@ def silver_checks(config):
             checks.append(Check(name, "row count", abs(expected - actual),
                                 f"Bronze: {expected}, Silver: {actual}"))
             checks.append(Check(name, "dictionary schema", int(not silver.schema_arrow.equals(schema))))
-            batches = (normalize_batch(batch, mapping[name], schema) for batch in bronze.iter_batches())
+            if name == "food_inspections" and config.inspection_silver:
+                shared, flags = shared_inspections(config, schema)
+                batches = iter(shared.to_batches())
+                actual_flags = pq.read_table(target.with_name(FLAGS_OUTPUT))
+                checks.append(Check(name, "shared inspection quality flags", int(not flags.equals(actual_flags))))
+                rule = "shared inspection values and source row lineage"
+            else:
+                batches = (normalize_batch(batch, mapping[name], schema) for batch in bronze.iter_batches())
+                rule = "dictionary values and source row lineage"
             matches = equal_batches(batches, silver.iter_batches())
-            checks.append(Check(name, "dictionary values and source row lineage", int(not matches)))
+            checks.append(Check(name, rule, int(not matches)))
     return checks
 
 

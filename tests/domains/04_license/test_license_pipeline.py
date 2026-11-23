@@ -354,3 +354,41 @@ def test_incoming_rows_flow_to_gold_and_preserve_original_snapshots(project, tmp
     failed = execute("run_pipeline", project, ok=False, extra=options)
     assert failed.returncode == 1 and "conflicting incoming rows" in failed.stderr
     assert snapshot(combined) == compared
+
+def test_independent_pipeline_reuses_01_inspection_codes_and_flags(project, tmp_path):
+    pytest.importorskip("pandas")
+    raw, data, _ = project
+    inspections = raw / "food_inspections.csv"
+    write_csv(inspections, ("Inspection ID", "License #", "Inspection Date", "Results"), [
+        ("101", "111", "01/01/2024", "Pass"),
+        ("102", "111", "01/02/2024", "  "),
+        ("103", "111", "01/03/2024", "Pending Review"),
+    ])
+    shared = tmp_path / "shared" / "food_inspections.parquet"
+    shared.parent.mkdir()
+    # Use the production 01 transform with the same rows fed to the 04 CLI.
+    subprocess.run([sys.executable, "-c", """
+from pathlib import Path
+import sys
+import pandas as pd
+sys.path.insert(0, sys.argv[1])
+from silver import COLUMNS, standardize
+raw = pd.read_csv(sys.argv[2], dtype='string', keep_default_na=False)
+for name in COLUMNS:
+    if name not in raw:
+        raw[name] = ''
+raw['source_row_num'] = range(1, len(raw) + 1)
+silver, flags = standardize(raw)
+output = Path(sys.argv[3])
+silver.to_parquet(output, index=False)
+pd.DataFrame(flags).assign(source_row_num=raw['source_row_num']).to_parquet(
+    output.with_name('inspection_rule_flags.parquet'), index=False)
+""", str(SCRIPTS.parent / "01_inspection"), str(inspections), str(shared)], check=True)
+    execute("run_pipeline", project, extra=("--inspection-silver", str(shared)))
+    silver = data / "02_silver/04_license"
+    assert pq.read_table(silver / "04_food_inspections.parquet")["result_cd"].to_pylist() == ["PASS", None, None]
+    expected = pq.read_table(shared.with_name("inspection_rule_flags.parquet"))
+    flags = pq.read_table(silver / "04_inspection_rule_flags.parquet")
+    assert flags.equals(expected)
+    assert flags["missing_result_cd"].to_pylist() == [False, True, False]
+    assert flags["unmapped_result_cd"].to_pylist() == [False, False, True]

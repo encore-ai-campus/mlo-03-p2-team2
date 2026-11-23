@@ -62,6 +62,10 @@ python "$domain/validate_gold.py" @options
 
 기본 원천 폴더는 `data/00_origin/`입니다. 원천 경로를 따로 지정하면 `--raw-dir`, `CHICAGO_RAW_DIR` 환경 변수, `.env` 순서로 적용됩니다. `data/01_bronze/`, `data/02_silver/`, `data/03_gold/`에는 이번 **318,627행** 공용본으로 만든 결과를 둡니다. 같은 입력과 라이브러리 버전으로 다시 돌리면 기존 Parquet와 체크섬을 대조합니다. 새 스냅샷을 검증할 때는 출력 위치를 따로 지정할 수 있습니다.
 
+기본 팀 원천으로 04를 독립 실행할 때 점검은 공용 `06_integration` Silver와 같은 폴더의 `inspection_rule_flags.parquet`를 읽습니다. 공용본 복원 절차는 [통합 가이드](06_integration.md)에 있습니다. 04 Silver에는 필요한 점검 컬럼과 `04_inspection_rule_flags.parquet`를 저장합니다. 공란과 코드표 미등록값은 모두 결과 코드가 `null`이며, 각각 `missing_result_cd`와 `unmapped_result_cd`로 구분합니다.
+
+별도 원천·설정·사전을 사용할 때 공용 점검 Silver를 쓰려면 `--inspection-silver <Parquet 경로>`를 지정합니다. 점검 원천과 행 순서가 맞고 같은 폴더에 품질 플래그가 있어야 합니다. 별도 입력에서 이 옵션을 생략하면 기존 04 자체 변환을 사용합니다. 기존 04 Silver를 보관하며 전환을 확인할 때는 새 `--data-dir`과 `--report-dir`에 실행합니다.
+
 ## 전체 실행, 검증, 추가 데이터 반영
 
 위와 같은 `$domain`, `$options`로 아래 명령을 실행할 수 있습니다. 실행 중 검증에 실패하면 다음 단계로 넘어가기 전에 종료합니다.

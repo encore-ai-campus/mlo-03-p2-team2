@@ -33,6 +33,7 @@ class Config:
     dictionary: Path
     data: Path
     reports: Path
+    inspection_silver: Path | None = None
 
     def stage_dir(self, stage):
         return self.data / STAGE_DIRS[stage]
@@ -98,10 +99,16 @@ def settings(args):
             raise ValueError(f"{name}: columns must be a nonempty list of distinct names.")
         sources[name] = Source(path, kind, tuple(columns) if columns else None,
                                spec.get("sheet"), spec.get("encoding", "utf-8"))
-    return Config(sources, args.dictionary.resolve(), data, reports)
+    inspection_silver = args.inspection_silver
+    if (inspection_silver is None and raw == PROJECT / "data/00_origin"
+            and source_config == example_sources and args.dictionary.resolve() == Path(__file__).with_name("데이터 사전.csv")):
+        inspection_silver = PROJECT / "data/02_silver/06_integration/food_inspections.parquet"
+    return Config(sources, args.dictionary.resolve(), data, reports,
+                  inspection_silver.resolve() if inspection_silver else None)
 
 
 def add_config_arguments(parser):
+    parser.add_argument("--inspection-silver", type=Path, help="Shared inspection Silver with sibling inspection_rule_flags.parquet")
     parser.add_argument("--raw-dir", type=Path, help="Directory containing the immutable input files")
     parser.add_argument("--sources-config", type=Path, help="YAML source mapping")
     parser.add_argument("--dictionary", type=Path, default=Path(__file__).with_name("데이터 사전.csv"))
