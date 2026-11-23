@@ -1,0 +1,20 @@
+{
+  "stage": "gold",
+  "status": "passed",
+  "checks": [
+    "upstream_manifest_and_artifact_hashes",
+    "source_row_reconciliation",
+    "unique_inspection_keys",
+    "nonempty_fact",
+    "dimension_references",
+    "aggregate_count_reconciliation"
+  ],
+  "row_counts": {
+    "source_rows": 318627,
+    "excluded_quality_rows": 0,
+    "gold_rows": 318627,
+    "decision_rows": 273488
+  },
+  "source_sha256": "b43beb7fae834a8698ca162004caf2929cb2eca7ff75c27b4db6bf07aa103c98",
+  "manifest": "data/03_gold/01_inspection/metadata/inspection_gold_manifest.json"
+}

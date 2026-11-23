@@ -37,4 +37,4 @@ def digest(path):
 
 
 def write_table(frame, target):
-    frame.to_parquet(target, index=False)
+    frame.to_parquet(target, index=False, compression="zstd")

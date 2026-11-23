@@ -1,0 +1,11 @@
+{
+  "source": "data/00_origin/food_inspections.csv",
+  "source_sha256": "b43beb7fae834a8698ca162004caf2929cb2eca7ff75c27b4db6bf07aa103c98",
+  "ingested_at": "2026-11-23T00:07:09.232123+00:00",
+  "source_rows": 318627,
+  "artifacts": {
+    "data/01_bronze/01_inspection/01_food_inspections.parquet": "ab4c9cf4db19f7875605d0f7222b912023bc9bec231d11e5dde558f549f6fff3",
+    "reports/01_inspection/validation_bronze.json": "e8ea005a00dfdcf0801114e729631eedc26e40c2048b4b0b925f5dae2736cc0a"
+  },
+  "parent_sha256": null
+}

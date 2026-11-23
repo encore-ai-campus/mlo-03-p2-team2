@@ -1,0 +1,14 @@
+{
+  "stage": "silver",
+  "status": "passed",
+  "checks": [
+    "upstream_manifest_and_artifact_hashes",
+    "source_row_preservation"
+  ],
+  "row_counts": {
+    "source_rows": 318627,
+    "silver_rows": 318627
+  },
+  "source_sha256": "b43beb7fae834a8698ca162004caf2929cb2eca7ff75c27b4db6bf07aa103c98",
+  "manifest": "data/02_silver/01_inspection/metadata/inspection_silver_manifest.json"
+}

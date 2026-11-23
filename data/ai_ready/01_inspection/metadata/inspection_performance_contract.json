@@ -1,0 +1,56 @@
+{
+  "source": "data/00_origin/food_inspections.csv",
+  "source_sha256": "b43beb7fae834a8698ca162004caf2929cb2eca7ff75c27b4db6bf07aa103c98",
+  "ingested_at": "2026-11-23T00:07:09.232123+00:00",
+  "source_rows": 318627,
+  "silver_rows": 318627,
+  "excluded_quality_rows": 0,
+  "quality_rule_counts": {
+    "exact_duplicate": 0,
+    "conflicting_inspection_key": 0,
+    "invalid_inspection_key": 0,
+    "invalid_inspection_date": 0,
+    "invalid_latitude": 0,
+    "invalid_longitude": 0,
+    "missing_result_cd": 0,
+    "unmapped_result_cd": 0,
+    "missing_risk_level_cd": 88,
+    "unmapped_risk_level_cd": 0,
+    "review_risk_level_cd": 90,
+    "missing_facility_type": 5358,
+    "missing_inspection_type": 1
+  },
+  "reporting_start_inclusive": "2010-01-04",
+  "reporting_end_inclusive": "2026-11-18",
+  "gold_rows": 318627,
+  "decision_rows": 273488,
+  "ai_ready_rows": 25632,
+  "purpose": "Descriptive analytics and grounded Q&A on historical inspection performance",
+  "grain": [
+    "inspection_year_num",
+    "inspection_month_num",
+    "facility_type",
+    "inspection_type",
+    "risk_level_cd"
+  ],
+  "period": {
+    "start_inclusive": "2010-01-04",
+    "end_inclusive": "2026-11-18"
+  },
+  "unknown_dimension_value": "__unknown__",
+  "type_normalization": "Trim, collapse whitespace and uppercase. Semantic aliases remain distinct.",
+  "decision_codes": [
+    "PASS",
+    "PASS W/ CONDITIONS",
+    "FAIL"
+  ],
+  "failure_rate": "fail_count_num / decision_count_num; null when denominator is zero",
+  "rollup": "Sum numerator and denominator separately, then divide. Counts are additive.",
+  "ranking_min_decisions": 100,
+  "zero_denominator": null,
+  "artifacts": {
+    "data/ai_ready/01_inspection/01_inspection_performance.parquet": "9a818e3fe6d0208778a3fd7675016b52f1bba408814a830f057d7abf0b7091c6",
+    "reports/01_inspection/validation_ai_ready.json": "641dc9ae68b1e4866447d98849eca82dfe4def95ae3cceca3c488bff87acc70c"
+  },
+  "parent_sha256": "a53203b8f1c6fd9cbe798bd8181e95cb03c26bfb2e4017a39de14fe460bf70a2"
+}

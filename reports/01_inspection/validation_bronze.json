@@ -1,0 +1,13 @@
+{
+  "stage": "bronze",
+  "status": "passed",
+  "checks": [
+    "source_schema",
+    "source_checksum_stability"
+  ],
+  "row_counts": {
+    "source_rows": 318627
+  },
+  "source_sha256": "b43beb7fae834a8698ca162004caf2929cb2eca7ff75c27b4db6bf07aa103c98",
+  "manifest": "data/01_bronze/01_inspection/metadata/inspection_manifest.json"
+}

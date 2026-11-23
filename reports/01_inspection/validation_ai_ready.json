@@ -1,0 +1,13 @@
+{
+  "stage": "ai_ready",
+  "status": "passed",
+  "checks": [
+    "upstream_manifest_and_artifact_hashes",
+    "unique_aggregate_grain"
+  ],
+  "row_counts": {
+    "ai_ready_rows": 25632
+  },
+  "source_sha256": "b43beb7fae834a8698ca162004caf2929cb2eca7ff75c27b4db6bf07aa103c98",
+  "manifest": "data/ai_ready/01_inspection/metadata/inspection_performance_contract.json"
+}

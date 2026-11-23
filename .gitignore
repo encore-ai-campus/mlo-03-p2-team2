@@ -20,7 +20,7 @@ __pycache__/
 .coverage*
 htmlcov/
 
-# Raw inputs and generated datasets
+# Raw inputs and generated datasets outside data/
 /origin/
 /origin.zip
 /origin.zip.*
@@ -41,13 +41,12 @@ download_manifest.csv
 *.geoparquet
 *.duckdb
 *.duckdb.wal
-/data/**
-!/data/**/
-!/data/README.md
-!/data/**/.gitkeep
+/data/origin/
+!/data/**/*.parquet
+!/data/**/*.geoparquet
+!/data/**/*.duckdb
+!/data/**/*.sha256
 /reports/runs/
-/reports/01_inspection/*.json
-/reports/01_inspection/inspection_quality_issues.csv
 
 # Temporary and editor files
 *.part
@@ -62,6 +61,7 @@ download_manifest.csv
 Thumbs.db
 
 # The team tracks one shared Origin snapshot. Restored CSV files remain local.
+/data/00_origin/*
 !/data/00_origin/SHA256SUMS
 !/data/00_origin/food_inspections.csv.gz.part-00[12]
 !/data/00_origin/business_licenses.csv.gz.part-00[12]
@@ -70,15 +70,6 @@ Thumbs.db
 !/data/00_origin/food_columns.json
 !/data/00_origin/license_columns.json
 
-# Published Domain 03 Bronze, Silver and Gold snapshot.
-!/data/01_bronze/03_repeat_inspection/03_food_inspections.parquet
-!/data/02_silver/03_repeat_inspection/03_inspection_history.parquet
-!/data/03_gold/03_repeat_inspection/03_inspection_reinspection_mart.parquet
-!/data/03_gold/03_repeat_inspection/03_repeat_violation_mart.parquet
-
 # Published Domain 04 snapshot. The reassembled Bronze file stays local.
-!/data/01_bronze/04_license/04_food_inspections.parquet
+/data/01_bronze/04_license/04_business_licenses.parquet
 !/data/01_bronze/04_license/04_business_licenses.parquet.part-00[12]
-!/data/01_bronze/04_license/ingestion_manifest.json
-!/data/02_silver/04_license/04_*.parquet
-!/data/03_gold/04_license/04_*.parquet

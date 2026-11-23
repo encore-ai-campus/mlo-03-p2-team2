@@ -1,0 +1,28 @@
+{
+  "source": "data/00_origin/food_inspections.csv",
+  "source_sha256": "b43beb7fae834a8698ca162004caf2929cb2eca7ff75c27b4db6bf07aa103c98",
+  "ingested_at": "2026-11-23T00:07:09.232123+00:00",
+  "source_rows": 318627,
+  "silver_rows": 318627,
+  "excluded_quality_rows": 0,
+  "quality_rule_counts": {
+    "exact_duplicate": 0,
+    "conflicting_inspection_key": 0,
+    "invalid_inspection_key": 0,
+    "invalid_inspection_date": 0,
+    "invalid_latitude": 0,
+    "invalid_longitude": 0,
+    "missing_result_cd": 0,
+    "unmapped_result_cd": 0,
+    "missing_risk_level_cd": 88,
+    "unmapped_risk_level_cd": 0,
+    "review_risk_level_cd": 90,
+    "missing_facility_type": 5358,
+    "missing_inspection_type": 1
+  },
+  "artifacts": {
+    "data/02_silver/01_inspection/01_validated_inspections.parquet": "74b7080df12d32a0eab3aab856fbb17ee22a5dd54f672486e969227bfa12c9a9",
+    "reports/01_inspection/inspection_quality_issues.csv": "912c72145b426bc6442c3e31e50bafe57b43665778a2c978fd0c9f6ec6948f7e"
+  },
+  "parent_sha256": "38428fd6b38f30169103b303d6e3516109ded1ee7a1ecf4cd74f6c23d6dde0cb"
+}
