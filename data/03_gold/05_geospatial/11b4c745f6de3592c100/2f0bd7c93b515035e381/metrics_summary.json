@@ -1,0 +1,50 @@
+{
+  "scope_check": {
+    "input_inspection_count": 318627,
+    "included_inspection_count": 318627,
+    "excluded_by_category_or_area_count": 0,
+    "excluded_undated_count": 0,
+    "excluded_outside_date_window_count": 0,
+    "silver_first_observed_date": "2010-01-04",
+    "silver_last_observed_date": "2026-11-18",
+    "covered_start_date": "2010-01-04",
+    "covered_end_date": "2026-11-18"
+  },
+  "inspection": {
+    "inspection_count": 318627,
+    "evaluated_count": 273488,
+    "failed_count": 61344,
+    "not_evaluated_count": 45139,
+    "unknown_result_count": 0
+  },
+  "spatial_status_counts": {
+    "unique_area": 317238,
+    "missing_coordinates": 1065,
+    "outside_boundary": 324
+  },
+  "violation_coverage": {
+    "evaluated_count": 273488,
+    "violation_recorded_count": 227696,
+    "violation_missing_count": 45792,
+    "violation_code_ready_count": 227519,
+    "violation_parsed_count": 226527,
+    "violation_partial_count": 992,
+    "violation_unrecognized_count": 177
+  },
+  "evaluated_inspection_code_rows_by_era": {
+    "from_2018_07_01": 446056,
+    "pre_2018_07_01": 512956
+  },
+  "periods": {
+    "MONTH": 203,
+    "YEAR": 17
+  },
+  "partial_periods": [
+    "MONTH 2010-01-01",
+    "MONTH 2026-11-01",
+    "YEAR 2010-01-01",
+    "YEAR 2026-01-01"
+  ],
+  "area_catalog_rows": 81,
+  "validated_against_selected_silver": true
+}

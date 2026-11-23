@@ -1,0 +1,129 @@
+{
+  "layer": "gold",
+  "batch_id": "11b4c745f6de3592c100",
+  "gold_id": "2f0bd7c93b515035e381",
+  "rules_signature": "2f0bd7c93b515035e381313731952f2d379931855897e3df5b9f5ff5209f2f46",
+  "built_at_utc": "2026-11-23T00:45:35.196000+00:00",
+  "silver_rules_id": "ce42dc2ba4b6c6c60bd4",
+  "silver_manifest_sha256": "39a75b8f5f4d4ced7c3922932637dc1e1267691f19e66d59b3aabd39ad0ffb0b",
+  "silver_rules_signature": "ce42dc2ba4b6c6c60bd480f9c72536ed619380b8a5cd10ad86a082ba7bb3454a",
+  "gold_source_code_sha256": {
+    "geographic_gold.py": "1db67fbdd78fe9dd9887eb48d1f7590190f9be974319714c2bffce6bced9086d",
+    "geographic_integration.py": "886d19cb8ac8c73cc8a7538b9385307e11821c0fb30a0a01a2a8a463503ef199",
+    "geographic_medallion.py": "6ba55d9761bc698e7f71bcd4defbfe00a87fc0466612c82155a21c6c21f16060",
+    "silver_violations.py": "b13b2b4601ef2a363cec95cef93a49dd73cc79e5da0791f9c908e7e65ef655c4"
+  },
+  "source_mode": "team",
+  "shared_inputs": {
+    "inspection_silver": {
+      "file": "01_food_inspections.parquet",
+      "sha256": "1ca356c665fe3344ba5d7d853487b6c66f9644241985b2bd77e53c64a13da2d6"
+    },
+    "violation_codes": {
+      "file": "inspection_violation_codes.parquet",
+      "sha256": "b7ad2282b6bcd090b015281bcb064cbe45f51da4f84a2074292b434f92c12b2b"
+    },
+    "violation_observations": {
+      "file": "inspection_violation_observations.parquet",
+      "sha256": "397156abcf48d691a8ade99998127c11d76dd0860cd0ad7e514c5c38940ad439"
+    }
+  },
+  "runtime": {
+    "python": "3.14.8",
+    "pandas": "3.1.1",
+    "pyarrow": "26.0.1"
+  },
+  "scope": {
+    "start_date": null,
+    "end_date": null,
+    "facility_type": null,
+    "inspection_type": null,
+    "risk_level_cd": null,
+    "community_area_num": null
+  },
+  "artifacts": {
+    "inspection_area_period.parquet": {
+      "sha256": "68e91261cab27ea9f1f2c9a9ef7f3da1a82722093c3ff3692f451a96b389d1da",
+      "size_bytes": 99319,
+      "rows": 17820,
+      "schema": {
+        "period_grain_cd": "string",
+        "period_start_dtm": "date32[day]",
+        "period_end_dtm": "date32[day]",
+        "covered_start_dtm": "date32[day]",
+        "covered_end_dtm": "date32[day]",
+        "partial_period_flag": "bool",
+        "community_area_match_status": "string",
+        "community_area_num": "int64",
+        "community_area_name": "string",
+        "boundary_version": "string",
+        "inspection_count": "int64",
+        "evaluated_count": "int64",
+        "failed_count": "int64",
+        "not_evaluated_count": "int64",
+        "unknown_result_count": "int64",
+        "failure_rate": "double"
+      }
+    },
+    "metrics_summary.json": {
+      "sha256": "871a2f722b9636920bbae5633b4716268621ec214133563e82253361bfc9d9f5",
+      "size_bytes": 1402
+    },
+    "violation_area_period.parquet": {
+      "sha256": "af7722f10f6bd53de0d1d1bffd59139b30f24ff6e8c783a91aefda5192fe50d5",
+      "size_bytes": 1739990,
+      "rows": 280469,
+      "schema": {
+        "period_grain_cd": "string",
+        "period_start_dtm": "date32[day]",
+        "period_end_dtm": "date32[day]",
+        "covered_start_dtm": "date32[day]",
+        "covered_end_dtm": "date32[day]",
+        "partial_period_flag": "bool",
+        "community_area_match_status": "string",
+        "community_area_num": "int64",
+        "community_area_name": "string",
+        "boundary_version": "string",
+        "code_system_version": "string",
+        "era_covered_start_dtm": "date32[day]",
+        "era_covered_end_dtm": "date32[day]",
+        "violation_cd": "string",
+        "violation_description_text": "string",
+        "description_variant_count": "int64",
+        "code_inspection_count": "int64",
+        "evaluated_count": "int64",
+        "violation_code_ready_count": "int64",
+        "code_recorded_rate": "double",
+        "code_recorded_among_ready_rate": "double"
+      }
+    },
+    "violation_coverage_area_period.parquet": {
+      "sha256": "6564e2ef4eaa37854600f6dd96300cdaae6b9e324b358d5cb2af87de42f85f47",
+      "size_bytes": 126228,
+      "rows": 17901,
+      "schema": {
+        "period_grain_cd": "string",
+        "period_start_dtm": "date32[day]",
+        "period_end_dtm": "date32[day]",
+        "covered_start_dtm": "date32[day]",
+        "covered_end_dtm": "date32[day]",
+        "partial_period_flag": "bool",
+        "community_area_match_status": "string",
+        "community_area_num": "int64",
+        "community_area_name": "string",
+        "boundary_version": "string",
+        "code_system_version": "string",
+        "era_covered_start_dtm": "date32[day]",
+        "era_covered_end_dtm": "date32[day]",
+        "evaluated_count": "int64",
+        "violation_recorded_count": "int64",
+        "violation_missing_count": "int64",
+        "violation_code_ready_count": "int64",
+        "violation_parsed_count": "int64",
+        "violation_partial_count": "int64",
+        "violation_unrecognized_count": "int64",
+        "violation_recorded_rate": "double"
+      }
+    }
+  }
+}

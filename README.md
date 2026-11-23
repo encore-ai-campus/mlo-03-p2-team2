@@ -57,7 +57,14 @@
 | 1.4 | 노진산 · 04 | 인허가 기간 매칭, 단계별 검증, Parquet와 체크섬 | 16:52 [산출물 반영](https://github.com/encore-ai-campus/mlo-03-p2-team2/commit/5e5e779) · 16:58 [PR #1](https://github.com/encore-ai-campus/mlo-03-p2-team2/pull/1) |
 | 1.5 | 오정민 · 05 | 공간 배정, 기간별 지역 집계, 공용 입력 계약과 검증 | 16:36 [공간 처리](https://github.com/encore-ai-campus/mlo-03-p2-team2/commit/08e03e0) · 17:54 [PR #3](https://github.com/encore-ai-campus/mlo-03-p2-team2/pull/3) |
 
-**11월 23일 진행 상태**　공용 Bronze·Silver 스냅샷을 `main`에 배포했습니다. 관점별 입력 경로 전환, 팀 Gold 통합·중복 차원 정리, 팀 공용 AI-Ready 데이터 제작은 역할 분담 완료 상태입니다. [공용 Bronze·Silver PR #11](https://github.com/encore-ai-campus/mlo-03-p2-team2/pull/11) · [팀 통합 작업](https://github.com/encore-ai-campus/mlo-03-p2-team2/wiki/Project-Details#팀-통합-작업)
+**11월 23일 진행 상태**
+
+| 작업 | 확인한 상태 |
+| --- | --- |
+| 공용 Bronze·Silver | 점검·인허가·지역 경계 스냅샷을 `06_integration` 경로에 배포했습니다. [PR #11](https://github.com/encore-ai-campus/mlo-03-p2-team2/pull/11) · [통합 가이드](docs/domains/06_integration.md) |
+| 공용 Gold·중복 차원 | 기존 관점별 Gold를 입력으로 공용 차원 9개와 Fact 9개를 만드는 코드가 반영됐습니다. 재실행에서 키 검증을 통과했고 공통 날짜 4,528개를 하나씩으로 합쳤습니다. [Gold 생성·검증 코드](src/gold/build_dimensions.py) |
+| 관점별 입력 전환 | 공용본으로 결과를 비교했습니다. 02번 매니페스트의 해시 필드와 04번 점검 키 타입을 맞춰 각 실행 경로에 적용하는 작업이 남았습니다. [관점별 비교 기준](docs/domains/06_integration.md#관점별-비교-실행) |
+| 팀 공용 AI-Ready | 역할 분담 완료. 01번 질의용 집계와 02번 피처 초안을 바탕으로 팀 학습용 정답·시점·분할 기준을 정할 차례입니다. [02번 피처 초안](docs/domains/02_violation/ai_ready_feature_draft.md) |
 
 ## 5. 요구사항 명세
 
@@ -70,13 +77,14 @@
 | B-02 | Bronze | 원천과 Bronze 파일의 SHA-256, 행 수, 적재 기록을 남깁니다. | [`validate_bronze.py`](src/domains/04_license/validate_bronze.py)에서 `ingestion_manifest.json`과 실제 파일을 대조 | ✅ 04 매니페스트 대조 통과 |
 | S-01 | 표준화·Silver | 면허번호는 문자열, 점검일과 인허가 기간은 `date32`, 표준 결과는 코드값으로 저장합니다. | [`validate_silver.py`](src/domains/04_license/validate_silver.py)에서 데이터 사전의 스키마와 재계산한 값을 대조 | ✅ 04 타입·변환값 대조 통과 |
 | S-02 | Silver | 기본 테이블은 Bronze의 행 수와 `source_row_num`을 보존해야 합니다. | [`validate_silver.py`](src/domains/04_license/validate_silver.py)에서 원천별 행 수와 순번을 대조 | ✅ 04 두 기본 테이블 행 수 일치 |
-| S-03 | 공용 Bronze·Silver | 점검·인허가·지역 경계 3종의 행 수를 원천부터 Silver까지 대조하고 배포본을 복원할 수 있어야 합니다. | 공용 [`build.py`](src/domains/integration/build.py)에서 행 수·키 대조, [`publish.py`](src/domains/integration/publish.py)에서 복원본 크기와 SHA-256 대조 | ✅ PR #11의 3종 행 수·배포 산출물 7개 대사 확인 |
+| S-03 | 공용 Bronze·Silver | 점검·인허가·지역 경계 3종의 행 수를 원천부터 Silver까지 대조하고 배포본을 복원할 수 있어야 합니다. | [`check_integration_bronze.py`](src/bronze/check_integration_bronze.py), [`validate_integration_silver.py`](src/silver/validate_integration_silver.py), [`publish.py`](src/domains/06_integration/publish.py)에서 행·스키마·해시를 대조 | ✅ PR #11의 3종 행 수·배포 산출물 7개 대사 확인 |
 | Q-01 | 품질 검증 | 결측·파싱 실패·기간 역전은 예외로 세고, 변환 전후 품질 결과를 재현할 수 있어야 합니다. | [`validate_quality.py`](src/domains/04_license/validate_quality.py)에서 Bronze·Silver 대조 보고서를 다시 계산 | ✅ 04 품질 검증 3/3 |
 | Q-02 | 품질 검증 | 위반 후보가 정상과 격리로 모두 설명되고 원천 점검으로 추적돼야 합니다. | [`reconciliation.py`](src/domains/02_violation/reconciliation.py)와 [02 위반 유형 스냅샷 보고서](reports/02_violation/README.md)에서 정상·격리 합계를 대조 | ✅ 02 보고서에서 1,029,281 + 1,792 = 1,031,073조각 대사 확인 |
 | G-01 | Gold | Fact와 Dim의 기본키에는 중복·공란이 없어야 하고, 필수 참조 키는 해당 차원에 존재해야 합니다. | [`validate_gold.py`](src/domains/04_license/validate_gold.py)에서 PK·FK와 팩트의 원천 키·순서·행 수를 검증 | ✅ 04 팩트·차원 키 검증 통과 |
 | G-02 | Gold | 같은 면허번호에서 `시작일 ≤ 점검일 ≤ 만료일`을 만족하는 후보를 세고, 단일 후보만 확정합니다. | [`validate_gold.py`](src/domains/04_license/validate_gold.py)에서 Silver로 Fact 값·후보 수·매칭 상태를 재계산 | ✅ 04 기간 매칭 검증 통과 |
-| T-01 | 관점별 입력 전환·Gold 통합 | 관점별 입력 타입과 메타데이터를 공용 규격에 맞추고 팀 Gold의 조인 전후 행 수와 키를 대조합니다. | 공용 스냅샷과 기존 결과를 [관점별 비교 기준](src/domains/integration/README.md#관점별-비교-실행)으로 대조하고 전환 후 재검증 예정 | ⏳ 역할 분담 완료 |
-| G-03 | Gold 공용 차원 | 의미·키·행 단위가 같은 차원을 공용화하고 Fact의 참조 키를 재검증합니다. | 공용 차원 대사 코드 예정 | ⏳ 역할 분담 완료 |
+| G-03 | Gold 공용 차원 | 같은 키와 속성을 가진 차원 행을 하나로 통합하고 키가 같은데 속성이 다르면 검증에 실패해야 합니다. | [`build_dimensions.py`](src/gold/build_dimensions.py)에서 차원 키를 대조하고 점검·인허가 달력 날짜를 합집합으로 구성 | ✅ 공용 차원 9개 생성, 공통 날짜 4,528개 중복 제거 |
+| G-04 | Gold 통합 | 관점별 Fact의 행 단위와 공용 차원·점검 키 참조가 유효해야 합니다. | [`build_dimensions.py`](src/gold/build_dimensions.py)에서 Fact의 행 단위 유일성과 참조 키를 검증 | ✅ Fact 9개 재생성 및 검증 통과 |
+| T-01 | 관점별 입력 전환 | 관점별 실행기의 입력 경로·타입·메타데이터를 공용 규격에 맞춥니다. | [관점별 비교 기준](docs/domains/06_integration.md#관점별-비교-실행)으로 기존 결과와 대조하고 전환 후 재검증 | ⏳ 비교 실행 완료 · 경로 전환 대기 |
 | A-01 | AI-Ready | 기준일 이전 입력과 이후 정답을 분리하고 시간순 학습·검증 구간을 정의합니다. | 입력 시점·정답 관찰 기간·시간 분할 검증 코드 예정 | ⏳ 역할 분담 완료 |
 
 ### 관점별 사용자와 분석 질문
@@ -93,7 +101,7 @@
 
 ## 6. ERD
 
-아래는 **04번에서 검증한 Gold 스타 스키마**입니다. draw.io 두 번째 탭에서 01~05 공용 모델 검토안을 볼 수 있습니다.
+아래는 **04번에서 검증한 Gold 스타 스키마**입니다. draw.io 두 번째 탭은 초기 공용 모델 검토안이며, 아래 표는 현재 공용 Gold에서 생성하는 Fact를 기준으로 정리했습니다.
 
 ![04번 Gold 스타 스키마. 점검 매칭과 인허가 이력 Fact가 면허·사업장·날짜 차원을 참조합니다.](docs/chicago_food_star_schema.png)
 
@@ -103,15 +111,17 @@
 
 | 관점 | Fact·마트 | 한 행의 의미 | 측정값의 계산 근거 |
 | --- | --- | --- | --- |
-| 01 | `fact_inspection` | 점검 1건 (`inspection_key`) | 표준 결과에서 평가·불합격 건수를 집계합니다. 불합격률은 `불합격 건수 ÷ 평가 완료 건수`입니다. |
-| 02 | `fact_inspection_violation` | 정상 처리한 위반 조각 1개 (`source_row_num` × `item_sequence_num`) | 파싱과 품질 조건을 통과한 위반 조각을 셉니다. 한 점검에 여러 조각이 들어갈 수 있습니다. |
-| 03 | `repeat_violation_mart` | 기준 점검 × 위반 코드 버전 × 코드 | 비교 가능한 다음 점검에서 같은 코드가 다시 관측됐는지 계산합니다. |
-| 03 | `inspection_reinspection_mart` | 기준 불합격 점검 1건 | 조건에 맞는 후속 점검의 연결 여부와 기준 점검부터의 경과일, 결과를 기록합니다. |
-| 04 | `fact_inspection_license_match` | 점검 1건 (`inspection_key`) | `candidate_count_num`은 면허번호와 유효기간이 모두 맞는 인허가 이력 수입니다. |
-| 04 | `fact_license_event` | 인허가 이력 1건 (`license_event_key`) | 발급·갱신 등의 이력을 보존합니다. 이력 건수는 해당 행 수입니다. |
-| 05 | `inspection_area_period` | 기간 단위 × 기간 시작일 × 지역 또는 미배정 사유 | 점검 좌표를 지역에 배정한 뒤 기간별 점검·평가 완료·불합격 건수를 집계합니다. |
+| 01 | `01_fact_inspection` | 점검 1건 (`inspection_key`) | 표준 결과에서 평가·불합격 건수를 집계합니다. 불합격률은 `불합격 건수 ÷ 평가 완료 건수`입니다. |
+| 02 | `02_fact_inspection_violation` | 정상 처리한 위반 조각 1개 (`source_row_num` × `item_sequence_num`) | 파싱과 품질 조건을 통과한 위반 조각을 셉니다. 한 점검에 여러 조각이 들어갈 수 있습니다. |
+| 03 | `03_fact_repeat_violation` | 기준 점검 × 위반 코드 버전 × 코드 | 비교 가능한 다음 점검에서 같은 코드가 다시 관측됐는지 계산합니다. |
+| 03 | `03_fact_reinspection` | 기준 불합격 점검 1건 | 조건에 맞는 후속 점검의 연결 여부와 기준 점검부터의 경과일, 결과를 기록합니다. |
+| 04 | `04_fact_inspection_license_match` | 점검 1건 (`inspection_key`) | `candidate_count_num`은 면허번호와 유효기간이 모두 맞는 인허가 이력 수입니다. |
+| 04 | `04_fact_license_event` | 인허가 이력 1건 (`license_event_key`) | 발급·갱신 등의 이력을 보존합니다. 이력 건수는 해당 행 수입니다. |
+| 05 | `05_fact_inspection_area_period` | 기간 단위 × 기간 시작일 × 지역 배정 결과 | 점검 좌표를 지역에 배정한 뒤 기간별 점검·평가 완료·불합격 건수를 집계합니다. |
+| 05 | `05_fact_violation_coverage_area_period` | 지역·기간 집계 키 × 위반 코드 버전 | 위반 관측과 파싱 상태별 점검 건수를 집계해 위반율 분모를 구분합니다. |
+| 05 | `05_fact_violation_area_period` | 위반 관측 범위 키 × 위반 코드 | 해당 코드가 관측된 점검 건수를 집계합니다. |
 
-04번의 두 Fact는 `dim_license`, `dim_establishment`, `dim_date`를 참조합니다. 날짜 차원은 점검 Fact에서 **점검일**, 인허가 Fact에서 **발급일**입니다. 팀 전체에서 반복 정의한 차원의 공용화는 역할 분담을 마친 상태입니다.
+04번의 두 Fact는 `dim_license`, `dim_establishment`, `dim_date`를 참조합니다. 날짜 차원은 점검 Fact에서 **점검일**, 인허가 Fact에서 **발급일**입니다. 공용 Gold의 `dim_date`는 점검일과 인허가 날짜에 함께 등장하는 날짜를 한 행으로 관리합니다.
 
 ## 7. 주요 프로시저
 
@@ -123,10 +133,10 @@
 | Bronze | 원천 CSV → 원천 값·순서·`source_row_num`을 보존한 Parquet | 04 [`01_bronze.py`](src/domains/04_license/01_bronze.py) |
 | Silver 표준화 | Bronze → 식별자·날짜·결과 코드를 표준화한 Parquet | 04 [`02_normalize.py`](src/domains/04_license/02_normalize.py) |
 | 품질 검증 | Bronze와 Silver → 결측·파싱·기간 예외의 전후 대조 보고서 | 04 [`03_quality.py`](src/domains/04_license/03_quality.py) |
-| Gold | 검증한 Silver → Fact·Dim·마트. 04번은 점검일 기준 인허가 후보 계산 | 04 [`04_modeling.py`](src/domains/04_license/04_modeling.py) |
+| Gold | 관점별 Silver → Fact·Dim·마트. 기존 관점별 Gold → 공용 차원·Fact | 04 [`04_modeling.py`](src/domains/04_license/04_modeling.py) · 공용 [`build_dimensions.py`](src/gold/build_dimensions.py) |
 | AI-Ready · 계획 | 공용 Gold → 기준일 이전 입력과 이후 정답을 나눈 학습 데이터 | 역할 분담 완료 |
 
-팀 공용 Bronze·Silver의 생성과 배포 검증은 [`build.py`](src/domains/integration/build.py)와 [`publish.py`](src/domains/integration/publish.py)를 사용합니다. 04번 전체 실행과 재검증은 [`run_pipeline.py`](src/domains/04_license/run_pipeline.py)를 사용합니다. [재현 명령과 예외 처리](https://github.com/encore-ai-campus/mlo-03-p2-team2/wiki/Project-Details#시연)
+팀 공용 Bronze·Silver의 생성과 배포 검증은 [`build.py`](src/domains/06_integration/build.py)와 [`publish.py`](src/domains/06_integration/publish.py)를 사용합니다. 04번 전체 실행과 재검증은 [`run_pipeline.py`](src/domains/04_license/run_pipeline.py)를 사용합니다. [재현 명령과 예외 처리](https://github.com/encore-ai-campus/mlo-03-p2-team2/wiki/Project-Details#시연)
 
 ## 8. 수행 결과
 
