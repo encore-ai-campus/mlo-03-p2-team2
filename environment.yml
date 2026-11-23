@@ -7,4 +7,5 @@ dependencies:
   - pip
   - pip:
       - -r src/domains/04_license/requirements.txt
+      - -r src/domains/05_geospatial/requirements.txt
       - pytest==9.0.2
