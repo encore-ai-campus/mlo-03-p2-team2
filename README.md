@@ -83,15 +83,6 @@
 | 3.3 AI Ready 학습 데이터 구축 | 오&#8288;정&#8288;민 | 11/23 | 점검 불합격·동일 위반 재관측 예측용 데이터셋 2종 | [PR #16](https://github.com/encore-ai-campus/mlo-03-p2-team2/pull/16) |
 | 4. 프로젝트 문서·ERD 정리 | 노&#8288;진&#8288;산 | 11/23 | 프로젝트 README와 통합 스타 스키마 ERD | [PR #14](https://github.com/encore-ai-campus/mlo-03-p2-team2/pull/14) |
 
-| 작업 ID · 담당 | 작업 | 커밋·PR |
-| --- | --- | --- |
-| 1.0 공용 기반 | 원천 조사, 적재·표준안, 경로와 체크섬 | [09:49 적재](https://github.com/encore-ai-campus/mlo-03-p2-team2/commit/243ad0d) · [16:45 원천 구조](https://github.com/encore-ai-campus/mlo-03-p2-team2/commit/69d1105) |
-| 1.1 이하영 | 점검 성과 파이프라인과 집계 | [16:41 파이프라인](https://github.com/encore-ai-campus/mlo-03-p2-team2/commit/0e1cd9b) · [17:44 공용 경로](https://github.com/encore-ai-campus/mlo-03-p2-team2/commit/7080986) |
-| 1.2 이자연 | 위반 분리, 격리 대사, Fact·Dim | [17:59 PR #4](https://github.com/encore-ai-campus/mlo-03-p2-team2/pull/4) · [18:18 PR #5](https://github.com/encore-ai-campus/mlo-03-p2-team2/pull/5) |
-| 1.3 김한울 | 반복 위반·재검사 마트와 기간 검증 | [12:25 기간 규칙](https://github.com/encore-ai-campus/mlo-03-p2-team2/commit/5593942) · [17:19 PR #2](https://github.com/encore-ai-campus/mlo-03-p2-team2/pull/2) |
-| 1.4 노진산 | 인허가 기간 매칭, 검증, Parquet | [16:52 산출물](https://github.com/encore-ai-campus/mlo-03-p2-team2/commit/5e5e779) · [16:58 PR #1](https://github.com/encore-ai-campus/mlo-03-p2-team2/pull/1) |
-| 1.5 오정민 | 지역 배정, 집계, 공용 입력 검증 | [16:36 공간 처리](https://github.com/encore-ai-campus/mlo-03-p2-team2/commit/08e03e0) · [17:54 PR #3](https://github.com/encore-ai-campus/mlo-03-p2-team2/pull/3) |
-
 ## 5. 요구사항 명세
 
 | 단계 | 요구사항 | 검증 방법 | 검&#8288;증&nbsp;상&#8288;태 |
@@ -190,11 +181,6 @@ flowchart TD
 | --- | --- | ---: | ---: | ---: |
 | 점검 직전 불합격 | 점검 1건 | 273,488 | 불합격 61,344건<br>22.43% | 28,161 |
 | 다음 점검의 위반 재발 | 기준 점검의 고유 위반 코드 1개 | 287,535 | 재관측 116,674건<br>40.58% | 47,472 |
-
-| 예측&nbsp;과제 | 한&nbsp;행과&nbsp;정답 | 행&nbsp;수 |
-| --- | --- | ---: |
-| 점검 직전 불합격 예측 | 점검 1건.<br>해당 점검 결과가 `FAIL`이면 양성. | 273,488 |
-| 점검 직후 위반 재관측 예측 | 기준 점검의 고유 위반 코드 1개.<br>다음 비교 점검에서 같은 체계의 동일 코드가 기록되면 양성. | 287,535 |
 
 - **01 불합격.** 점검 `2646979`의 입력은 직전 365일 점검 1건, 불합격 0건이다. 이후 해당 점검의 실제 결과가 `FAIL`로 기록돼 정답 `label_fail_flag`는 `true`다. [01 학습 Parquet](data/ai_ready/inspection_training/ac0d0f3f4f33656e78a6/01_preinspection_failure.parquet)
 - **03 위반 재관측.** 점검 `2609905`의 직전 365일 이력에서 코드 `38`이 기록된 점검은 0건이었다. 기준 점검과 03 Gold가 연결한 `2025-06-03` 후속 점검 `2618455`에는 모두 코드 `38`이 있어 `label_repeat_flag`는 `true`다. 두 점검의 코드는 02 Gold에서 확인했다. [02 위반 상세](data/03_gold/02_violation/02_violations_analysis_mart.parquet) · [03 비교 결과](data/03_gold/03_repeat_inspection/03_repeat_violation_mart.parquet) · [03 학습 Parquet](data/ai_ready/inspection_training/ac0d0f3f4f33656e78a6/03_next_inspection_violation_recurrence.parquet)
