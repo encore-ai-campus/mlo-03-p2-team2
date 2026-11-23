@@ -19,7 +19,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from src.bronze.paths import PROJECT_ROOT
-from .profiling import BRONZE_RELATIVE, FRAGMENT_SEPARATOR, origin_snapshot, sha256
+from .profiling import BRONZE_RELATIVE, FRAGMENT_SEPARATOR, bronze_reference, origin_snapshot, sha256
 from .silver import SILVER_SCHEMA, parse_fragment
 
 
@@ -88,14 +88,19 @@ def _publish(temp: Path, final: Path) -> None:
         os.replace(temp, final)
 
 
-def run(root: Path = PROJECT_ROOT, output_root: Path | None = None) -> dict:
+def run(
+    root: Path = PROJECT_ROOT, output_root: Path | None = None, *,
+    bronze_path: Path | None = None, origin_root: Path | None = None,
+) -> dict:
     """Recompute both reconciliation levels from Bronze; never alter input data."""
     root = Path(root)
     output_root = Path(output_root) if output_root is not None else root
-    bronze_path = root / BRONZE_RELATIVE
+    bronze_path = Path(bronze_path) if bronze_path is not None else root / BRONZE_RELATIVE
+    bronze_file = bronze_reference(root, bronze_path)
     if not bronze_path.is_file():
         raise FileNotFoundError(bronze_path)
-    origin_before = origin_snapshot(root)
+    origin_root = origin_root or root
+    origin_before = origin_snapshot(origin_root)
     bronze_before = sha256(bronze_path)
     origin_before_sha = origin_before["source_sha256"]
     started = datetime.now(timezone.utc).isoformat()
@@ -191,7 +196,7 @@ def run(root: Path = PROJECT_ROOT, output_root: Path | None = None) -> dict:
                     issues["misclassified_quarantine"] += 1
                 q = next(quarantine_iter, None)
         issues["lineage_or_missing_fragment"] = int(lineage.hexdigest() != expected_lineage.hexdigest())
-        origin_after = origin_snapshot(root)
+        origin_after = origin_snapshot(origin_root)
         issues["input_hash_changed"] = int(
             sha256(bronze_path) != bronze_before
             or origin_after["source_sha256"] != origin_before_sha
@@ -200,7 +205,7 @@ def run(root: Path = PROJECT_ROOT, output_root: Path | None = None) -> dict:
         status = "PASS" if not any(issues.values()) else "FAIL"
         unexpected_reasons = {reason: count for reason, count in reasons.items()
                               if reason != "MISSING_COMMENTS_MARKER"}
-        result = {"status": status, "source_bronze": BRONZE_RELATIVE.as_posix(),
+        result = {"status": status, "source_bronze": bronze_file,
                   "source_bronze_sha256": bronze_before, "origin_sha256": origin_before_sha,
                   "origin_guard_sha256": origin_before["guard_sha256"],
                   "accepted_file": ACCEPTED_RELATIVE.as_posix(), "quarantine_file": QUARANTINE_RELATIVE.as_posix(),
@@ -230,8 +235,8 @@ def run(root: Path = PROJECT_ROOT, output_root: Path | None = None) -> dict:
             writer = csv.DictWriter(stream, fieldnames=["source_file", "source_column", "target_file", "transformation", "affected_rows", "status"])
             writer.writeheader()
             writer.writerows([
-                {"source_file": BRONZE_RELATIVE.as_posix(), "source_column": "Violations", "target_file": ACCEPTED_RELATIVE.as_posix(), "transformation": "Split fragments; accept complete PARSED records", "affected_rows": accepted_rows, "status": "APPLIED"},
-                {"source_file": BRONZE_RELATIVE.as_posix(), "source_column": "Violations", "target_file": QUARANTINE_RELATIVE.as_posix(), "transformation": "Preserve incomplete or invalid fragments with reason", "affected_rows": quarantined_rows, "status": "APPLIED"},
+                {"source_file": bronze_file, "source_column": "Violations", "target_file": ACCEPTED_RELATIVE.as_posix(), "transformation": "Split fragments; accept complete PARSED records", "affected_rows": accepted_rows, "status": "APPLIED"},
+                {"source_file": bronze_file, "source_column": "Violations", "target_file": QUARANTINE_RELATIVE.as_posix(), "transformation": "Preserve incomplete or invalid fragments with reason", "affected_rows": quarantined_rows, "status": "APPLIED"},
             ])
         completed = True
         return result

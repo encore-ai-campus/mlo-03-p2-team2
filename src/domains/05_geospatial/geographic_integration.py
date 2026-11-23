@@ -19,6 +19,14 @@ INSPECTION_FIELDS = {
 CODE_FIELDS = dict.fromkeys(("inspection_key", "code_system_version", "violation_cd"), pa.string())
 OBSERVATION_FIELDS = dict.fromkeys(("inspection_key", "violation_observation_status"), pa.string())
 OBSERVATION_STATES = {"parsed", "partial", "unrecognized", "raw_missing"}
+GOLD_INSPECTION_FIELDS = {
+    name: INSPECTION_FIELDS[name]
+    for name in ("inspection_key", "inspection_dtm", "result_cd", "facility_type", "inspection_type", "risk_level_cd")
+}
+AREA_FIELDS = {"community_area_num": pa.int64(), "community_area_name": pa.string()}
+SHARED_SILVER_ARTIFACTS = {
+    "inspection_community_areas.parquet", "inspection_geography.parquet", "quality_summary.json",
+}
 
 
 def shared_files(inspection_path, violations_dir):
@@ -42,6 +50,22 @@ def read_typed(path, required, optional=None):
         ), f"{path.name}: {name} must be {dtype}")
     table = pq.read_table(path, columns=list(fields))
     return table.cast(pa.schema(list(fields.items())))
+
+
+def align_rows(table, name, keys):
+    source = table[name]
+    check(len(table) == len(keys) and source.null_count == 0 and pc.count_distinct(source).as_py() == len(table),
+          f"Shared rows must contain one row per {name}")
+    order = pc.index_in(keys, value_set=source)
+    check(order.null_count == 0 and pc.count_distinct(order).as_py() == len(keys), f"Shared {name} values differ")
+    return table.take(order)
+
+
+def read_shared_violation_codes(path):
+    codes = read_typed(path, CODE_FIELDS, {"description_text": pa.string()}).to_pandas()
+    if "description_text" not in codes:
+        codes["description_text"] = pd.Series(pd.NA, index=codes.index, dtype="string")
+    return codes
 
 
 def validate_inspection_silver(shared, local):
@@ -93,9 +117,7 @@ def load_shared_inputs(silver_dir, inspections, files):
     inspections.loc[:, sorted(fields)] = common_values.reindex(inspections.index)
     inspections = inspections.reset_index()
 
-    codes = read_typed(files["violation_codes"], CODE_FIELDS, {"description_text": pa.string()}).to_pandas()
-    if "description_text" not in codes:
-        codes["description_text"] = pd.Series(pd.NA, index=codes.index, dtype="string")
+    codes = read_shared_violation_codes(files["violation_codes"])
     observations = read_typed(files["violation_observations"], OBSERVATION_FIELDS).to_pandas()
     inspections = attach_shared_violations(inspections, codes, observations)
 
@@ -104,3 +126,14 @@ def load_shared_inputs(silver_dir, inspections, files):
     check(pd.MultiIndex.from_frame(codes[list(CODE_FIELDS)]).isin(pd.MultiIndex.from_frame(candidates)).all(),
           "02 contains a violation code absent from the 05 source snapshot")
     return inspections, codes
+
+
+def read_shared_geography(silver_dir, files, columns):
+    shared = read_typed(files["inspection_silver"], GOLD_INSPECTION_FIELDS)
+    derived = pq.read_table(silver_dir / "inspection_geography.parquet",
+                            columns=["inspection_key", *[name for name in columns if name not in GOLD_INSPECTION_FIELDS]])
+    aligned = align_rows(shared, "inspection_key", derived["inspection_key"])
+    for name in aligned.column_names:
+        if name != "inspection_key":
+            derived = derived.append_column(name, aligned[name])
+    return derived.select(columns).to_pandas()

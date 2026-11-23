@@ -8,9 +8,9 @@ from common import REPORTS, RULE_FLAGS, SILVER, TABLE, VALIDATED, write_table
 REJECT_RULES = ["exact_duplicate", "conflicting_inspection_key", "invalid_inspection_key", "invalid_inspection_date"]
 
 
-def transform(data, output, _metadata):
-    clean = pd.read_parquet(data / SILVER / TABLE)
-    flags = pd.read_parquet(data / SILVER / RULE_FLAGS)
+def transform(data, output, _metadata, *, inspections=None, rule_flags=None):
+    clean = pd.read_parquet(inspections if inspections is not None else data / SILVER / TABLE)
+    flags = pd.read_parquet(rule_flags if rule_flags is not None else data / SILVER / RULE_FLAGS)
     if not clean["source_row_num"].equals(flags.pop("source_row_num")):
         raise ValueError("Quality flags do not align with Silver")
     exceptions = pd.concat([

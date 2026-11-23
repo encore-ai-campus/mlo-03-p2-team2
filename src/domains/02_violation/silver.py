@@ -20,6 +20,7 @@ import pyarrow.parquet as pq
 from src.bronze.paths import PROJECT_ROOT
 from .profiling import (
     BRONZE_RELATIVE,
+    bronze_reference,
     FRAGMENT_SEPARATOR,
     ORIGIN_RELATIVE,
     OUTPUT_RELATIVE as PROFILE_RELATIVE,
@@ -73,11 +74,11 @@ def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
 
 
-def _mapping_rows(counts: Counter, actual: dict, silver_path: str) -> list[dict]:
+def _mapping_rows(counts: Counter, actual: dict, bronze_file: str, silver_path: str) -> list[dict]:
     source = {
         "source_dataset": SOURCE_DATASET,
         "source_origin_file": ORIGIN_RELATIVE.as_posix(),
-        "source_bronze_file": BRONZE_RELATIVE.as_posix(),
+        "source_bronze_file": bronze_file,
         "source_column": SOURCE_COLUMN,
         "target_file": silver_path,
         "status": "APPLIED",
@@ -107,7 +108,7 @@ def _mapping_rows(counts: Counter, actual: dict, silver_path: str) -> list[dict]
         ),
         (
             "source_row_num",
-            "Copy the logical row number assigned in the Domain 02 Bronze projection.",
+            "Copy the logical source row number from Bronze.",
             "Positive integer source row number",
             "The original inspection record number is repeated for each violation fragment.",
             actual["output_rows"],
@@ -251,11 +252,16 @@ def _append_run_log(root: Path, record: dict) -> None:
         stream.write(json.dumps(record, ensure_ascii=False) + "\n")
 
 
-def run(root: Path = PROJECT_ROOT) -> dict:
+def run(
+    root: Path = PROJECT_ROOT, *,
+    bronze_path: Path | None = None, origin_root: Path | None = None,
+) -> dict:
     """Stream only Inspection ID and Violations into a dedicated Silver child table."""
     root = Path(root)
-    bronze_path = root / BRONZE_RELATIVE
-    origin_before = origin_snapshot(root)
+    bronze_path = Path(bronze_path) if bronze_path is not None else root / BRONZE_RELATIVE
+    bronze_file = bronze_reference(root, bronze_path)
+    origin_root = origin_root or root
+    origin_before = origin_snapshot(origin_root)
     profile_path = root / PROFILE_RELATIVE
     final_path = root / SILVER_RELATIVE
     mapping_path = root / MAPPING_RELATIVE
@@ -286,7 +292,7 @@ def run(root: Path = PROJECT_ROOT) -> dict:
             "dataset": SOURCE_DATASET,
             "source_origin_file": ORIGIN_RELATIVE.as_posix(),
             "source_origin_sha256_before": input_origin_sha,
-            "source_bronze_file": BRONZE_RELATIVE.as_posix(),
+            "source_bronze_file": bronze_file,
             "source_bronze_sha256_before": input_bronze_sha,
             "source_column": SOURCE_COLUMN,
             "target_file": SILVER_RELATIVE.as_posix(),
@@ -403,11 +409,11 @@ def run(root: Path = PROJECT_ROOT) -> dict:
             if readback[count_name] != expected_count:
                 raise ValueError(f"Silver {count_name} differs from Profiling")
 
-        mapping_rows = _mapping_rows(counters, readback, SILVER_RELATIVE.as_posix())
+        mapping_rows = _mapping_rows(counters, readback, bronze_file, SILVER_RELATIVE.as_posix())
         _write_mapping(temp_mapping, mapping_rows)
         mapping_hash = sha256(temp_mapping)
         output_hash = sha256(temp_output)
-        origin_after = origin_snapshot(root)
+        origin_after = origin_snapshot(origin_root)
         origin_after_sha = origin_after["source_sha256"]
         bronze_after_sha = sha256(bronze_path)
         if (origin_after_sha != input_origin_sha

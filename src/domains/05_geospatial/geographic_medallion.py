@@ -215,10 +215,10 @@ def verify_artifacts(directory, layer, signature, required_artifacts, batch_id=N
         path = directory / name
         check(sha256_file(path) == expected["sha256"], f"{layer}: checksum mismatch for {name}")
         if path.suffix == ".parquet":
-            parquet = pq.ParquetFile(path)
-            schema = {field.name: str(field.type) for field in parquet.schema_arrow}
-            check(parquet.metadata.num_rows == expected["rows"], f"{layer}: row count differs for {name}")
-            check(schema == expected["schema"], f"{layer}: schema differs for {name}")
+            with pq.ParquetFile(path) as parquet:
+                schema = {field.name: str(field.type) for field in parquet.schema_arrow}
+                check(parquet.metadata.num_rows == expected["rows"], f"{layer}: row count differs for {name}")
+                check(schema == expected["schema"], f"{layer}: schema differs for {name}")
     return manifest
 
 
@@ -236,9 +236,9 @@ def publish(directory, layer, signature, required_artifacts, build, batch_id=Non
         for path in sorted(staging.iterdir()):
             entry = {"sha256": sha256_file(path), "size_bytes": path.stat().st_size}
             if path.suffix == ".parquet":
-                parquet = pq.ParquetFile(path)
-                entry["rows"] = parquet.metadata.num_rows
-                entry["schema"] = {field.name: str(field.type) for field in parquet.schema_arrow}
+                with pq.ParquetFile(path) as parquet:
+                    entry["rows"] = parquet.metadata.num_rows
+                    entry["schema"] = {field.name: str(field.type) for field in parquet.schema_arrow}
             manifest["artifacts"][path.name] = entry
         write_json(staging / "manifest.json", manifest)
         verify_artifacts(staging, layer, signature, required_artifacts, batch_id)
@@ -450,13 +450,8 @@ def standardize(directory, bronze_dir, contract, maps, boundary_sha):
     return {column: dict(Counter(issues[column].to_pylist())) for column in ("reason_cd", "source_dataset")}
 
 
-def derive_geography(directory, boundary):
-    inspect_path = directory / "food_inspections.parquet"
-    points = pq.read_table(
-        inspect_path, columns=["inspection_key", "latitude", "longitude", "coordinate_invalid_flag"]
-    ).to_pandas()
-    areas = pq.read_table(directory / "community_areas.parquet", columns=["community_area_num", "geometry"]).to_pandas()
-    assigned, summary = assign_community_areas(points, areas, boundary["sha256"], points["coordinate_invalid_flag"])
+def spatial_assignment(points, areas, boundary, invalid_coordinates):
+    assigned, summary = assign_community_areas(points, areas, boundary["sha256"], invalid_coordinates)
     summary["boundary"].update(
         source_file=boundary["file"], source_format=boundary["format"],
         axis_assumption=("GeoJSON positions are longitude/latitude" if boundary["format"] == "geojson"
@@ -466,9 +461,40 @@ def derive_geography(directory, boundary):
     for name in ("inspection_key", "community_area_match_status", "boundary_version"):
         index = spatial.schema.get_field_index(name)
         spatial = spatial.set_column(index, name, spatial[name].cast(pa.string()))
-    write_table(directory / "inspection_community_areas.parquet", spatial)
     check(len(spatial) == len(points), "Spatial assignment changed the inspection row count")
     return spatial, summary
+
+
+def derive_geography(directory, boundary):
+    inspect_path = directory / "food_inspections.parquet"
+    points = pq.read_table(
+        inspect_path, columns=["inspection_key", "latitude", "longitude", "coordinate_invalid_flag"]
+    ).to_pandas()
+    areas = pq.read_table(directory / "community_areas.parquet", columns=["community_area_num", "geometry"]).to_pandas()
+    spatial, summary = spatial_assignment(points, areas, boundary, points["coordinate_invalid_flag"])
+    write_table(directory / "inspection_community_areas.parquet", spatial)
+    return spatial, summary
+
+
+def append_evaluation(geography, result):
+    evaluated = pc.is_in(result, value_set=pa.array(EVALUATED_RESULTS))
+    failed = pc.fill_null(pc.equal(result, "FAIL"), False)
+    not_evaluated = pc.is_in(result, value_set=pa.array(NOT_EVALUATED_RESULTS))
+    evaluation = pc.if_else(evaluated, "EVALUATED", pc.if_else(not_evaluated, "NOT_EVALUATED", "UNKNOWN_RESULT"))
+    for name, values in (("evaluated_flag", evaluated), ("failed_flag", failed), ("evaluation_status_cd", evaluation)):
+        geography = geography.append_column(name, values)
+    return geography
+
+
+def inspection_summary(geography, inspection_dates):
+    date_range = pc.min_max(inspection_dates).as_py()
+    return {
+        "inspection_count": len(geography), "assigned_count": len(geography) - geography["community_area_num"].null_count,
+        "evaluated_count": pc.sum(geography["evaluated_flag"]).as_py(),
+        "failed_count": pc.sum(geography["failed_flag"]).as_py(),
+        "evaluation_status": dict(Counter(geography["evaluation_status_cd"].to_pylist())),
+        "date_range": {key: str(value) if value is not None else None for key, value in date_range.items()},
+    }
 
 
 def derive_analysis_tables(directory, spatial):
@@ -494,21 +520,9 @@ def derive_analysis_tables(directory, spatial):
     for field in observations.schema:
         if field.name not in {*geography.column_names, "violations_text"}:
             geography = geography.append_column(field, observations[field.name])
-    result = geography["result_cd"]
-    evaluated = pc.is_in(result, value_set=pa.array(EVALUATED_RESULTS))
-    failed = pc.fill_null(pc.equal(result, "FAIL"), False)
-    not_evaluated = pc.is_in(result, value_set=pa.array(NOT_EVALUATED_RESULTS))
-    evaluation = pc.if_else(evaluated, "EVALUATED", pc.if_else(not_evaluated, "NOT_EVALUATED", "UNKNOWN_RESULT"))
-    for name, values in (("evaluated_flag", evaluated), ("failed_flag", failed), ("evaluation_status_cd", evaluation)):
-        geography = geography.append_column(name, values)
+    geography = append_evaluation(geography, geography["result_cd"])
     write_table(directory / "inspection_geography.parquet", geography)
-    date_range = pc.min_max(selected["inspection_dtm"]).as_py()
-    return violation_summary, {
-        "inspection_count": len(geography), "assigned_count": len(geography) - geography["community_area_num"].null_count,
-        "evaluated_count": pc.sum(evaluated).as_py(), "failed_count": pc.sum(failed).as_py(),
-        "evaluation_status": dict(Counter(evaluation.to_pylist())),
-        "date_range": {key: str(value) if value is not None else None for key, value in date_range.items()},
-    }
+    return violation_summary, inspection_summary(geography, selected["inspection_dtm"])
 
 
 def build_silver(directory, bronze_dir, bronze, contract, maps, rules, signature):

@@ -52,7 +52,7 @@ CODE_SCHEMA = pa.schema(COMMON_FIELDS + [
 ])
 
 
-def _procedure_version(inspection_date: date | None) -> str | None:
+def procedure_version(inspection_date: date | None) -> str | None:
     # 같은 번호라도 절차 변경 전후의 코드는 별도 유형으로 관리한다.
     if inspection_date is None or inspection_date < SOURCE_START:
         return None
@@ -118,7 +118,7 @@ def parse_violations(inspections: pa.Table) -> tuple[pa.Table, pa.Table, pa.Tabl
         occurrences = []
         for row in batch.to_pylist():
             inspection_key = row["inspection_key"]
-            version = _procedure_version(row["inspection_dtm"])
+            version = procedure_version(row["inspection_dtm"])
             metadata = tuple(row[name] for name, _ in KEY_FIELDS) + (version,)
             raw_text = row["violations_text"]
             if raw_text is None or not raw_text.strip():
