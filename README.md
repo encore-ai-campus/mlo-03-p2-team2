@@ -1,17 +1,6 @@
 # Chicago Food Safety Data Quality & AI-Ready Platform
 
-시카고 식품위생 점검 한 건에 어떤 인허가 이력과 위반 기록을 붙일 수 있을까? 치카치카는 시카고시 공개 데이터에서 점검일에 유효한 인허가를 찾고, 점검 위치를 커뮤니티 지역에 배정했다. 그 결과로 점검·위반 지표를 조회하는 Gold와 두 가지 예측 과제에 쓸 학습 데이터를 만들었다.
-
-| 주요 결과 | 확인한 범위 |
-| --- | --- |
-| **점검 318,627건** | 공용 Bronze·Silver에서 원천 행 수 유지 |
-| **인허가 매칭 232,383건** | 면허번호와 점검일 조건을 모두 충족한 후보가 한 건인 점검 |
-| **차원 9개 · Fact 9개** | 관점별 Gold를 공용 모델로 구성하고 키와 참조 관계 검증 |
-| **학습 데이터 2종** | 점검 직전 불합격 273,488행, 다음 점검의 동일 위반 재관측 287,535행 |
-
-[팀 소개](#1-팀-소개) · [프로젝트 개요](#2-프로젝트-개요) · [기술 스택](#3-기술-스택) · [WBS](#4-wbs) · [요구사항](#5-요구사항-명세) · [ERD](#6-erd) · [실행](#7-주요-프로시저) · [수행 결과](#8-수행-결과) · [회고](#9-한-줄-회고)
-
-[프로젝트 상세 Wiki](https://github.com/encore-ai-campus/mlo-03-p2-team2/wiki/Project-Details) · [저장소 구조](https://github.com/encore-ai-campus/mlo-03-p2-team2/wiki/Repository-Structure) · [실행 환경](docs/project_setup_and_sharing.md) · [학습 데이터](#학습용-ai-ready-데이터)
+시카고시 공개 데이터를 연결해 **점검 성과, 위반 유형, 반복 위반·재검사, 인허가, 지역별 차이**를 분석하는 데이터 프로젝트입니다. 공용 Gold는 **팩트 9개와 차원 9개**, 학습용 AI Ready는 **점검 불합격과 위반 재발을 예측하는 데이터 2종**으로 구성했습니다.
 
 ## 1. 팀 소개
 
@@ -27,46 +16,33 @@
 
 ## 2. 프로젝트 개요
 
-| 시카고시 공개 데이터 | 공용 스냅샷 | 한 행의 의미 |
+| 시카고시 원천 | 규모 | 주요 내용 |
 | --- | ---: | --- |
-| [식품위생 점검](https://data.cityofchicago.org/d/4ijn-s7e5) | 318,627행 | 위생점검 1건 |
-| [사업체 인허가](https://data.cityofchicago.org/d/r5kz-chrr) | 1,212,132행 | 인허가 이력 1건 |
-| [커뮤니티 지역 경계](https://data.cityofchicago.org/d/igwz-8jzy) | 77개 | 지역 1곳 |
-
-공용 Bronze와 Silver는 원천 행을 보존한다. 조인으로 행이 늘어나는 경우에는 분석에 필요한 행 단위를 정해 파생 테이블에 기록했다.
+| Food Inspections | 318,627건 | 점검일, 시설 유형, 결과, 위반 원문, 좌표 |
+| Business Licenses | 1,212,132건 | 면허 발급·갱신 이력, 사업장, 유효기간 |
+| Community Area Boundaries | 77개 지역 | 점검 위치를 배정할 지역 경계 |
 
 ### 프로젝트 필요성
 
-실제 점검 `2646979`와 인허가 이력 `3031292`를 따라가면 컬럼명, 날짜, 공간 정보가 어디서 달라지는지 확인할 수 있다. 경계 형식은 지역 GeoJSON을 기준으로 했다.
+**AS-IS · 현재 원천 데이터의 문제점**
 
 - **점검 결과** - 통과·불합격과 함께 폐업·출입 불가 같은 미평가 상태가 섞여 있어, 전체 점검 건수로 불합격률을 계산하면 비율이 달라집니다.
 - **위반 원문** - 한 셀에 여러 위반 코드·설명·코멘트가 섞여 있고, 원문이 비어 있는 점검이 90,022건입니다. 코드별 빈도와 재발 여부를 바로 집계하기 어렵습니다.
 - **인허가 이력** - 한 면허번호에 발급·갱신 기록이 여러 건 있어, 번호만으로 연결하면 점검 한 건이 여러 행으로 늘어날 수 있습니다.
 - **지역 배정** - 점검은 좌표로, 지역은 별도 경계 데이터로 제공됩니다. 좌표가 비어 있거나 경계 밖이면 지역을 특정하기 어렵습니다.
 
-같은 값 `2398495`가 점검 CSV의 `License #`와 인허가 CSV의 `LICENSE NUMBER`에 들어 있다. 두 컬럼을 문자열 `license_number_key`로 연결하고, 점검의 `0`은 결측으로 처리했다.
+### 프로젝트 목표
 
-#### 면허번호 조인과 점검 중복
-
-면허번호 하나에 발급·갱신 이력이 쌓이므로 면허번호만 연결하면 점검 행이 늘어날 수 있다. 점검일 `2026-11-18`과 유효기간 `2025-07-16`~`2027-07-15`를 `date32`로 비교했다. 기간 조건까지 맞는 후보가 한 건일 때 연결을 확정하고, 후보 수와 상태는 점검당 한 행에 남겼다.
-
-#### 점 좌표와 지역 경계
-
-점검 좌표 `[-87.62249083278, 41.89245290794]`는 `[경도, 위도]` 순서로 GeoJSON의 `MultiPolygon`과 교차를 검사했다. 교차한 경계가 하나면 `properties.area_numbe`로 지역을 배정했다. 좌표 공란과 경계 밖은 미배정 사유로 기록했다.
-
-#### 점검 결과와 위반 상세
-
-`Results`의 `Fail`은 `result_cd`의 `FAIL`로 통일했다. `50. HOT & COLD WATER AVAILABLE…` 같은 위반 텍스트는 코드·설명·메모로 파싱해 위반 조각당 한 행으로 저장했다. 점검 건수는 위반 상세의 행 수와 별도로 점검 키를 기준으로 센다.
-
-[원천 차이와 예외 처리](https://github.com/encore-ai-campus/mlo-03-p2-team2/wiki/Project-Details#원천과-as-is)
+- 세 원천을 표준화하고 품질을 검증해, 원천 행·조인 키·지표 분모를 추적할 수 있는 Gold 분석 데이터를 구축합니다.
+- 예측 시점에 알 수 있었던 입력과 이후 관측한 정답을 구분해, 점검 불합격과 위반 재발을 예측하는 학습용 AI Ready 데이터를 만듭니다.
 
 ## 3. 기술 스택
 
 | 용도 | 기술 |
 | --- | --- |
-| 처리·저장 | Python 3.14, pandas, Apache Parquet |
-| 공간 연산 | Shapely, GeoJSON |
-| 검증·설계 | pytest, draw.io |
+| 처리·저장 | ![Python 3.14](https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white) ![pandas](https://img.shields.io/badge/pandas-150458?logo=pandas&logoColor=white) ![Apache Parquet](https://img.shields.io/badge/Apache-Parquet-168B89) |
+| 공간 연산 | ![Shapely](https://img.shields.io/badge/Shapely-1F766E) ![GeoJSON](https://img.shields.io/badge/GeoJSON-3A6B35) |
+| 검증·설계 | ![pytest](https://img.shields.io/badge/pytest-0A9EDC?logo=pytest&logoColor=white) ![draw.io](https://img.shields.io/badge/draw.io-F08705?logo=diagramsdotnet&logoColor=white) |
 
 ## 4. WBS
 
@@ -82,6 +58,8 @@
 | 3.2 공용 Gold 통합 | 김&#8288;한&#8288;울 | 11/23 | 공용 Dimension 9개, Fact 9개, 일괄 생성·검증 코드 | [Gold 일괄 생성](https://github.com/encore-ai-campus/mlo-03-p2-team2/commit/be9f8f1) |
 | 3.3 AI Ready 학습 데이터 구축 | 오&#8288;정&#8288;민 | 11/23 | 점검 불합격·동일 위반 재관측 예측용 데이터셋 2종 | [PR #16](https://github.com/encore-ai-campus/mlo-03-p2-team2/pull/16) |
 | 4. 프로젝트 문서·ERD 정리 | 노&#8288;진&#8288;산 | 11/23 | 프로젝트 README와 통합 스타 스키마 ERD | [PR #14](https://github.com/encore-ai-campus/mlo-03-p2-team2/pull/14) |
+
+*기간은 2026년 한국 시간 기준 Git 커밋·반영 기록을 따릅니다.*
 
 ## 5. 요구사항 명세
 
@@ -101,57 +79,25 @@
 | AI Ready | 기준일 전 이력 사용 및 시간순 분할 | 입력 시점과 정답 관측일이 규칙에 맞는지 대조 | ✅ 통과 |
 | AI Ready | 학습 행의 키와 정답 검증 | 공개 산출물의 키·정답·체크섬 대조 | ✅ 통과 |
 
-02에서 분리한 위반 후보 **1,031,073조각**을 정상 **1,029,281조각**과 격리 **1,792조각**으로 대사했다. 정상과 격리 조각 모두 원천 점검을 추적할 수 있다. [Bronze 원천 검증](src/bronze/check_integration_bronze.py) · [Silver 스키마 검증](src/silver/validate_integration_silver.py)
-
-### 관점별 사용자와 분석 질문
-
-| 사용자 | 분석 질문 |
-| --- | --- |
-| 01 점검 배정 담당자 | 다음 점검에서 불합격 위험이 높은 유형은 무엇인가? |
-| 02 교육 기획자 | 다음 점검에서 집중해서 살필 위반 유형은 무엇인가? |
-| 03 재점검 담당자 | 직전 위반이 반복되거나 후속 점검이 불합격할 위험은 어느 정도인가? |
-| 04 인허가 분석가 | 점검 당시 사업장은 어느 인허가 이력과 연결되는가? |
-| 05 지역 운영 담당자 | 다음 기간에 우선적으로 살필 지역은 어디인가? |
-
-[페르소나·시나리오·필요 데이터·수용 기준](https://github.com/encore-ai-campus/mlo-03-p2-team2/wiki/Project-Details#요구사항-명세)
+[공용 Bronze·Silver 검증](docs/domains/06_integration.md)
 
 ## 6. ERD
 
 ![다섯 관점의 팩트와 공용 차원을 연결한 Gold 통합 ERD](docs/chicago_food_gold_erd.png)
 
-그림의 기준은 04 인허가 Gold다. 점검 매칭 Fact와 인허가 이력 Fact가 면허·사업장·날짜 차원을 공유한다. draw.io 두 번째 탭에는 초기 공용 모델 검토안이 있다.
-
 01 점검 팩트는 **점검 ID 하나에 한 행**입니다. 02 위반 조각과 03 기준·후속 점검은 이 점검 ID를 참조합니다. 01·04는 공용 날짜 차원을, 05의 지역 집계는 공용 지역 차원을 사용합니다.
 
-[편집 가능한 draw.io](docs/chicago_food_star_schema.drawio) · [테이블의 한 행과 측정값](https://github.com/encore-ai-campus/mlo-03-p2-team2/wiki/Project-Details#erd와-측정값)
-
-### Fact·마트의 한 행과 측정값
-
-| 공용 Gold Fact | 한 행과 주요 값 |
-| --- | --- |
-| `01_fact_inspection` | 점검 1건(`inspection_key`). 평가 완료·불합격 지표. |
-| `02_fact_inspection_violation` | 정상 위반 조각 1개(`source_row_num` × `item_sequence_num`). |
-| `03_fact_repeat_violation` | 기준 점검 × 코드 체계 × 위반 코드. 다음 비교 점검의 동일 코드 관측 여부. |
-| `03_fact_reinspection` | 기준 불합격 점검 1건. 후속 점검 연결 상태, 경과일, 결과. |
-| `04_fact_inspection_license_match` | 점검 1건(`inspection_key`). 면허번호와 기간이 일치하는 후보 수(`candidate_count_num`). |
-| `04_fact_license_event` | 발급·갱신 등 인허가 이력 1건(`license_event_key`). |
-| `05_fact_inspection_area_period` | 기간 단위 × 시작일 × 지역 배정 결과. 점검·평가 완료·불합격 건수. |
-| `05_fact_violation_coverage_area_period` | 지역·기간 × 코드 체계. 위반 기록·파싱 상태별 점검 수와 분모. |
-| `05_fact_violation_area_period` | 위반 관측 범위 × 위반 코드. 해당 코드가 기록된 점검 건수. |
-
-04 Fact가 참조하는 차원은 `dim_license`, `dim_establishment`, `dim_date`다. 같은 날짜 차원이라도 점검 Fact에서는 **점검일**, 인허가 Fact에서는 **발급일**에 연결된다. 같은 달력 날짜는 공용 `dim_date`에서 한 행으로 관리한다.
+| 관점 | 한 행의 의미 | 주요 지표 |
+| --- | --- | --- |
+| 01 점검 성과 | 점검 1건 | 점검·판정·불합격 건수 |
+| 02 위반 유형 | 정상 파싱된 위반 조각 1개 | 위반 조각 수, 위반이 기록된 고유 점검 수 |
+| 03 반복 위반·재검사 | 기준 점검의 고유 위반 코드 1개 / 기준 불합격 점검 1건 | 재관측 여부 / 재검사 연결 여부와 소요일 |
+| 04 사업체 인허가 | 인허가 이력 1건 / 점검별 인허가 매칭 1건 | 이력 수 / 유효기간 후보 수 |
+| 05 지역 분석 | 지역·기간 / 지역·기간·코드 버전 / 지역·기간·코드 버전·위반 코드 | 점검 결과 / 위반 관측 범위 / 코드별 고유 점검 수 |
 
 ## 7. 주요 프로시저
 
-```mermaid
-flowchart TD
-    O["Origin"] --> B["Bronze · 원문 보존"]
-    B --> S["Silver · 표준화와 품질 검증"]
-    S --> G["Gold · Fact, 차원, 마트"]
-    S -->|04 점검본| A["AI-Ready · 학습 데이터 2종"]
-    G -->|02 위반 기록 · 03 후속 점검| A
-    G -->|05 지역 집계| Q["AI-Ready · 지역 질의용"]
-```
+**Origin → Bronze → Silver·품질 검증 → Gold → AI Ready**
 
 1. **공용 원천·Bronze·Silver** · 원천을 복원하고 `06_integration`에서 점검·인허가·지역 경계 세 테이블을 표준화합니다.
 2. **관점별 Gold** · `06_integration` 공용 입력으로 01~05 팩트와 집계를 일괄 생성합니다. [팀 일괄 실행](docs/domains/06_integration.md#관점별-비교-실행)
@@ -160,34 +106,27 @@ flowchart TD
 
 ## 8. 수행 결과
 
-### 실제 점검 2건의 단계별 변화
+| 관점 | 대표 결과 | 확인 자료 |
+| --- | --- | --- |
+| 01 점검 성과 | 전체 318,627건 중 판정 273,488건, 불합격 61,344건 · **22.43%** | [점검 성과 보고서](docs/domains/01_inspection_proposal.md) |
+| 02 위반 유형 | 후보 1,031,073조각 = 정상 1,029,281조각 + 격리 1,792조각 | [위반 유형 결과](reports/02_violation/README.md) |
+| 03 반복 위반·재검사 | 비교 가능 위반 코드 333,856건 중 130,574건 재관측 · **39.1%**. 불합격 61,344건 중 54,106건에 1~30일 내 재검사 연결 | [반복 위반·재검사 결과](docs/domains/03_repeat_inspection.md) |
+| 04 사업체 인허가 | 유효기간 후보 1건 232,383건, 복수 후보 1,401건, 후보 없음 84,843건 | [기간 매칭 검증](docs/domains/04_license/03_gold/README.md) |
+| 05 지역 분석 | 317,238건 지역 배정. 좌표 공란 1,065건과 경계 밖 324건 별도 집계 | [지역 분석 결과](docs/domains/05_geospatial.md) |
 
-같은 점검 ID를 따라 원천 날짜·결과와 Gold의 집계 값을 대조했다. Silver의 `inspection_dtm`은 `date32`이고, Gold의 평가 완료와 불합격 지표는 각각 `0` 또는 `1`이다.
-
-| 단계 · 파일 | 점검&nbsp;`2646979` | 점검&nbsp;`2609905` |
-| --- | :---: | :---: |
-| [Origin CSV](data/00_origin/) | `11/18/2026` · `Fail` | `01/02/2025` · `Pass` |
-| [04 Bronze Parquet](data/01_bronze/04_license/04_food_inspections.parquet) | 원문 보존<br>원천 순번 `4` | 원문 보존<br>원천 순번 `33448` |
-| [04 Silver Parquet](data/02_silver/04_license/04_food_inspections.parquet) | `2026-11-18` · `FAIL` | `2025-01-02` · `PASS` |
-| [01 Gold 점검 Fact](data/03_gold/facts/01_fact_inspection.parquet) | 평가 완료 `1`<br>불합격 `1` | 평가 완료 `1`<br>불합격 `0` |
-
-**04 인허가 매칭.** Bronze와 Silver에서 점검 **318,627행**과 인허가 **1,212,132행**을 유지했다. 점검일에 유효한 후보가 한 건인 점검은 **232,383건**, 여러 건인 점검은 **1,401건**, 후보가 없는 점검은 **84,843건**이었다. 04 단계별 검사 **39개**가 통과했다. [04 검증 보고서](reports/04_license/README.md) · [관점별 결과](https://github.com/encore-ai-campus/mlo-03-p2-team2/wiki/Project-Details#수행-결과)
-
-**05 지역 집계.** 로컬 비교 배치에서 2025년 West Town의 불합격률은 **27.24%**(평가 완료 903건 중 246건)였다. 같은 분모에서 코드 `47` 기록률은 **31.45%**(284건)다. 지역이나 기간을 합칠 때도 분자와 분모를 각각 합산해 비율을 구한다. [지역별 조회 예시](docs/domains/05_geospatial.md#결과-조회-예시) · [지표 산정](docs/domains/05_geospatial/model.md#지표-산정)
-
-### 학습용 AI-Ready 데이터
+### 학습용 AI Ready 데이터
 
 | 예측&nbsp;과제 | 한&nbsp;행의&nbsp;의미 | 전체&nbsp;행&nbsp;수 | 실제&nbsp;양성 | 최종&nbsp;평가용<br>행&nbsp;수 |
 | --- | --- | ---: | ---: | ---: |
 | 점검 직전 불합격 | 점검 1건 | 273,488 | 불합격 61,344건<br>22.43% | 28,161 |
 | 다음 점검의 위반 재발 | 기준 점검의 고유 위반 코드 1개 | 287,535 | 재관측 116,674건<br>40.58% | 47,472 |
 
-- **01 불합격.** 점검 `2646979`의 입력은 직전 365일 점검 1건, 불합격 0건이다. 이후 해당 점검의 실제 결과가 `FAIL`로 기록돼 정답 `label_fail_flag`는 `true`다. [01 학습 Parquet](data/ai_ready/inspection_training/ac0d0f3f4f33656e78a6/01_preinspection_failure.parquet)
-- **03 위반 재관측.** 점검 `2609905`의 직전 365일 이력에서 코드 `38`이 기록된 점검은 0건이었다. 기준 점검과 03 Gold가 연결한 `2025-06-03` 후속 점검 `2618455`에는 모두 코드 `38`이 있어 `label_repeat_flag`는 `true`다. 두 점검의 코드는 02 Gold에서 확인했다. [02 위반 상세](data/03_gold/02_violation/02_violations_analysis_mart.parquet) · [03 비교 결과](data/03_gold/03_repeat_inspection/03_repeat_violation_mart.parquet) · [03 학습 Parquet](data/ai_ready/inspection_training/ac0d0f3f4f33656e78a6/03_next_inspection_violation_recurrence.parquet)
+재발 학습 데이터는 비교 가능한 Gold 333,856행 중 기준일과 정답 관측일이 서로 다른 기간에 속한 46,321행을 제외합니다. 두 비율은 데이터에 기록된 **실제 정답 분포**입니다.
 
-두 데이터셋의 이력은 같은 면허번호의 기준일 전 365일에서 계산했다. 학습·검증·테스트의 경계는 `2023-01-01`과 `2025-01-01`이다. 위반 재관측은 비교 가능한 **333,856행** 중 기준 점검과 정답 관측일이 서로 다른 구간에 속한 **46,321행**을 제외해 **287,535행**을 남겼다.
+- **불합격 예시** · 점검 `2646979`의 과거 365일 이력은 점검 1건·불합격 0건입니다. 이번 점검이 불합격이므로 정답은 `true`입니다.
+- **위반 재발 예시** · 점검 `2609905`의 코드 `38`은 기준일 전 365일 이력에서 0회였고, 2025년 6월 3일 후속 점검에서 다시 관측돼 정답은 `true`입니다.
 
-[과제별 입력과 정답](docs/ai_ready/inspection_training.md) · [시간순 분할과 검증 결과](reports/ai_ready/inspection_training/README.md)
+학습 데이터 자동화 테스트 **3개 통과**. 실제 산출물의 중복 키, 정답 누락·불일치, 시간 분할 위반은 각각 **0건**입니다. [검증 보고서](reports/ai_ready/inspection_training/README.md)
 
 ## 9. 한 줄 회고
 
