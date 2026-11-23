@@ -108,30 +108,7 @@
 
 [공용 Fact 산출물](data/03_gold/facts) · [Gold 생성·검증 코드](src/gold/build_dimensions.py)
 
-### Fact와 차원을 연결하는 키
-
-위 표의 **행 식별 키**는 Fact 한 행을 구분합니다. 아래의 **참조 키**는 Fact에 날짜나 위반 유형 같은 설명을 붙일 때 사용합니다.
-
-| Fact | Fact의 참조 키 → 연결할 표와 키 |
-| --- | --- |
-| 점검 | `inspection_dtm` → 날짜 차원의 `calendar_dtm`. `facility_type_key`, `inspection_type_key`, `risk_level_cd_key`, `result_cd_key` → 각각 시설 유형·점검 유형·위험등급·결과 차원의 같은 키 |
-| 점검별 위반 | `violation_key` → 위반 차원의 `violation_key`. `inspection_id` → 점검 Fact의 `inspection_key` |
-| 반복 위반·재검사 | `base_inspection_key`, `followup_inspection_key` → 점검 Fact의 `inspection_key`. 후속 점검 미확정 시 후속 키는 비어 있을 수 있습니다. |
-| 면허 매칭·인허가 이력 | `date_key`, `license_number_key`, `establishment_key` → 각각 날짜·면허·사업장 차원의 같은 키. 매칭 Fact의 `matched_license_event_id` → 인허가 이력 Fact의 `license_event_key` |
-| 지역 Fact 3종 | 지역 배정에 성공한 행의 `(boundary_version, community_area_num)` → 지역 차원의 같은 조합 |
-
-[참조 키 검증 코드](src/gold/build_dimensions.py#L148)
-
-### 공용 Gold 실제 행 미리보기
-
-Parquet에서 조회한 실제 값입니다. 각 행에서 분석에 필요한 컬럼만 골라 표시했습니다.
-
-| Fact | 실제 컬럼과 값 | 이 행에서 읽을 수 있는 것 |
-| --- | --- | --- |
-| 점검 | `inspection_key=2646929`, `inspection_dtm=2026-11-18`, `conditional_pass_count_num=1`, `fail_count_num=0` | 이 점검은 조건부 통과 1건으로 집계됩니다. |
-| 위반 | `inspection_id=2646929`, `source_row_num=1`, `item_sequence_num=1`, `violation_key=45` | 같은 점검에서 분리한 첫 번째 위반입니다. 위반 유형은 키 45로 차원에서 찾습니다. |
-| 재점검 | `base_inspection_key=2646979`, `base_result_cd=FAIL`, `followup_inspection_key=null`, `reinspection_match_status_cd=insufficient_observation` | 이 불합격 점검은 관찰 기간이 충분하지 않아 후속 점검을 확정할 수 없습니다. |
-| 지역·기간별 점검 | `period_grain_cd=MONTH`, `period_start_dtm=2010-01-01`, `community_area_name=WEST TOWN`, `evaluated_count=61`, `failed_count=20` | 2010년 1월 West Town에서 평가 완료 61건 중 20건이 불합격했습니다. |
+점검 Fact의 `inspection_dtm`은 `dim_date.calendar_dtm`을, 위반 Fact의 `violation_key`는 `dim_violation.violation_key`를 참조합니다. 전체 관계는 위 ERD와 [Fact·차원 참조 검증 코드](src/gold/build_dimensions.py#L148)에서 확인할 수 있습니다.
 
 ## 7. 주요 프로시저
 
@@ -142,23 +119,52 @@ Parquet에서 조회한 실제 값입니다. 각 행에서 분석에 필요한 �
 3. **공용 Gold** · 관점별 결과를 연결해 공용 차원과 팩트를 생성하고, 키와 참조 관계를 확인합니다.
 4. **AI Ready** · 점검 Silver와 02 위반 기록, 03 후속 점검 결과에서 기준일 전 365일 이력과 과제별 정답을 만듭니다. [학습 데이터 생성과 검증](docs/ai_ready/inspection_training.md)
 
-### 공용 Bronze에서 Silver로 바뀐 실제 점검
-
-점검 `2646979`를 공용 Bronze와 Silver Parquet에서 각각 조회했습니다. 날짜·결과 표기가 바뀌어도 원천 행 번호 `4`로 같은 점검을 추적할 수 있습니다.
-
-| 항목 | 공용 Bronze 컬럼과 값 | 공용 Silver 컬럼과 값 |
-| --- | --- | --- |
-| 점검 번호 | `Inspection ID` = `"2646979"` | `inspection_key` = `"2646979"` |
-| 면허번호 | `License #` = `"2398495"` | `license_number_key` = `"2398495"` |
-| 점검 날짜 | `Inspection Date` = `"11/18/2026"` (문자열) | `inspection_dtm` = `2026-11-18` (날짜형) |
-| 점검 결과 | `Results` = `"Fail"` | `result_cd` = `"FAIL"` |
-| 원천 행 번호 | `source_row_num` = `4` | `source_row_num` = `4` |
-| 원천 파일명 | `_SRC_FILE` = `food_inspections.csv` | 컬럼 제거 |
-| 적재 시각 | `_LOAD_DTM` = `2026-11-23T00:29:09Z` | 컬럼 제거 |
-
-[공용 Bronze](data/01_bronze/06_integration) · [공용 Silver](data/02_silver/06_integration) · [점검 표준화 코드](src/domains/01_inspection/silver.py#L11) · [공용 Silver 생성 코드](src/domains/06_integration/build.py#L72)
-
 ## 8. 수행 결과
+
+아래 이미지는 원천과 공개 Parquet의 처음 3행을 직접 읽어 핵심 컬럼만 표시한 자료입니다.
+
+### 8.1 원천 데이터
+
+점검 318,627건, 인허가 이력 1,212,132건, 커뮤니티 지역 77개에서 시작합니다. 점검의 `Inspection ID`와 `Violations`, 인허가의 `LICENSE ID`와 `LICENSE NUMBER`, 지역의 `area_numbe`와 `geometry`를 확인합니다.
+
+- **실행:** `python -m src.ingestion.restore_origin --restore` · [복원·체크섬 검증 코드](src/ingestion/restore_origin.py#L71)
+- **참고:** [원천 인벤토리](docs/source_data_inventory.md) · [공용 원천과 실행 환경](docs/project_setup_and_sharing.md)
+
+![점검 CSV·인허가 CSV·지역 GeoJSON의 처음 3개 기록](docs/pipeline-origin-head3.png)
+
+### 8.2 Bronze 데이터
+
+원천값과 순서를 Parquet에 보존하고 `_SRC_FILE`(원천 파일명), `_LOAD_DTM`(적재 시각), `source_row_num`(원천 행 번호)을 붙입니다. 공용 점검 Bronze는 원천 17열에 이 3열을 더한 20열입니다.
+
+- **실행:** `python -m src.domains.06_integration.build --output reports/runs/06_integration/shared-bronze-silver` · [Bronze 생성 함수](src/domains/06_integration/build.py#L33)
+- **검증:** [원천값·행 수·순서 대조 함수](src/domains/06_integration/build.py#L52) · [공용 통합 가이드](docs/domains/06_integration.md)
+
+![점검·인허가·지역 공용 Bronze Parquet의 처음 3행](docs/pipeline-bronze-head3.png)
+
+### 8.3 Silver 데이터 · 데이터 분석, 표준화, 검증
+
+위 Bronze 실행 명령이 Silver도 함께 생성합니다. 점검의 `Inspection ID`는 `inspection_key`로, 두 원천의 면허번호는 `license_number_key`로 맞춥니다. 날짜는 날짜형으로, `Fail`은 `FAIL`로 바꾸고 지역 번호는 정수로 저장합니다. 표준화 뒤에도 `source_row_num`을 유지합니다.
+
+| 원천에서 확인한 사례 | 처리와 확인 방법 |
+| --- | --- |
+| 위반 원문 공란 90,022건 | 점검 행은 유지하고 빈 칸에서는 위반 상세 행을 만들지 않습니다. |
+| 위반 조각 1,792건에 `Comments:` 표시 없음 | 설명과 메모를 추측하지 않고 원문과 사유를 격리합니다. 전체 1,031,073건이 정상 1,029,281건과 격리 1,792건의 합인지 확인합니다. |
+| 점검 면허번호 `0`, `9999999` | 연결할 수 없는 값은 `null`로 바꾸고 점검 행은 유지합니다. |
+| 좌표 공란 1,065건, 경계 밖 324건 | 지역을 임의로 채우지 않고 지역 분석에서 두 미배정 사유를 구분합니다. |
+
+- **표준화:** [공용 Silver 생성 함수](src/domains/06_integration/build.py#L72) · [점검 표준화와 품질 표시](src/domains/01_inspection/silver.py#L11)
+- **검증:** [행 수·키·원천 순번](src/domains/06_integration/build.py#L104) · [위반 정상·격리 대조](src/domains/02_violation/reconciliation.py#L91) · [팀 표준화 기준](docs/data_integration_conventions.md)
+
+![점검·인허가·지역 공용 Silver Parquet의 처음 3행](docs/pipeline-silver-head3.png)
+
+### 8.4 Gold 데이터
+
+점검 Fact는 점검 한 건, 위반 Fact는 정상 위반 조각 하나가 한 행입니다. `inspection_key`로 점검을 찾고, `violation_key`로 위반 차원의 설명을 확인합니다. 캡처는 표별 첫 3행이라 같은 줄끼리 연결된 결과가 아닙니다.
+
+- **실행:** `python -m src.domains.06_integration.run_pipeline` · [공용 Gold 생성](src/gold/build_dimensions.py#L236) · [위반 분석 마트 생성](src/domains/02_violation/build_analysis_mart.py#L133)
+- **검증·참고:** [Fact 키·참조 검증](src/gold/build_dimensions.py#L167) · [일괄 실행 가이드](docs/domains/06_integration.md#관점별-비교-실행) · [통합 검증 결과](reports/quality/team_integration_verification.json) · [위반 분석 HTML](reports/02_violation/violations_analysis.html)
+
+![공용 Gold 점검 Fact·위반 Fact·위반 차원 Parquet의 처음 3행](docs/pipeline-gold-head3.png)
 
 | 관점 | 대표 결과 | 확인 자료 |
 | --- | --- | --- |
@@ -168,7 +174,12 @@ Parquet에서 조회한 실제 값입니다. 각 행에서 분석에 필요한 �
 | 04 사업체 인허가 | 유효기간 후보 1건 232,383건, 복수 후보 1,401건, 후보 없음 84,843건 | [기간 매칭 검증](docs/domains/04_license/03_gold/README.md) |
 | 05 지역 분석 | 317,238건 지역 배정. 좌표 공란 1,065건과 경계 밖 324건 별도 집계 | [지역 분석 결과](docs/domains/05_geospatial.md) |
 
-### 학습용 AI Ready 데이터
+### 8.5 AI Ready Data
+
+- **실행:** `python -m src.ai_ready.build_inspection_training` · [학습 데이터 생성 함수](src/ai_ready/build_inspection_training.py#L193)
+- **볼 컬럼:** `prediction_dtm`(예측 기준일), `split_cd`(학습·검증·테스트 구분), `label_fail_flag`와 `label_repeat_flag`(과제별 정답)
+- **참고:** [입력·정답·시간 분할 기준](docs/ai_ready/inspection_training.md)
+
 
 | 예측&nbsp;과제 | 한&nbsp;행의&nbsp;의미 | 전체&nbsp;행&nbsp;수 | 실제&nbsp;양성 | 최종&nbsp;평가용<br>행&nbsp;수 |
 | --- | --- | ---: | ---: | ---: |
@@ -182,157 +193,7 @@ Parquet에서 조회한 실제 값입니다. 각 행에서 분석에 필요한 �
 
 학습 데이터 자동화 테스트 **3개 통과**. 실제 산출물의 중복 키, 정답 누락·불일치, 시간 분할 위반은 각각 **0건**입니다. [검증 보고서](reports/ai_ready/inspection_training/README.md)
 
-## 9. 실행 흐름 시연
-
-저장소 루트에서 공용 스냅샷을 준비한 뒤 일괄 실행합니다. 실행 결과는 별도 폴더에 저장해 공개 스냅샷과 비교합니다. [실행 환경과 준비 방법](docs/domains/06_integration.md#관점별-비교-실행)
-
-```sh
-python -m src.domains.06_integration.run_pipeline
-python -m src.domains.06_integration.run_pipeline --verify
-```
-
-| 화면 순서 | 열어 볼 처리 코드와 검증 코드 | 결과에서 확인할 값 |
-| --- | --- | --- |
-| 1. Origin 복원 | [`restore_origin.py` · `run()`](src/ingestion/restore_origin.py#L71)에서 원천 CSV를 복원하고 분할 조각과 원본의 체크섬을 확인 | 점검 318,627건, 인허가 1,212,132건, 지역 77개 |
-| 2. Bronze 저장 | [`build.py` · `build_bronze()`](src/domains/06_integration/build.py#L33)에서 원본값에 파일명·적재 시각·원천 행 번호를 추가. [`verify_bronze()`](src/domains/06_integration/build.py#L52)에서 원천의 값·순서·행 수를 대조 | 점검 `2646979`는 원천 행 번호 `4`, 날짜 `11/18/2026`, 결과 `Fail` |
-| 3. Silver 표준화·품질 | [`silver.py` · `standardize()`](src/domains/01_inspection/silver.py#L11)에서 날짜·결과·면허번호를 정리하고 예외를 표시. [`build.py` · `validate_silver()`](src/domains/06_integration/build.py#L104)에서 행 수·키·원천 순번을 검사 | 같은 점검의 날짜 `2026-11-18`, 결과 `FAIL`, 원천 행 번호 `4` 유지 |
-| 4. 위반 분리·품질 | [`silver.py` · `run()`](src/domains/02_violation/silver.py#L255)으로 위반을 나누고 [`quality.py` · `run()`](src/domains/02_violation/quality.py#L216)과 [`reconciliation.py` · `run()`](src/domains/02_violation/reconciliation.py#L91)으로 원문과 분리 결과를 대조 | 후보 1,031,073건 = 정상 1,029,281건 + 격리 1,792건. `Comments:` 경계가 없는 조각은 원문과 이유를 보관 |
-| 5. Gold·마트 | [`build_dimensions.py` · `build()`](src/gold/build_dimensions.py#L236)로 공용 Gold 생성, [`validate_facts()`](src/gold/build_dimensions.py#L167)로 키와 참조 관계 확인. [`build_analysis_mart.py` · `build()`](src/domains/02_violation/build_analysis_mart.py#L133)로 위반 분석 표와 리포트 생성 | Fact 9개·차원 9개. [위반 분석 HTML](reports/02_violation/violations_analysis.html)에서 시설별 위반 빈도 확인 |
-| 6. AI Ready·최종 대조 | [`build_inspection_training.py` · `build()`](src/ai_ready/build_inspection_training.py#L193)로 입력과 정답을 나눈 학습 데이터 생성. [`validate_pipeline.py` · `compare_results()`](src/domains/06_integration/validate_pipeline.py#L42)로 공개 결과와 대조 | 불합격 예측 273,488행, 위반 재관측 예측 287,535행. [공용 통합 검증 기록](reports/quality/team_integration_verification.json)에서 PASS 확인 |
-
-### 실행 결과 미리보기 (각 파일의 처음 5행)
-
-[발표용 표 이미지(PNG)](docs/gold-pipeline-parquet-head5.png)
-
-아래 값은 로컬에 있는 **공개 Parquet 스냅샷**에서 파일의 저장 순서대로 처음 다섯 행을 직접 읽은 결과입니다. 핵심 컬럼만 표시했습니다. 이 표를 만들기 위해 전체 파이프라인을 다시 실행하지는 않았습니다. 서로 다른 테이블의 미리보기는 같은 점검을 행별로 대조한 표가 아닙니다.
-
-#### 공용 Bronze 점검
-
-[`food_inspections.parquet`](data/01_bronze/06_integration/food_inspections.parquet)
-
-| `source_row_num` | `Inspection ID` | `Inspection Date` | `Results` | `_SRC_FILE` |
-| --- | --- | --- | --- | --- |
-| 1 | 2646929 | 11/18/2026 | Pass w/ Conditions | food_inspections.csv |
-| 2 | 2646968 | 11/18/2026 | Pass | food_inspections.csv |
-| 3 | 2646918 | 11/18/2026 | Pass | food_inspections.csv |
-| 4 | 2646979 | 11/18/2026 | Fail | food_inspections.csv |
-| 5 | 2646933 | 11/18/2026 | Pass w/ Conditions | food_inspections.csv |
-
-#### 공용 Silver 점검
-
-[`food_inspections.parquet`](data/02_silver/06_integration)
-
-| `source_row_num` | `inspection_key` | `inspection_dtm` | `result_cd` | `license_number_key` |
-| --- | --- | --- | --- | --- |
-| 1 | 2646929 | 2026-11-18 | PASS W/ CONDITIONS | 3108683 |
-| 2 | 2646968 | 2026-11-18 | PASS | 2516510 |
-| 3 | 2646918 | 2026-11-18 | PASS | 2215535 |
-| 4 | 2646979 | 2026-11-18 | FAIL | 2398495 |
-| 5 | 2646933 | 2026-11-18 | PASS W/ CONDITIONS | 3108684 |
-
-#### 위반 Silver 정상
-
-[`02_inspection_violations_accepted.parquet`](data/02_silver/02_violation)
-
-| `inspection_id` | `source_row_num` | `item_sequence_num` | `violation_code` | `parsing_status` |
-| --- | --- | --- | --- | --- |
-| 2646929 | 1 | 1 | 3 | PARSED |
-| 2646929 | 1 | 2 | 38 | PARSED |
-| 2646918 | 3 | 1 | 49 | PARSED |
-| 2646918 | 3 | 2 | 55 | PARSED |
-| 2646918 | 3 | 3 | 55 | PARSED |
-
-#### 위반 Silver 격리
-
-[`02_inspection_violations_quarantine.parquet`](data/02_silver/02_violation/02_inspection_violations_quarantine.parquet)
-
-| `inspection_id` | `source_row_num` | `item_sequence_num` | `violation_code` | `rejection_reason` |
-| --- | --- | --- | --- | --- |
-| 2646817 | 38 | 1 | 1 | MISSING_COMMENTS_MARKER |
-| 2646417 | 232 | 1 | 1 | MISSING_COMMENTS_MARKER |
-| 2645684 | 754 | 1 | 47 | MISSING_COMMENTS_MARKER |
-| 2645452 | 933 | 2 | 54 | MISSING_COMMENTS_MARKER |
-| 2643327 | 1705 | 7 | 58 | MISSING_COMMENTS_MARKER |
-
-#### 공용 Gold 점검 Fact
-
-[`01_fact_inspection.parquet`](data/03_gold/facts/01_fact_inspection.parquet)
-
-| `inspection_key` | `inspection_dtm` | `result_cd_key` | `decision_count_num` | `fail_count_num` |
-| --- | --- | --- | --- | --- |
-| 2646929 | 2026-11-18 | value:PASS W/ CONDITIONS | 1 | 0 |
-| 2646968 | 2026-11-18 | value:PASS | 1 | 0 |
-| 2646918 | 2026-11-18 | value:PASS | 1 | 0 |
-| 2646979 | 2026-11-18 | value:FAIL | 1 | 1 |
-| 2646933 | 2026-11-18 | value:PASS W/ CONDITIONS | 1 | 0 |
-
-#### 공용 Gold 위반 차원
-
-[`dim_violation.parquet`](data/03_gold/dimensions/dim_violation.parquet)
-
-| `violation_key` | `violation_code` | `violation_description` |
-| --- | --- | --- |
-| 1 | 1 | PERSON IN CHARGE PRESENT, DEMONSTRATES KNOWLEDGE, AND PERFORMS DUTIES |
-| 2 | 1 | SOURCE SOUND CONDITION, NO SPOILAGE, FOODS PROPERLY LABELED, SHELLFISH TAGS IN PLACE |
-| 3 | 10 | ADEQUATE HANDWASHING SINKS PROPERLY SUPPLIED AND ACCESSIBLE |
-| 4 | 10 | SEWAGE AND WASTE WATER DISPOSAL, NO BACK SIPHONAGE, CROSS  CONNECTION AND/OR BACK FLOW |
-| 5 | 11 | ADEQUATE NUMBER, CONVENIENT, ACCESSIBLE, DESIGNED, AND MAINTAINED |
-
-#### Gold 위반 분석 마트
-
-[`02_violations_analysis_mart.parquet`](data/03_gold/02_violation/02_violations_analysis_mart.parquet)
-
-| `inspection_id` | `item_sequence_num` | `facility_type` | `inspection_result` | `violation_code` |
-| --- | --- | --- | --- | --- |
-| 2646929 | 1 | Restaurant | Pass w/ Conditions | 3 |
-| 2646929 | 2 | Restaurant | Pass w/ Conditions | 38 |
-| 2646918 | 1 | Children's Services Facility | Pass | 49 |
-| 2646918 | 2 | Children's Services Facility | Pass | 55 |
-| 2646918 | 3 | Children's Services Facility | Pass | 55 |
-
-#### AI Ready 점검 전 불합격
-
-[`01_preinspection_failure.parquet`](data/ai_ready/inspection_training/ac0d0f3f4f33656e78a6/01_preinspection_failure.parquet)
-
-| `inspection_key` | `prediction_dtm` | `prior_inspection_count_num` | `label_fail_flag` | `split_cd` |
-| --- | --- | --- | --- | --- |
-| 120273 | 2010-01-06 | NULL | false | train |
-| 74277 | 2010-01-22 | NULL | false | train |
-| 68074 | 2010-01-28 | NULL | false | train |
-| 120331 | 2010-02-08 | NULL | false | train |
-| 68320 | 2010-03-02 | NULL | true | train |
-
-#### AI Ready 다음 점검의 위반 재관측
-
-[`03_next_inspection_violation_recurrence.parquet`](data/ai_ready/inspection_training/ac0d0f3f4f33656e78a6/03_next_inspection_violation_recurrence.parquet)
-
-| `inspection_key` | `prediction_dtm` | `violation_cd` | `followup_inspection_key` | `label_repeat_flag` | `split_cd` |
-| --- | --- | --- | --- | --- | --- |
-| 2291046 | 2019-06-06 | 3 | 2366339 | false | train |
-| 2291046 | 2019-06-06 | 36 | 2366339 | false | train |
-| 2291046 | 2019-06-06 | 40 | 2366339 | false | train |
-| 2291046 | 2019-06-06 | 5 | 2366339 | true | train |
-| 2291046 | 2019-06-06 | 55 | 2366339 | true | train |
-
-### 코드 화면에서 보여줄 부분
-
-Bronze 코드의 아래 부분에서 기존 원천 행에 추적 정보 세 개를 붙입니다. [Bronze 원본 코드](src/domains/06_integration/build.py#L44)
-
-```python
-records = [dict(row, _SRC_FILE=source.path.name, _LOAD_DTM=load_time,
-                source_row_num=start * BATCH_SIZE + index)
-           for index, (_, row) in enumerate(items, 1)]
-```
-
-Silver 코드의 아래 부분에서 미국식 날짜 문자열을 날짜형으로 변환합니다. 변환할 수 없는 날짜는 품질 검사에서 짚을 수 있도록 표시합니다. [Silver 원본 코드](src/domains/01_inspection/silver.py#L29)
-
-```python
-dates = pd.to_datetime(silver["inspection_dtm"], format="%m/%d/%Y", errors="coerce")
-issues["invalid_inspection_date"] = dates.isna()
-silver["inspection_dtm"] = dates.astype(pd.ArrowDtype(pa.date32()))
-```
-
-## 10. 한 줄 회고
+## 9. 한 줄 회고
 
 **Keep** : 팀원별 역할을 분담하고 데이터 처리 과정을 단계별로 정리한 점 <br>
 **Problem** : 분석 관점을 스스로 충분히 고민하기보다 제안된 관점을 중심으로 진행하다 보니, 각 관점의 목적과 의미를 깊이 이해하는 데 다소 아쉬움이 있었음<br>
