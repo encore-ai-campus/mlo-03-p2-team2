@@ -6,13 +6,13 @@
 
 **치카치카**
 
-| 관점 | 팀원 | GitHub |
-| --- | :---: | --- |
-| 01 점검 성과 | 이하영 | [@coffeewoouuu](https://github.com/coffeewoouuu) |
-| 02 위반 유형 | 이자연 | [@naturedevworks](https://github.com/naturedevworks) |
-| 03 반복 위반·재검사 | 김한울 | [@hannyeee](https://github.com/hannyeee) |
-| 04 사업체 인허가 | 노진산 | [@jinsan02](https://github.com/jinsan02) |
-| 05 지역 분석 | 오정민 | [@OZAM0415](https://github.com/OZAM0415) |
+| 팀원 | 담당 관점 | 대표 Fact | GitHub |
+| --- | --- | --- | --- |
+| 이하영 | 01 점검 성과 | `01_fact_inspection` | [@coffeewoouuu](https://github.com/coffeewoouuu) |
+| 이자연 | 02 위반 유형 | `02_fact_inspection_violation` | [@naturedevworks](https://github.com/naturedevworks) |
+| 김한울 | 03 반복 위반·재검사 | `03_fact_repeat_violation` | [@hannyeee](https://github.com/hannyeee) |
+| 노진산 | 04 사업체 인허가 | `04_fact_inspection_license_match` | [@jinsan02](https://github.com/jinsan02) |
+| 오정민 | 05 지역 분석 | `05_fact_inspection_area_period` | [@OZAM0415](https://github.com/OZAM0415) |
 
 ## 2. 프로젝트 개요
 
@@ -87,13 +87,28 @@
 01 점검 팩트는 **점검 ID 하나에 한 행**입니다. <br>
 02 위반 조각과 03 기준·후속 점검은 이 점검 ID를 참조합니다.  <br>01·04는 공용 날짜 차원을, 05의 지역 집계는 공용 지역 차원을 사용합니다.
 
-| 관점 | 한 행의 의미 | 주요 지표 |
-| --- | --- | --- |
-| 01 점검 성과 | 점검 1건 | 점검·판정·불합격 건수 |
-| 02 위반 유형 | 정상 파싱된 위반 조각 1개 | 위반 조각 수, 위반이 기록된 고유 점검 수 |
-| 03 반복 위반·재검사 | 기준 점검의 고유 위반 코드 1개 / 기준 불합격 점검 1건 | 재관측 여부 / 재검사 연결 여부와 소요일 |
-| 04 사업체 인허가 | 인허가 이력 1건 / 점검별 인허가 매칭 1건 | 이력 수 / 유효기간 후보 수 |
-| 05 지역 분석 | 지역·기간 / 지역·기간·코드 버전 / 지역·기간·코드 버전·위반 코드 | 점검 결과 / 위반 관측 범위 / 코드별 고유 점검 수 |
+### 공용 Gold Fact 9개
+
+행 수는 공용 Gold Parquet 스냅샷 기준입니다. 키는 팩트 검증 코드가 행의 유일성을 확인할 때 사용하는 컬럼입니다.
+
+| 관점 | Fact 테이블 | 한 행의 의미 | 행 식별 키 | 행 수 |
+| --- | --- | --- | --- | ---: |
+| 01 점검 성과 | `01_fact_inspection` | 점검 1건 | `inspection_key` | 318,627 |
+| 02 위반 유형 | `02_fact_inspection_violation` | 정상으로 분류된 위반 조각 1개 | `source_row_num` + `item_sequence_num` | 1,029,281 |
+| 03 반복 위반·재검사 | `03_fact_repeat_violation` | 기준 점검의 위반 코드 버전과 코드 조합 1개 | `base_inspection_key` + `code_system_version` + `violation_cd` | 444,768 |
+| 03 반복 위반·재검사 | `03_fact_reinspection` | 기준 불합격 점검 1건 | `base_inspection_key` | 61,344 |
+| 04 사업체 인허가 | `04_fact_inspection_license_match` | 인허가 연결 후보를 확인한 점검 1건 | `inspection_key` | 318,627 |
+| 04 사업체 인허가 | `04_fact_license_event` | 발급·갱신 등 인허가 이력 1건 | `license_event_key` | 1,212,132 |
+| 05 지역 분석 | `05_fact_inspection_area_period` | 기간 단위·시작일과 지역 배정 결과의 조합 1개 | 지역·기간 키 | 17,820 |
+| 05 지역 분석 | `05_fact_violation_coverage_area_period` | 지역·기간별 위반 코드 버전 1개 | 지역·기간 키 + `code_system_version` | 17,901 |
+| 05 지역 분석 | `05_fact_violation_area_period` | 지역·기간·위반 코드 버전별 위반 코드 1개 | 지역·기간 키 + `code_system_version` + `violation_cd` | 280,469 |
+
+**지역·기간 키**는 `period_grain_cd`, `period_start_dtm`, `community_area_match_status`, `community_area_num`의 조합입니다. 지역 미배정 행은 `community_area_num`이 비어 있을 수 있으며, 배정 상태로 구분합니다.
+
+
+[공용 Fact 산출물](data/03_gold/facts) · [Gold 생성·검증 코드](src/gold/build_dimensions.py)
+
+점검 Fact의 `inspection_dtm`은 `dim_date.calendar_dtm`을, 위반 Fact의 `violation_key`는 `dim_violation.violation_key`를 참조합니다. 전체 관계는 위 ERD와 [Fact·차원 참조 검증 코드](src/gold/build_dimensions.py#L148)에서 확인할 수 있습니다.
 
 ## 7. 주요 프로시저
 
@@ -106,6 +121,51 @@
 
 ## 8. 수행 결과
 
+아래 이미지는 원천과 공개 Parquet의 처음 3행을 직접 읽어 핵심 컬럼만 표시한 자료입니다.
+
+### 8.1 원천 데이터
+
+점검 318,627건, 인허가 이력 1,212,132건, 커뮤니티 지역 77개에서 시작합니다. 점검의 `Inspection ID`와 `Violations`, 인허가의 `LICENSE ID`와 `LICENSE NUMBER`, 지역의 `area_numbe`와 `geometry`를 확인합니다.
+
+- **실행:** `python -m src.ingestion.restore_origin --restore` · [복원·체크섬 검증 코드](src/ingestion/restore_origin.py#L71)
+- **참고:** [원천 인벤토리](docs/source_data_inventory.md) · [공용 원천과 실행 환경](docs/project_setup_and_sharing.md)
+
+![점검 CSV·인허가 CSV·지역 GeoJSON의 처음 3개 기록](docs/pipeline-origin-head3.png)
+
+### 8.2 Bronze 데이터
+
+원천값과 순서를 Parquet에 보존하고 `_SRC_FILE`(원천 파일명), `_LOAD_DTM`(적재 시각), `source_row_num`(원천 행 번호)을 붙입니다. 공용 점검 Bronze는 원천 17열에 이 3열을 더한 20열입니다.
+
+- **실행:** `python -m src.domains.06_integration.build --output reports/runs/06_integration/shared-bronze-silver` · [Bronze 생성 함수](src/domains/06_integration/build.py#L33)
+- **검증:** [원천값·행 수·순서 대조 함수](src/domains/06_integration/build.py#L52) · [공용 통합 가이드](docs/domains/06_integration.md)
+
+![점검·인허가·지역 공용 Bronze Parquet의 처음 3행](docs/pipeline-bronze-head3.png)
+
+### 8.3 Silver 데이터 · 데이터 분석, 표준화, 검증
+
+위 Bronze 실행 명령이 Silver도 함께 생성합니다. 점검의 `Inspection ID`는 `inspection_key`로, 두 원천의 면허번호는 `license_number_key`로 맞춥니다. 날짜는 날짜형으로, `Fail`은 `FAIL`로 바꾸고 지역 번호는 정수로 저장합니다. 표준화 뒤에도 `source_row_num`을 유지합니다.
+
+| 원천에서 확인한 사례 | 처리와 확인 방법 |
+| --- | --- |
+| 위반 원문 공란 90,022건 | 점검 행은 유지하고 빈 칸에서는 위반 상세 행을 만들지 않습니다. |
+| 위반 조각 1,792건에 `Comments:` 표시 없음 | 설명과 메모를 추측하지 않고 원문과 사유를 격리합니다. 전체 1,031,073건이 정상 1,029,281건과 격리 1,792건의 합인지 확인합니다. |
+| 점검 면허번호 `0`, `9999999` | 연결할 수 없는 값은 `null`로 바꾸고 점검 행은 유지합니다. |
+| 좌표 공란 1,065건, 경계 밖 324건 | 지역을 임의로 채우지 않고 지역 분석에서 두 미배정 사유를 구분합니다. |
+
+- **표준화:** [공용 Silver 생성 함수](src/domains/06_integration/build.py#L72) · [점검 표준화와 품질 표시](src/domains/01_inspection/silver.py#L11)
+- **검증:** [행 수·키·원천 순번](src/domains/06_integration/build.py#L104) · [위반 정상·격리 대조](src/domains/02_violation/reconciliation.py#L91) · [팀 표준화 기준](docs/data_integration_conventions.md)
+
+![점검·인허가·지역 공용 Silver Parquet의 처음 3행](docs/pipeline-silver-head3.png)
+
+### 8.4 Gold 데이터
+
+점검 Fact는 점검 한 건, 위반 Fact는 정상 위반 조각 하나가 한 행입니다. `inspection_key`로 점검을 찾고, `violation_key`로 위반 차원의 설명을 확인합니다. 캡처는 표별 첫 3행이라 같은 줄끼리 연결된 결과가 아닙니다.
+
+- **실행:** `python -m src.domains.06_integration.run_pipeline` · [공용 Gold 생성](src/gold/build_dimensions.py#L236) · [위반 분석 마트 생성](src/domains/02_violation/build_analysis_mart.py#L133)
+- **검증·참고:** [Fact 키·참조 검증](src/gold/build_dimensions.py#L167) · [일괄 실행 가이드](docs/domains/06_integration.md#관점별-비교-실행) · [통합 검증 결과](reports/quality/team_integration_verification.json) · [위반 분석 HTML](reports/02_violation/violations_analysis.html)
+
+![공용 Gold 점검 Fact·위반 Fact·위반 차원 Parquet의 처음 3행](docs/pipeline-gold-head3.png)
+
 | 관점 | 대표 결과 | 확인 자료 |
 | --- | --- | --- |
 | 01 점검 성과 | 전체 318,627건 중 판정 273,488건, 불합격 61,344건 · **22.43%** | [점검 성과 보고서](docs/domains/01_inspection_proposal.md) |
@@ -114,7 +174,12 @@
 | 04 사업체 인허가 | 유효기간 후보 1건 232,383건, 복수 후보 1,401건, 후보 없음 84,843건 | [기간 매칭 검증](docs/domains/04_license/03_gold/README.md) |
 | 05 지역 분석 | 317,238건 지역 배정. 좌표 공란 1,065건과 경계 밖 324건 별도 집계 | [지역 분석 결과](docs/domains/05_geospatial.md) |
 
-### 학습용 AI Ready 데이터
+### 8.5 AI Ready Data
+
+- **실행:** `python -m src.ai_ready.build_inspection_training` · [학습 데이터 생성 함수](src/ai_ready/build_inspection_training.py#L193)
+- **볼 컬럼:** `prediction_dtm`(예측 기준일), `split_cd`(학습·검증·테스트 구분), `label_fail_flag`와 `label_repeat_flag`(과제별 정답)
+- **참고:** [입력·정답·시간 분할 기준](docs/ai_ready/inspection_training.md)
+
 
 | 예측&nbsp;과제 | 한&nbsp;행의&nbsp;의미 | 전체&nbsp;행&nbsp;수 | 실제&nbsp;양성 | 최종&nbsp;평가용<br>행&nbsp;수 |
 | --- | --- | ---: | ---: | ---: |
