@@ -6,11 +6,12 @@ from collections import defaultdict
 from dataclasses import dataclass
 from datetime import date, datetime
 from functools import lru_cache
+from pathlib import Path
 
 import pyarrow as pa
 import pyarrow.compute as pc
 
-from config import TABLES
+from config import PROJECT, TABLES
 from pipeline_io import ROW
 
 
@@ -33,24 +34,44 @@ class Field:
     decision_id: str
 
 
-def load_dictionary(path):
+def read_fields(path, table=None):
     entries = defaultdict(list)
     with path.open(encoding="utf-8-sig", newline="") as stream:
         for row in csv.DictReader(stream):
+            if table is not None and row["table"] != table:
+                continue
             field = Field(**row)
             if TRANSFORM_TYPES.get(field.transform) != field.type or not field.decision_id.strip():
                 raise ValueError(f"Invalid transform or decision ID for {field.target_column}.")
             if not re.fullmatch(r"[a-z][a-z0-9_]*", field.target_column):
                 raise ValueError(f"Invalid Silver column name: {field.target_column}")
             entries[field.table].append(field)
-    if set(entries) != set(TABLES):
-        raise ValueError(f"Data dictionary must define exactly {TABLES}.")
     for table, fields in entries.items():
         targets = [field.target_column for field in fields]
         if len(targets) != len(set(targets)) or ROW in targets:
             raise ValueError(f"{table}: duplicate or reserved target column.")
     return entries
 
+
+def shared_license_fields():
+    path = PROJECT / "metadata/data_dictionary/shared_silver_columns.csv"
+    fields = read_fields(path, table="business_licenses").get("business_licenses")
+    if not fields:
+        raise ValueError("Shared Silver dictionary must define business_licenses.")
+    return fields
+
+
+def load_dictionary(path):
+    # Keep the existing CLI default and old path argument as a compatibility alias.
+    if path.resolve() == Path(__file__).with_name("데이터 사전.csv"):
+        directory = PROJECT / "metadata/data_dictionary/04_license"
+        entries = read_fields(directory / "standalone_inspection_columns.csv")
+        entries["business_licenses"] = shared_license_fields()
+    else:
+        entries = read_fields(path)
+    if set(entries) != set(TABLES):
+        raise ValueError(f"Data dictionary must define exactly {TABLES}.")
+    return entries
 
 def silver_schema(fields):
     return pa.schema([(field.target_column, ARROW_TYPES[field.type]) for field in fields]

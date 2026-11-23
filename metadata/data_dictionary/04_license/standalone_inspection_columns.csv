@@ -1,0 +1,5 @@
+table,source_column,target_column,type,transform,decision_id
+food_inspections,Inspection ID,inspection_key,string,positive_id,D04-N02
+food_inspections,License #,license_number_key,string,inspection_license,D04-N05
+food_inspections,Inspection Date,inspection_dtm,date,calendar_date,D04-N04
+food_inspections,Results,result_cd,string,upper,D04-N03

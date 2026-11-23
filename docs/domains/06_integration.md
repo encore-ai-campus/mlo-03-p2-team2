@@ -57,7 +57,7 @@ python -m src.silver.validate_integration_silver
 | --- | --- | --- |
 | B-01 | 원천과 Bronze의 논리 행 수, 순서 및 원문 값 확인 | [check_integration_bronze.py](../../src/bronze/check_integration_bronze.py) |
 | B-02 | 원천 파일명 `_SRC_FILE`, UTC 적재 시각 `_LOAD_DTM`, 원천 순번 확인 | [check_integration_bronze.py](../../src/bronze/check_integration_bronze.py) |
-| S-01 | Silver 컬럼명을 01 표준 매핑, 04 사전, 지역 경계 규칙과 대조 | [validate_integration_silver.py](../../src/silver/validate_integration_silver.py) |
+| S-01 | Silver 컬럼명과 타입을 [공용 데이터 사전](../../metadata/data_dictionary/README.md)과 대조 | [validate_integration_silver.py](../../src/silver/validate_integration_silver.py) |
 | S-02 | 점검·인허가 달력 날짜의 Parquet `date32` 검증. 문서 표기는 `YYYY-MM-DD` | [validate_integration_silver.py](../../src/silver/validate_integration_silver.py) |
 | S-03 | 관점별 기본 키 중복 검사와 점검의 완전 중복·키 충돌 플래그 집계 | [validate_integration_silver.py](../../src/silver/validate_integration_silver.py) |
 

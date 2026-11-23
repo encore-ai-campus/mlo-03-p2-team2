@@ -1,6 +1,6 @@
 # 원천 데이터 사전
 
-생성 명령: `python -m src.profiling.render_dictionary`. 수치는 `metadata/source_profiles.json`의 실제 측정값이다. 의미는 제공된 컬럼 메타데이터의 설명을 사용하며 설명이 없거나 불명확하면 `확인 필요`로 표시했다. Silver 타입은 **권장안**이고 구현되지 않았다.
+생성 명령: `python -m src.profiling.render_dictionary`. 수치는 `metadata/source_profiles.json`의 실제 측정값이다. 의미는 제공된 컬럼 메타데이터의 설명을 사용하며 설명이 없거나 불명확하면 `확인 필요`로 표시했다. 이 문서의 Silver 타입은 원천 조사 당시 권장안이다. 현재 구현은 [공용 Silver 데이터 사전](data_dictionary/README.md)을 참고한다.
 
 결측은 원천의 빈 문자열과 공백만 있는 문자열의 합이다. `NULL` 같은 문자 토큰은 별도 집계하고 결측률에 넣지 않는다. 고유값 수는 검증된 Bronze의 원본 컬럼을 한 컬럼씩 정확히 계산했다.
 
