@@ -1,0 +1,29 @@
+{
+  "artifacts": {
+    "01_preinspection_failure.parquet": "347daa64e1ed72df8cb06ad0b7f3afe5986f474bdf544df8ca2b484f6aefb3d0",
+    "03_next_inspection_violation_recurrence.parquet": "6ef5fe6bf00e5249c0edbc80cacefb42cded9e2c6f9b259579abc5b57833fd44",
+    "validation_summary.json": "ccb696e69bfef6ec1a4373c2b1790248eff1b1434f6487ddc6e5cad0106d6480"
+  },
+  "lineage": {
+    "code_sha256": {
+      "build_inspection_training.py": "30fd8032118a36a8d041111892d84cc37ce20086ff7addee760bdcd907f7385b",
+      "inspection_training.py": "598cf2e1e56f474ff918001046e25196a2e3a0dbc78935e59d48a802bec60bf8"
+    },
+    "input_sha256": {
+      "data/02_silver/02_violation/02_inspection_violations_quarantine.parquet": "4329906441766ecdceb6bfd492f569ea9acf0a286c56fa6ca666a0c2388dbe23",
+      "data/02_silver/04_license/04_food_inspections.parquet": "91e083969187426f1a5230df8d5f0e72e323ea1a648e3ec0e6c073c95cd5e039",
+      "data/03_gold/02_violation/02_violations_analysis_mart.parquet": "e6ad982b23de64cfd94da275ef38274a4340f628ed8ebf63b115291d63ddb70e",
+      "data/03_gold/03_repeat_inspection/03_repeat_violation_mart.parquet": "8351257df27bb199cac80194ff5d708fa3bd11e9388deb24ce3bb0b4047dd99e",
+      "metadata/feature_dictionary/inspection_training/contract.json": "391ee81a9f1a515011aa8621168cb51df4d3e867f96332bc8b05ea361ae61594",
+      "metadata/lineage/03_repeat_inspection/bronze_manifest.json": "a4fb5154c851882710b17c0265d5176b155bcaa717c985a579cb3b2329987329",
+      "metadata/lineage/04_license/bronze_manifest.json": "9218ef101a79a036e3209df16f6e543ce6243cd3a13068c670dd390d0844f496",
+      "reports/02_violation/parquet_sha256sums.txt": "b28318f6eb4dd62270b2d46d5e6f7261cc94b2540aee032e5f640ae6e5eae18b",
+      "reports/03_repeat_inspection/parquet_sha256sums.txt": "0517b3f66ccf9bc7050901e3cb905f81ca152d82b4593c632193f50d16044504",
+      "reports/04_license/parquet_sha256sums.txt": "e51edba7afb1ebe3c48edd4389c2772a5f0760ab00f3d8e36b61d092ba5f1331",
+      "reports/quality/violations_reconciliation.json": "7d101b175945c8957c0615ad3e0da751657d6040cdd16279653a8d17147c5a2f"
+    },
+    "pyarrow_version": "26.0.1",
+    "source_sha256": "b43beb7fae834a8698ca162004caf2929cb2eca7ff75c27b4db6bf07aa103c98"
+  },
+  "release_id": "ac0d0f3f4f33656e78a6"
+}
