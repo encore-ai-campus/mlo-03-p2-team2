@@ -1,0 +1,228 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<mxfile host="app.diagrams.net" version="32.6.10" compressed="false">
+  <diagram id="license-star" name="04 인허가 · 구현 ERD">
+    <mxGraphModel grid="1" gridSize="10" guides="1" connect="1" arrows="1" page="1" pageScale="1" pageWidth="1320" pageHeight="655" math="0" shadow="0" background="#ffffff">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="star-title" parent="1" value="04 인허가 기간 매칭 · Gold 스타 스키마" vertex="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Malgun Gothic;fontSize=35;fontStyle=1;fontColor=#183838;">
+          <mxGeometry x="36" y="22" width="1220" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="star-caption" parent="1" value="점검 1건과 인허가 이력 1건의 행 단위를 유지하며 면허·사업장·날짜 차원을 공유합니다." vertex="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Malgun Gothic;fontSize=18;fontStyle=0;fontColor=#496263;">
+          <mxGeometry x="38" y="79" width="1220" height="31" as="geometry" />
+        </mxCell>
+        <mxCell id="fact-match" parent="1" value="fact_inspection_license_match" vertex="1" style="shape=table;startSize=38;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;fontColor=#183838;fontFamily=Consolas;fontSize=18;html=1;fillColor=#d3ebe5;strokeColor=#aac2be;align=left;spacingLeft=12;">
+          <mxGeometry x="35" y="222" width="383" height="244" as="geometry" />
+        </mxCell>
+        <mxCell id="fact-match-row-0" parent="fact-match" value="&lt;b&gt;Grain&lt;/b&gt;　점검 1건 · 318,627행" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="38.000" width="383" height="29.309" as="geometry" />
+        </mxCell>
+        <mxCell id="fact-match-row-1" parent="fact-match" value="&lt;b&gt;PK&lt;/b&gt;　inspection_key" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="67.429" width="383" height="29.309" as="geometry" />
+        </mxCell>
+        <mxCell id="fact-match-row-2" parent="fact-match" value="&lt;b&gt;FK&lt;/b&gt;　license_number_key · establishment_key" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="96.857" width="383" height="29.309" as="geometry" />
+        </mxCell>
+        <mxCell id="fact-match-row-3" parent="fact-match" value="&lt;b&gt;FK&lt;/b&gt;　date_key (점검일)" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="126.286" width="383" height="29.309" as="geometry" />
+        </mxCell>
+        <mxCell id="fact-match-row-4" parent="fact-match" value="&lt;b&gt;선택 키&lt;/b&gt;　matched_license_event_id" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="155.714" width="383" height="29.309" as="geometry" />
+        </mxCell>
+        <mxCell id="fact-match-row-5" parent="fact-match" value="&lt;b&gt;측정값&lt;/b&gt;　candidate_count_num (기간 후보 수)" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="185.143" width="383" height="29.309" as="geometry" />
+        </mxCell>
+        <mxCell id="fact-match-row-6" parent="fact-match" value="&lt;b&gt;상태&lt;/b&gt;　match_status_cd · result_cd" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="214.571" width="383" height="29.309" as="geometry" />
+        </mxCell>
+        <mxCell id="fact-event" parent="1" value="fact_license_event" vertex="1" style="shape=table;startSize=38;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;fontColor=#183838;fontFamily=Consolas;fontSize=18;html=1;fillColor=#d3ebe5;strokeColor=#aac2be;align=left;spacingLeft=12;">
+          <mxGeometry x="910" y="222" width="375" height="244" as="geometry" />
+        </mxCell>
+        <mxCell id="fact-event-row-0" parent="fact-event" value="&lt;b&gt;Grain&lt;/b&gt;　인허가 이력 1건 · 1,212,132행" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="38.000" width="375" height="34.213" as="geometry" />
+        </mxCell>
+        <mxCell id="fact-event-row-1" parent="fact-event" value="&lt;b&gt;PK&lt;/b&gt;　license_event_key" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="72.333" width="375" height="34.213" as="geometry" />
+        </mxCell>
+        <mxCell id="fact-event-row-2" parent="fact-event" value="&lt;b&gt;FK&lt;/b&gt;　license_number_key · establishment_key" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="106.667" width="375" height="34.213" as="geometry" />
+        </mxCell>
+        <mxCell id="fact-event-row-3" parent="fact-event" value="&lt;b&gt;FK&lt;/b&gt;　date_key (발급일)" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="141.000" width="375" height="34.213" as="geometry" />
+        </mxCell>
+        <mxCell id="fact-event-row-4" parent="fact-event" value="&lt;b&gt;기간&lt;/b&gt;　term_start_dtm · term_end_dtm" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="175.333" width="375" height="34.213" as="geometry" />
+        </mxCell>
+        <mxCell id="fact-event-row-5" parent="fact-event" value="&lt;b&gt;상태&lt;/b&gt;　application_cd · recorded_status_cd" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="209.667" width="375" height="34.213" as="geometry" />
+        </mxCell>
+        <mxCell id="dim-license" parent="1" value="dim_license" vertex="1" style="shape=table;startSize=38;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;fontColor=#183838;fontFamily=Consolas;fontSize=18;html=1;fillColor=#eef4ea;strokeColor=#aac2be;align=left;spacingLeft=12;">
+          <mxGeometry x="500" y="135" width="320" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="dim-license-row-0" parent="dim-license" value="&lt;b&gt;Grain&lt;/b&gt;　면허번호 1개" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="38.000" width="320" height="35.880" as="geometry" />
+        </mxCell>
+        <mxCell id="dim-license-row-1" parent="dim-license" value="&lt;b&gt;PK&lt;/b&gt;　license_number_key" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="74.000" width="320" height="35.880" as="geometry" />
+        </mxCell>
+        <mxCell id="match-dim-license" edge="1" parent="1" source="fact-match" target="dim-license" style="html=1;rounded=1;strokeColor=#75928e;strokeWidth=1.7;startArrow=ERmany;endArrow=ERmandOne;exitX=1;exitY=0.19;entryX=0;entryY=0.58;exitPerimeter=1;entryPerimeter=1;dashed=0;labelBackgroundColor=#ffffff;fontColor=#496263;fontFamily=Malgun Gothic;fontSize=14;" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="event-dim-license" edge="1" parent="1" source="fact-event" target="dim-license" style="html=1;rounded=1;strokeColor=#75928e;strokeWidth=1.7;startArrow=ERmany;endArrow=ERmandOne;exitX=0;exitY=0.19;entryX=1;entryY=0.58;exitPerimeter=1;entryPerimeter=1;dashed=0;labelBackgroundColor=#ffffff;fontColor=#496263;fontFamily=Malgun Gothic;fontSize=14;" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dim-establishment" parent="1" value="dim_establishment" vertex="1" style="shape=table;startSize=38;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;fontColor=#183838;fontFamily=Consolas;fontSize=18;html=1;fillColor=#eef4ea;strokeColor=#aac2be;align=left;spacingLeft=12;">
+          <mxGeometry x="500" y="281" width="320" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="dim-establishment-row-0" parent="dim-establishment" value="&lt;b&gt;Grain&lt;/b&gt;　사업장 1곳" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="38.000" width="320" height="23.880" as="geometry" />
+        </mxCell>
+        <mxCell id="dim-establishment-row-1" parent="dim-establishment" value="&lt;b&gt;PK&lt;/b&gt;　establishment_key" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="62.000" width="320" height="23.880" as="geometry" />
+        </mxCell>
+        <mxCell id="dim-establishment-row-2" parent="dim-establishment" value="account_key · site_key" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="86.000" width="320" height="23.880" as="geometry" />
+        </mxCell>
+        <mxCell id="match-dim-establishment" edge="1" parent="1" source="fact-match" target="dim-establishment" style="html=1;rounded=1;strokeColor=#75928e;strokeWidth=1.7;startArrow=ERmany;endArrow=ERmandOne;exitX=1;exitY=0.5;entryX=0;entryY=0.58;exitPerimeter=1;entryPerimeter=1;dashed=0;labelBackgroundColor=#ffffff;fontColor=#496263;fontFamily=Malgun Gothic;fontSize=14;" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="event-dim-establishment" edge="1" parent="1" source="fact-event" target="dim-establishment" style="html=1;rounded=1;strokeColor=#75928e;strokeWidth=1.7;startArrow=ERmany;endArrow=ERmandOne;exitX=0;exitY=0.5;entryX=1;entryY=0.58;exitPerimeter=1;entryPerimeter=1;dashed=0;labelBackgroundColor=#ffffff;fontColor=#496263;fontFamily=Malgun Gothic;fontSize=14;" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="dim-date" parent="1" value="dim_date" vertex="1" style="shape=table;startSize=38;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;fontColor=#183838;fontFamily=Consolas;fontSize=18;html=1;fillColor=#eef4ea;strokeColor=#aac2be;align=left;spacingLeft=12;">
+          <mxGeometry x="500" y="438" width="320" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="dim-date-row-0" parent="dim-date" value="&lt;b&gt;Grain&lt;/b&gt;　달력 날짜 1일" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="38.000" width="320" height="23.880" as="geometry" />
+        </mxCell>
+        <mxCell id="dim-date-row-1" parent="dim-date" value="&lt;b&gt;PK&lt;/b&gt;　date_key" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="62.000" width="320" height="23.880" as="geometry" />
+        </mxCell>
+        <mxCell id="dim-date-row-2" parent="dim-date" value="calendar_dtm" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="86.000" width="320" height="23.880" as="geometry" />
+        </mxCell>
+        <mxCell id="match-dim-date" edge="1" parent="1" source="fact-match" target="dim-date" style="html=1;rounded=1;strokeColor=#75928e;strokeWidth=1.7;startArrow=ERmany;endArrow=ERmandOne;exitX=1;exitY=0.81;entryX=0;entryY=0.58;exitPerimeter=1;entryPerimeter=1;dashed=0;labelBackgroundColor=#ffffff;fontColor=#496263;fontFamily=Malgun Gothic;fontSize=14;" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="event-dim-date" edge="1" parent="1" source="fact-event" target="dim-date" style="html=1;rounded=1;strokeColor=#75928e;strokeWidth=1.7;startArrow=ERmany;endArrow=ERmandOne;exitX=0;exitY=0.81;entryX=1;entryY=0.58;exitPerimeter=1;entryPerimeter=1;dashed=0;labelBackgroundColor=#ffffff;fontColor=#496263;fontFamily=Malgun Gothic;fontSize=14;" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="selected-event" edge="1" parent="1" source="fact-match" target="fact-event" style="html=1;rounded=1;strokeColor=#5f8279;strokeWidth=1.7;startArrow=ERmany;endArrow=ERzeroToOne;exitX=0.5;exitY=1;entryX=0.5;entryY=1;exitPerimeter=1;entryPerimeter=1;dashed=1;labelBackgroundColor=#ffffff;fontColor=#496263;fontFamily=Malgun Gothic;fontSize=14;" value="유효기간 후보가 한 건일 때만 연결">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="226" y="586" />
+              <mxPoint x="1097" y="586" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="star-legend" parent="1" value="실선  차원 참조    ·    점선  선택된 인허가 이력 (점검당 0~1건)" vertex="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Malgun Gothic;fontSize=16;fontStyle=0;fontColor=#496263;">
+          <mxGeometry x="38" y="616" width="1220" height="28" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="team-model" name="01~05 · 통합 검토안">
+    <mxGraphModel grid="1" gridSize="10" guides="1" connect="1" arrows="1" page="1" pageScale="1" pageWidth="1320" pageHeight="680" math="0" shadow="0" background="#ffffff">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="integration-title" parent="1" value="01~05 공용 점검 모델 · 통합 검토안" vertex="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Malgun Gothic;fontSize=35;fontStyle=1;fontColor=#183838;">
+          <mxGeometry x="36" y="22" width="1220" height="54" as="geometry" />
+        </mxCell>
+        <mxCell id="integration-caption" parent="1" value="점검 키로 관점별 결과를 연결하고, 여러 행이 붙는 결과는 점검 단위로 집계한 뒤 결합합니다." vertex="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Malgun Gothic;fontSize=18;fontStyle=0;fontColor=#496263;">
+          <mxGeometry x="38" y="77" width="1220" height="36" as="geometry" />
+        </mxCell>
+        <mxCell id="inspection" parent="1" value="01 · fact_inspection" vertex="1" style="shape=table;startSize=38;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;fontColor=#183838;fontFamily=Consolas;fontSize=18;html=1;fillColor=#d3ebe5;strokeColor=#aac2be;align=left;spacingLeft=12;">
+          <mxGeometry x="443" y="252" width="371" height="153" as="geometry" />
+        </mxCell>
+        <mxCell id="inspection-row-0" parent="inspection" value="&lt;b&gt;Grain&lt;/b&gt;　점검 1건" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="38.000" width="371" height="28.630" as="geometry" />
+        </mxCell>
+        <mxCell id="inspection-row-1" parent="inspection" value="&lt;b&gt;PK&lt;/b&gt;　inspection_key" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="66.750" width="371" height="28.630" as="geometry" />
+        </mxCell>
+        <mxCell id="inspection-row-2" parent="inspection" value="&lt;b&gt;측정값&lt;/b&gt;　평가·불합격 건수의 집계 기준" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="95.500" width="371" height="28.630" as="geometry" />
+        </mxCell>
+        <mxCell id="inspection-row-3" parent="inspection" value="&lt;b&gt;분석 축&lt;/b&gt;　날짜 · 결과 · 시설 · 유형 · 위험등급" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="124.250" width="371" height="28.630" as="geometry" />
+        </mxCell>
+        <mxCell id="date" parent="1" value="dim_date" vertex="1" style="shape=table;startSize=38;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;fontColor=#183838;fontFamily=Consolas;fontSize=18;html=1;fillColor=#eef4ea;strokeColor=#aac2be;align=left;spacingLeft=12;">
+          <mxGeometry x="36" y="158" width="315" height="96" as="geometry" />
+        </mxCell>
+        <mxCell id="date-row-0" parent="date" value="&lt;b&gt;Grain&lt;/b&gt;　날짜 1일" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="38.000" width="315" height="28.880" as="geometry" />
+        </mxCell>
+        <mxCell id="date-row-1" parent="date" value="&lt;b&gt;PK 후보&lt;/b&gt;　date_key" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="67.000" width="315" height="28.880" as="geometry" />
+        </mxCell>
+        <mxCell id="categories" parent="1" value="점검 분류 차원" vertex="1" style="shape=table;startSize=38;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;fontColor=#183838;fontFamily=Consolas;fontSize=18;html=1;fillColor=#eef4ea;strokeColor=#aac2be;align=left;spacingLeft=12;">
+          <mxGeometry x="36" y="405" width="315" height="96" as="geometry" />
+        </mxCell>
+        <mxCell id="categories-row-0" parent="categories" value="&lt;b&gt;Grain&lt;/b&gt;　표준 코드 1개" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="38.000" width="315" height="28.880" as="geometry" />
+        </mxCell>
+        <mxCell id="categories-row-1" parent="categories" value="결과 · 시설 · 점검 유형 · 위험등급" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="67.000" width="315" height="28.880" as="geometry" />
+        </mxCell>
+        <mxCell id="violation" parent="1" value="02 · 위반 관측" vertex="1" style="shape=table;startSize=38;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;fontColor=#183838;fontFamily=Consolas;fontSize=18;html=1;fillColor=#eef4ea;strokeColor=#aac2be;align=left;spacingLeft=12;">
+          <mxGeometry x="922" y="130" width="360" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="violation-row-0" parent="violation" value="&lt;b&gt;Grain&lt;/b&gt;　점검 × 코드 버전 × 위반 코드" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="38.000" width="360" height="30.880" as="geometry" />
+        </mxCell>
+        <mxCell id="violation-row-1" parent="violation" value="&lt;b&gt;측정값&lt;/b&gt;　위반 코드별 관측 건수" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="69.000" width="360" height="30.880" as="geometry" />
+        </mxCell>
+        <mxCell id="repeat" parent="1" value="03 · 후속·반복 마트" vertex="1" style="shape=table;startSize=38;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;fontColor=#183838;fontFamily=Consolas;fontSize=18;html=1;fillColor=#eef4ea;strokeColor=#aac2be;align=left;spacingLeft=12;">
+          <mxGeometry x="922" y="256" width="360" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="repeat-row-0" parent="repeat" value="&lt;b&gt;Grain&lt;/b&gt;　기준 점검 또는 기준 점검 × 코드" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="38.000" width="360" height="30.880" as="geometry" />
+        </mxCell>
+        <mxCell id="repeat-row-1" parent="repeat" value="&lt;b&gt;측정값&lt;/b&gt;　후속 연결 수 · 재관측 수" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="69.000" width="360" height="30.880" as="geometry" />
+        </mxCell>
+        <mxCell id="license" parent="1" value="04 · 인허가 매칭" vertex="1" style="shape=table;startSize=38;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;fontColor=#183838;fontFamily=Consolas;fontSize=18;html=1;fillColor=#eef4ea;strokeColor=#aac2be;align=left;spacingLeft=12;">
+          <mxGeometry x="922" y="382" width="360" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="license-row-0" parent="license" value="&lt;b&gt;Grain&lt;/b&gt;　점검 1건" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="38.000" width="360" height="30.880" as="geometry" />
+        </mxCell>
+        <mxCell id="license-row-1" parent="license" value="&lt;b&gt;측정값&lt;/b&gt;　기간 후보 수" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="69.000" width="360" height="30.880" as="geometry" />
+        </mxCell>
+        <mxCell id="area" parent="1" value="05 · 지역 배정과 집계" vertex="1" style="shape=table;startSize=38;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=0;fontStyle=1;fontColor=#183838;fontFamily=Consolas;fontSize=18;html=1;fillColor=#eef4ea;strokeColor=#aac2be;align=left;spacingLeft=12;">
+          <mxGeometry x="922" y="508" width="360" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="area-row-0" parent="area" value="&lt;b&gt;Grain&lt;/b&gt;　점검 1건 → 지역 × 기간 집계" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="38.000" width="360" height="30.880" as="geometry" />
+        </mxCell>
+        <mxCell id="area-row-1" parent="area" value="&lt;b&gt;측정값&lt;/b&gt;　평가 건수 · 불합격 건수" vertex="1" style="shape=tableRow;horizontal=1;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=#ffffff;strokeColor=none;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacingLeft=12;collapsible=0;dropTarget=0;fontColor=#183838;fontFamily=Malgun Gothic;fontSize=15;">
+          <mxGeometry x="0" y="69.000" width="360" height="30.880" as="geometry" />
+        </mxCell>
+        <mxCell id="inspection-date" edge="1" parent="1" source="inspection" target="date" style="html=1;rounded=1;strokeColor=#75928e;strokeWidth=1.7;startArrow=ERmany;endArrow=ERmandOne;exitX=0;exitY=0.25;entryX=1;entryY=0.55;exitPerimeter=1;entryPerimeter=1;dashed=0;labelBackgroundColor=#ffffff;fontColor=#496263;fontFamily=Malgun Gothic;fontSize=14;" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="inspection-category" edge="1" parent="1" source="inspection" target="categories" style="html=1;rounded=1;strokeColor=#75928e;strokeWidth=1.7;startArrow=ERmany;endArrow=ERmandOne;exitX=0;exitY=0.75;entryX=1;entryY=0.55;exitPerimeter=1;entryPerimeter=1;dashed=0;labelBackgroundColor=#ffffff;fontColor=#496263;fontFamily=Malgun Gothic;fontSize=14;" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="violation-inspection" edge="1" parent="1" source="violation" target="inspection" style="html=1;rounded=1;strokeColor=#5f8279;strokeWidth=1.7;startArrow=none;endArrow=none;exitX=0;exitY=0.55;entryX=1;entryY=0.2;exitPerimeter=1;entryPerimeter=1;dashed=1;labelBackgroundColor=#ffffff;fontColor=#496263;fontFamily=Malgun Gothic;fontSize=14;" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="repeat-inspection" edge="1" parent="1" source="repeat" target="inspection" style="html=1;rounded=1;strokeColor=#5f8279;strokeWidth=1.7;startArrow=none;endArrow=none;exitX=0;exitY=0.55;entryX=1;entryY=0.39;exitPerimeter=1;entryPerimeter=1;dashed=1;labelBackgroundColor=#ffffff;fontColor=#496263;fontFamily=Malgun Gothic;fontSize=14;" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="license-inspection" edge="1" parent="1" source="license" target="inspection" style="html=1;rounded=1;strokeColor=#5f8279;strokeWidth=1.7;startArrow=none;endArrow=none;exitX=0;exitY=0.55;entryX=1;entryY=0.61;exitPerimeter=1;entryPerimeter=1;dashed=1;labelBackgroundColor=#ffffff;fontColor=#496263;fontFamily=Malgun Gothic;fontSize=14;" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="area-inspection" edge="1" parent="1" source="area" target="inspection" style="html=1;rounded=1;strokeColor=#5f8279;strokeWidth=1.7;startArrow=none;endArrow=none;exitX=0;exitY=0.55;entryX=1;entryY=0.8;exitPerimeter=1;entryPerimeter=1;dashed=1;labelBackgroundColor=#ffffff;fontColor=#496263;fontFamily=Malgun Gothic;fontSize=14;" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="integration-legend" parent="1" value="점선은 공용 점검 키로 연결하는 통합 후보를 뜻합니다. 상세한 키와 지표는 요구사항 문서에 있습니다." vertex="1" style="text;html=1;whiteSpace=wrap;align=left;verticalAlign=middle;spacing=0;fontFamily=Malgun Gothic;fontSize=16;fontStyle=0;fontColor=#496263;">
+          <mxGeometry x="38" y="630" width="1220" height="28" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
