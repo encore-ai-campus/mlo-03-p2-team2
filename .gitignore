@@ -76,6 +76,7 @@ Thumbs.db
 /data/02_silver/02_violation/02_inspection_violations.parquet
 /data/02_silver/02_violation/02_inspection_violations_accepted.parquet
 /data/03_gold/02_violation/02_fact_inspection_violation.parquet
+/data/03_gold/facts/02_fact_inspection_violation.parquet
 !/data/02_silver/02_violation/02_inspection_violations.parquet.part-00[12]
 !/data/02_silver/02_violation/02_inspection_violations_accepted.parquet.part-00[12]
 !/data/03_gold/02_violation/02_fact_inspection_violation.parquet.part-00[12]
